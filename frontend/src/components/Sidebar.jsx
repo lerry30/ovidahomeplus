@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import AppLogo from '@/components/Logo';
+import AppLogo from '@/components/AppLogo';
 
 const SidebarLayout = () => {
     return (
