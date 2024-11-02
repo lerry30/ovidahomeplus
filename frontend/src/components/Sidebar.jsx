@@ -13,9 +13,9 @@ const SidebarLayout = () => {
                 className="rounded-l-full px-4 py-2 leading-none">
                     Inventory
             </NavLink>
-            <NavLink to="/admin/test" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
+            <NavLink to="/admin/supplier" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
                 className="rounded-l-full px-4 py-2 leading-none">
-                    Test
+                    Supplier
             </NavLink>
             <Outlet />
         </div>
