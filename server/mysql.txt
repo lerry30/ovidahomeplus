@@ -1,0 +1,79 @@
+CREATE DATABASE flow_database;
+USE flow_database;
+
+CREATE TABLE info(
+	id INT PRIMARY KEY AUTO_INCREMENT, 
+	firstname VARCHAR(255) NOT NULL, 
+	lastname VARCHAR(255) NOT NULL, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE employees(
+	id INT PRIMARY KEY AUTO_INCREMENT, 
+    info_id INT NOT NULL,
+	username VARCHAR(255) NOT NULL UNIQUE,
+	password VARCHAR(255) NOT NULL, 
+    FOREIGN KEY(info_id) REFERENCES info(id)
+);
+
+CREATE TABLE players(
+	id INT PRIMARY KEY AUTO_INCREMENT, 
+    info_id INT NOT NULL,
+    status INT DEFAULT 0,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    added_by INT NOT NULL,
+    FOREIGN KEY(info_id) REFERENCES info(id),
+    FOREIGN KEY (added_by) REFERENCES employees(id)
+);
+
+CREATE TABLE transactions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    player_id INT NOT NULL,
+    units INT UNSIGNED NOT NULL,
+    action ENUM("IN", "OUT") NOT NULL,
+    note VARCHAR(255) DEFAULT '',
+    added_by INT NOT NULL,
+    deleted TINYINT(1) DEFAULT 0,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (player_id) REFERENCES players(id),
+    FOREIGN KEY (added_by) REFERENCES employees(id)
+);
+
+CREATE TABLE profits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    revenue INT UNSIGNED NOT NULL,
+    revenue_note VARCHAR(255) NOT NULL,
+    added_by INT NOT NULL,
+    entry_date DATE NOT NULL,
+    entry_time TIME NOT NULL,
+    FOREIGN KEY (added_by) REFERENCES employees(id)
+);
+
+CREATE TABLE losses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    expense INT UNSIGNED NOT NULL,
+    expense_note VARCHAR(255) NOT NULL,
+    added_by INT NOT NULL,
+    entry_date DATE NOT NULL,
+    entry_time TIME NOT NULL,
+    FOREIGN KEY (added_by) REFERENCES employees(id)
+);
+
+CREATE TABLE xcashflow (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    amount INT NOT NULL,
+    note VARCHAR(255) NOT NULL,
+    added_by INT NOT NULL,
+    entry_date DATE NOT NULL,
+    entry_time TIME NOT NULL,
+    FOREIGN KEY (added_by) REFERENCES employees(id)
+);
+
+-- Adding indexes for optimization
+CREATE INDEX idx_info_id ON employees(info_id);
+CREATE INDEX idx_player_id ON transactions(player_id);
+
+-- [mysqld]
+-- default-time-zone = '+10:00'
+
