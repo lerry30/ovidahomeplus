@@ -21,9 +21,9 @@ const authUser = requestHandler(async (req, res, database) => {
     if(user.length > 0) {
         const {employee_id, firstname, lastname, username, password: hashedPassword} = user[0];
         const value = `${employee_id}-${username}`;
-        const token = generateToken(value);
+        generateToken(res, value);
         if(user && (await bcrypt.compare(password, hashedPassword))) {
-            res.status(200).json({id: employee_id, token, firstname, lastname, username});
+            res.status(200).json({id: employee_id, firstname, lastname, username});
             return;
         }
     }
@@ -69,11 +69,10 @@ const registerUser = requestHandler(async (req, res, database) => {
         if(employeeId) {
             const id = employeeId;
             const value = `${employeeId}-${username}`;
-            const token = generateToken(value);
+            generateToken(res, value);
 
             res.status(201).json({
                 id: employeeId,
-                token: token,
                 firstname: firstname,
                 lastname: lastname,
                 username: username,
