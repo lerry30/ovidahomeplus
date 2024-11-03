@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
-import * as mysqlStatements from '../mysql/statements.js';
+import * as employeeStmt from '../mysql/employee.js';
 import { requestHandler } from '../utils/requestHandler.js';
 
 /*
@@ -9,14 +9,14 @@ import { requestHandler } from '../utils/requestHandler.js';
    access   public
 */
 const authUser = requestHandler(async (req, res, database) => {
-    const username = req.body?.username?.trim();
-    const password = req.body?.password?.trim();
+    const username = String(req.body?.username).trim();
+    const password = String(req.body?.password).trim();
 
     if(!username || !password) {
         throw {status: 400, message: 'All fields are required.'};
     }
 
-    const [user] = await database.execute(mysqlStatements.employeeWithPassword, [username]);
+    const [user] = await database.execute(employeeStmt.employeeWithPassword, [username]);
 
     if(user.length > 0) {
         const {employee_id, firstname, lastname, username, password: hashedPassword} = user[0];
@@ -37,13 +37,16 @@ const authUser = requestHandler(async (req, res, database) => {
    access   public
 */
 const registerUser = requestHandler(async (req, res, database) => {
-    const { firstname, lastname, username, password } = req.body;
+    const firstname = String(req.body?.firstname).trim();
+    const lastname = String(req.body?.lastname).trim();
+    const username = String(req.body?.username).trim();
+    const password = String(req.body?.password).trim();
     
     if(!firstname || !lastname || !username || !password) {
         throw {status: 400, message: 'All fields are required.'};
     }
 
-    const [userExists] = await database.execute(mysqlStatements.username, [username]);
+    const [userExists] = await database.execute(employeeStmt.username, [username]);
 
     if(userExists.length > 0) {
         throw {status: 400, message: 'Username unavailable. Please try a different one'};
@@ -52,34 +55,25 @@ const registerUser = requestHandler(async (req, res, database) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const [newInfoResult] = await database.execute(
-        mysqlStatements.newInfo, 
-        [firstname, lastname]
+    const [newEmployeeResult] = await database.execute(
+        employeeStmt.newEmployee, 
+        [firstname, lastname, username, hashedPassword]
     );
+    
+    const employeeId = newEmployeeResult?.insertId;
+    if(employeeId) {
+        const id = employeeId;
+        const value = `${employeeId}-${username}`;
+        generateToken(res, value);
 
-    const infoId = newInfoResult?.insertId;
+        res.status(201).json({
+            id: employeeId,
+            firstname: firstname,
+            lastname: lastname,
+            username: username,
+        });
 
-    if(infoId) {
-        const [newEmployeeResult] = await database.execute(
-            mysqlStatements.newEmployee, 
-            [infoId, username, hashedPassword]
-        );
-        
-        const employeeId = newEmployeeResult?.insertId;
-        if(employeeId) {
-            const id = employeeId;
-            const value = `${employeeId}-${username}`;
-            generateToken(res, value);
-
-            res.status(201).json({
-                id: employeeId,
-                firstname: firstname,
-                lastname: lastname,
-                username: username,
-            });
-
-            return;
-        }
+        return;
     }
 
     throw {status: 400, message: 'Invalid user data'};

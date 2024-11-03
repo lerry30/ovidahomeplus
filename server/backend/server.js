@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectToDB from './config/db.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 
 import userRoutes from './routes/userRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
@@ -19,6 +20,8 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
 });
+
+app.use(cors());
 
 // Use Helmet for security
 app.use(helmet());

@@ -12,12 +12,12 @@ const SignIn = () => {
                 <form className="flex justify-center items-center flex-col bg-white rounded-md py-6 px-6 lg:px-10">
                     <h1 className="font-bold text-3xl">Sign In</h1>
                     <div className="flex flex-col py-2 px-4 gap-2">
-                        <label htmlFor="supplier-name" className="font-semibold pl-1">Username</label>
-                        <input id="supplier-name" autoFocus={true} className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Username"/>
+                        <label htmlFor="username" className="font-semibold pl-1">Username</label>
+                        <input id="username" autoFocus={true} className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Username"/>
                     </div>
                     <div className="flex flex-col py-2 px-4 gap-2">
-                        <label htmlFor="supplier-name" className="font-semibold pl-1">Password</label>
-                        <input type="password" id="supplier-name" className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Password"/>
+                        <label htmlFor="password" className="font-semibold pl-1">Password</label>
+                        <input type="password" id="password" className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Password"/>
                     </div>
                     <div className="px-4 py-2">
                         <button className="w-[300px] flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">Sign In</button>
