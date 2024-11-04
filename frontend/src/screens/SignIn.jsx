@@ -70,7 +70,7 @@ const SignIn = () => {
                             value={data?.username}
                             onChange={elem => setData(state => ({...state, username: elem.target.value}))}
                             autoFocus={true} 
-                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4 leading-none" 
+                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4 leading-3" 
                             placeholder="Username"
                             autoComplete="username"
                             required
@@ -88,7 +88,7 @@ const SignIn = () => {
                                 id="password"
                                 value={data?.password}
                                 onChange={elem => setData(state => ({...state, password: elem.target.value}))}
-                                className="w-full h-full outline-none leading-none px-4 py-2"
+                                className="w-full h-full outline-none leading-3 px-4 py-2"
                                 placeholder="Password"
                                 autoComplete="current-password"
                                 required

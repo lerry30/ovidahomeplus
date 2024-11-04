@@ -10,3 +10,11 @@ CREATE TABLE employees(
 	image VARCHAR(255) DEFAULT '',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE suppliers(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	contact VARCHAR(255) NOT NULL,
+	status ENUM('active', 'inactive') DEFAULT 'active',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

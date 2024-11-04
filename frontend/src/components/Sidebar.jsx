@@ -1,21 +1,27 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { LayoutDashboard, ListCollapse, Truck } from 'lucide-react';
 import AppLogo from '@/components/AppLogo';
 
 const SidebarLayout = () => {
     return (
-        <div className="fixed w-admin-sidebar h-screen flex flex-col py-4 pl-4 gap-4">
-            <AppLogo />
+        <div className="fixed w-admin-sidebar-sm lg:w-admin-sidebar-lg h-screen flex flex-col py-4 pl-4 gap-4">
+            <div className="hidden lg:flex">
+                <AppLogo />
+            </div>
             <NavLink to="/admin" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}}
-                className="rounded-l-full px-4 py-2 leading-none mt-2">
-                    Dashboard
+                className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none mt-2">
+                    <LayoutDashboard />
+                    <span className="hidden lg:flex">Dashboard</span>
             </NavLink>
             <NavLink to="/admin/inventory" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
-                className="rounded-l-full px-4 py-2 leading-none">
-                    Inventory
+                className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
+                    <ListCollapse />
+                    <span className="hidden lg:flex">Inventory</span>
             </NavLink>
             <NavLink to="/admin/supplier" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
-                className="rounded-l-full px-4 py-2 leading-none">
-                    Supplier
+                className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
+                    <Truck />
+                    <span className="hidden lg:flex">Supplier</span>
             </NavLink>
             <Outlet />
         </div>

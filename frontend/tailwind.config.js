@@ -7,10 +7,12 @@ export default {
   	theme: {
     	extend: {
 			width: {
-				'admin-sidebar': 'var(--admin-sidebar-width)'
+				'admin-sidebar-sm': 'var(--admin-sidebar-width-sm)',
+				'admin-sidebar-lg': 'var(--admin-sidebar-width-lg)'
 			},
 			inset: {
-				'admin-sidebar': 'var(--admin-sidebar-width)'
+				'admin-sidebar-sm': 'var(--admin-sidebar-width-sm)',
+				'admin-sidebar-lg': 'var(--admin-sidebar-width-lg)'
 			}
     	},
   	},

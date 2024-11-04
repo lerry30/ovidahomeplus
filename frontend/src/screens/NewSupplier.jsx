@@ -18,14 +18,14 @@ const NewSupplier = () => {
                 <section className="bg-white rounded-md p-4">
                     <ImageUpload fileData={[image, setImage]} className="size-[100px]" />
                 </section>
-                <section className="lg:col-start-2 lg:col-span-3 bg-white rounded-md p-4">
+                <section className="lg:col-start-2 lg:col-span-3 bg-white rounded-md p-4 flex flex-col gap-2">
                     <h3 className="font-bold text-lg">Supplier Details</h3>
                     <hr />
-                    <div className="flex flex-col sm:px-4 sm:py-2 gap-2">
+                    <div className="flex flex-col sm:px-4 gap-2">
                         <label htmlFor="supplier-name" className="font-semibold">Supplier Name</label>
                         <input id="supplier-name" className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Supplier Name"/>
                     </div>
-                    <div className="flex flex-col sm:px-4 sm:py-2 gap-2">
+                    <div className="flex flex-col sm:px-4 gap-2">
                         <label htmlFor="supplier-name" className="font-semibold">Supplier Contact</label>
                         <input id="supplier-name" className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Supplier Contact"/>
                     </div>

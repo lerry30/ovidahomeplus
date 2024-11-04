@@ -7,7 +7,8 @@
 	margin: 0;
 	box-sizing: border-box;
 
-	--admin-sidebar-width: 240px;
+	--admin-sidebar-width-sm: 80px;
+	--admin-sidebar-width-lg: 240px;
 }
 
 body {
