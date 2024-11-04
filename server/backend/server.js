@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import cors from 'cors';
 
 import userRoutes from './routes/userRoutes.js';
+import supplierRoutes from './routes/supplierRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use('/api/users', userRoutes);
+app.use('/api/suppliers', supplierRoutes);
 
 // fall back when route is not found
 app.use(notFound);

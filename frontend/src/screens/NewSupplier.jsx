@@ -2,9 +2,30 @@ import { useState } from 'react';
 
 import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
+import Loading from '@/components/Loading';
+import ErrorField from '@/components/ErrorField';
 
 const NewSupplier = () => {
+    const [data, setData] = useState({name: '', contact: ''});
     const [image, setImage] = useState(undefined);
+    const [errorData, setErrorData] = useState({name: '', default: ''});
+    const [loading, setLoading] = useState(false);
+
+    const supplier = () => {
+        try {
+            setLoading(true);
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if(loading) {
+        return (
+            <Loading customStyle="w-full h-screen" />
+        )
+    }
 
     return (
         <div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
@@ -22,16 +43,34 @@ const NewSupplier = () => {
                     <h3 className="font-bold text-lg">Supplier Details</h3>
                     <hr />
                     <div className="flex flex-col sm:px-4 gap-2">
-                        <label htmlFor="supplier-name" className="font-semibold">Supplier Name</label>
-                        <input id="supplier-name" className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Supplier Name"/>
+                        <label htmlFor="supplier-name" className="font-semibold">
+                            Supplier Name
+                            <span className="text-red-500">*</span>
+                        </label>
+                        <input 
+                            id="supplier-name"
+                            value={data?.name}
+                            onChange={elem => setData(state => ({...state, name: elem.target.value}))}
+                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            placeholder="Supplier Name"
+                            required
+                        />
+                        <ErrorField message={errorData?.name || ''} />
                     </div>
                     <div className="flex flex-col sm:px-4 gap-2">
                         <label htmlFor="supplier-name" className="font-semibold">Supplier Contact</label>
-                        <input id="supplier-name" className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" placeholder="Supplier Contact"/>
+                        <input 
+                            id="supplier-name"
+                            value={data?.contact}
+                            onChange={elem => setData(state => ({...state, contact: elem.target.value}))}
+                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            placeholder="Supplier Contact(Optional)"
+                        />
                     </div>
                     <div className="sm:px-4 sm:py-2">
-                        <button className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">Add Supplier</button>
+                        <button onClick={supplier} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">Add Supplier</button>
                     </div>
+                    <ErrorField message={errorData?.default || ''} />
                 </section>
             </main>
         </div>
