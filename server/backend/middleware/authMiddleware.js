@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import * as mysqlStatements from '../mysql/statements.js';
+import * as employeeStmt from '../mysql/statements.js';
 import { requestHandler } from '../utils/requestHandler.js';
 
 const protect = requestHandler(async (req, res, database, next) => {
@@ -10,7 +10,7 @@ const protect = requestHandler(async (req, res, database, next) => {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const [id, username] = decoded.value.split('-');
-            const [rows] = await database.execute(mysqlStatements.employee, [username]);
+            const [rows] = await database.execute(employeeStmt.employee, [username]);
             if(rows.length > 0) {
                 req.user = rows[0];
                 next();

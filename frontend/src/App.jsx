@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useLayoutEffect } from 'react';
+import { zUser } from './store/user';
 
 import SidebarRoute from '@/routes/SidebarRoute';
 import SignUp from '@/screens/SignUp';
@@ -16,7 +17,7 @@ const App = () => {
 		const segments = pathname?.trim()?.replace(/^\//, '')?.split('/');
 		const fSegment = segments?.length > 0 ? segments[0]?.toLowerCase() : '';
 
-		if(fSegment === 'admin') {
+		if(fSegment === 'admin' && !zUser.getState()?.username) {
 			navigate('/signin');
 			location.reload();
 		}
