@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { zUser } from '@/store/user';
+import { Eye, EyeOff } from 'lucide-react';
 
 import OvidaHomePlus from '../../public/ovida-front.jpg';
 import Loading from '@/components/Loading';
@@ -12,6 +13,7 @@ const SignIn = () => {
     const [data, setData] = useState({username: '', password: ''});
     const [errorData, setErrorData] = useState({username: '', password: '', default: ''});
     const [loading, setLoading] = useState(false);
+    const [togglePasswordDisplay, setTogglePasswordDisplay] = useState(false);
 
     const navigate = useNavigate();
 
@@ -56,7 +58,7 @@ const SignIn = () => {
                 <img src={OvidaHomePlus} alt="Ovida Home Plus" className="w-full h-full min-h-screen object-cover"/>
             </section>
             <section className="absolute lg:static w-full min-h-screen flex flex-col justify-center items-center bg-neutral-300/25 backdrop-blur-sm">
-                <form onSubmit={signin} className="flex justify-center items-center flex-col bg-white rounded-md py-6 px-6 lg:px-10">
+                <form onSubmit={signin} className="flex justify-center items-center flex-col bg-white rounded-lg py-6 px-6 lg:px-10">
                     <h1 className="font-bold text-3xl text-neutral-600">Sign In</h1>
                     <div className="flex flex-col py-2 px-4 gap-2">
                         <label htmlFor="username" className="font-semibold pl-1">
@@ -68,7 +70,7 @@ const SignIn = () => {
                             value={data?.username}
                             onChange={elem => setData(state => ({...state, username: elem.target.value}))}
                             autoFocus={true} 
-                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4 leading-none" 
                             placeholder="Username"
                             autoComplete="username"
                             required
@@ -80,16 +82,24 @@ const SignIn = () => {
                             Password
                             <span className="text-red-500">*</span>
                         </label>
-                        <input 
-                            type="password" 
-                            id="password"
-                            value={data?.password}
-                            onChange={elem => setData(state => ({...state, password: elem.target.value}))}
-                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
-                            placeholder="Password"
-                            autoComplete="current-password"
-                            required
-                        />
+                        <div className="w-[300px] flex border-2 border-neutral-400 rounded-full overflow-hidden">
+                            <input 
+                                type={togglePasswordDisplay ? 'text' : 'password'}
+                                id="password"
+                                value={data?.password}
+                                onChange={elem => setData(state => ({...state, password: elem.target.value}))}
+                                className="w-full h-full outline-none leading-none px-4 py-2"
+                                placeholder="Password"
+                                autoComplete="current-password"
+                                required
+                            />
+                            <button onClick={ev => {
+                                ev.preventDefault();
+                                setTogglePasswordDisplay(state => !state);
+                            } } className="pr-4" tabIndex="-1">
+                                { togglePasswordDisplay ? <Eye /> : <EyeOff /> }
+                            </button>
+                        </div>
                         <ErrorField message={errorData?.password || ''} />
                     </div>
                     <div className="px-4 py-2">

@@ -40,7 +40,6 @@ const SignUp = () => {
             if(response) {
                 zUser.getState().save(response?.firstname, response?.lastname, response?.username);
                 navigate('/admin');
-                location.reload();
             }
         } catch(error) {
             console.log(error);
@@ -63,7 +62,7 @@ const SignUp = () => {
                 <img src={OvidaHomePlus} alt="Ovida Home Plus" className="w-full h-full min-h-screen object-cover"/>
             </section>
             <section className="absolute lg:static w-full min-h-screen flex flex-col justify-center items-center bg-neutral-300/25 backdrop-blur-sm">
-                <form onSubmit={signup} className="flex justify-center items-center flex-col bg-white rounded-md py-10 px-6 lg:p-10">
+                <form onSubmit={signup} className="flex justify-center items-center flex-col bg-white rounded-lg py-10 px-6 lg:p-10">
                     <h1 className="font-bold text-3xl text-neutral-600">Sign Up</h1>
                     <div className="flex flex-col py-1 px-4 gap-2">
                         <label htmlFor="first-name" className="font-semibold pl-1">
