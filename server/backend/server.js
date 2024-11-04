@@ -4,6 +4,7 @@ import connectToDB from './config/db.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 import userRoutes from './routes/userRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
@@ -22,7 +23,10 @@ const limiter = rateLimit({
     max: 100, // limit each IP to 100 requests per windowMs
 });
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_DOMAIN,
+    credentials: true, // Allow cookies to be sent
+}));
 
 // Use Helmet for security
 app.use(helmet());
@@ -30,6 +34,7 @@ app.use(helmet());
 // in order to use req.body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 // routes
 app.use('/api/users', userRoutes);

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { sendForm, sendJSON } from '@/utils/send';
+import { urls } from '@/constants/urls';
 
 import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
@@ -11,11 +13,31 @@ const NewSupplier = () => {
     const [errorData, setErrorData] = useState({name: '', default: ''});
     const [loading, setLoading] = useState(false);
 
-    const supplier = () => {
+    const supplier = async () => {
         try {
             setLoading(true);
+
+            const name = data?.name?.trim();
+            const contact = data?.contact?.trim();
+
+            if(!name) {
+                setErrorData(state => ({...state, name: 'Supplier name is empty.'}));
+                throw new Error('All fields are required.');
+            }
+
+            // const form = new FormData();
+            // form.append('name', name);
+            // form.append('contact', contact);
+            // form.append('image', image);
+
+            // const response = await sendForm(urls?.newsupplier, form);
+            const response = await sendJSON(urls?.newsupplier, {name, contact, image: undefined});
+            if(response) {
+                console.log(response);
+            }
         } catch(error) {
             console.log(error);
+            setErrorData(state => ({...state, default: error?.message}));
         } finally {
             setLoading(false);
         }

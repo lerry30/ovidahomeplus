@@ -4,6 +4,7 @@ import * as employeeStmt from '../mysql/statements.js';
 import { requestHandler } from '../utils/requestHandler.js';
 
 const protect = requestHandler(async (req, res, database, next) => {
+    console.log(req.cookies);
     const token = req.cookies.jwt;
 
     if(token) {

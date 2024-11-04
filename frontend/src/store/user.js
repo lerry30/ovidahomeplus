@@ -19,8 +19,6 @@ export const zUser = create(set => ({
             return;
         }
 
-        console.log('store', firstname, lastname, username);
-
         const fullName = createFullname(firstname, lastname);
         set(state => ({firstname, lastname, username, fullName}));
     }

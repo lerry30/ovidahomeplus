@@ -1,5 +1,6 @@
 export const sendJSON = async (urlPath, payload, method="POST") => {
     const res = await fetch(urlPath, {
+        credentials: 'include',
         method: method,
         headers: {
             'Content-Type': 'application/json',
@@ -18,6 +19,7 @@ export const sendJSON = async (urlPath, payload, method="POST") => {
 
 export const sendForm = async (urlPath, form, method="POST") => {
     const res = await fetch(urlPath, {
+        credentials: 'include',
         method: method,
         body: form
     });
