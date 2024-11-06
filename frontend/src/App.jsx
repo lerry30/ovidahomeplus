@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { zUser } from './store/user';
 
 import SidebarRoute from '@/routes/SidebarRoute';
@@ -8,20 +8,39 @@ import SignIn from '@/screens/SignIn';
 import NewItem from '@/screens/NewItem';
 import NewSupplier from '@/screens/NewSupplier';
 import NotFound from '@/screens/NotFound';
+import Loading from '@/components/Loading';
 
 const App = () => {
+	const [loading, setLoading] = useState(false);
+
 	const pathname = useLocation()?.pathname;
 	const navigate = useNavigate();
 
 	useLayoutEffect(() => {
 		const segments = pathname?.trim()?.replace(/^\//, '')?.split('/');
 		const fSegment = segments?.length > 0 ? segments[0]?.toLowerCase() : '';
-
-		if(fSegment === 'admin' && !zUser.getState()?.username) {
-			navigate('/signin');
-			location.reload();
+		
+		if(fSegment === 'admin') {
+			(async () => {
+				setLoading(true);
+				try {	
+					await zUser.getState()?.saveUserData();
+				} catch(error) {
+					console.log('Error 29884714398', error);
+					navigate('/signin');
+					//location.reload();
+				} finally {
+					setLoading(false);
+				}
+			})();
 		}
 	}, [pathname, navigate]);
+
+	if(loading) {
+		return (
+			<Loading customStyle="w-full h-screen" />
+		)
+	}
 
 	return (
 		<Routes>
