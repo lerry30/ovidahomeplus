@@ -1,17 +1,21 @@
 import { useState } from 'react';
-import { sendForm, sendJSON } from '@/utils/send';
+import { sendForm } from '@/utils/send';
 import { urls } from '@/constants/urls';
+import { useNavigate } from 'react-router-dom';
 
 import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
+import TitleFormat from '@/utils/titleFormat';
 
 const NewSupplier = () => {
     const [data, setData] = useState({name: '', contact: ''});
     const [image, setImage] = useState(undefined);
-    const [errorData, setErrorData] = useState({name: '', default: ''});
+    const [errorData, setErrorData] = useState({name: '', contact: '', default: ''});
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const supplier = async () => {
         try {
@@ -25,15 +29,15 @@ const NewSupplier = () => {
                 throw new Error('All fields are required.');
             }
 
-            // const form = new FormData();
-            // form.append('name', name);
-            // form.append('contact', contact);
-            // form.append('image', image);
+            const form = new FormData();
+            form.append('name', TitleFormat(name));
+            form.append('contact', contact);
+            form.append('file', image);
 
-            // const response = await sendForm(urls?.newsupplier, form);
-            const response = await sendJSON(urls?.newsupplier, {name, contact, image: undefined});
+            const response = await sendForm(urls?.newsupplier, form);
             if(response) {
-                console.log(response);
+                console.log(response?.message);
+                navigate('/admin/supplier');
             }
         } catch(error) {
             console.log(error);
@@ -41,6 +45,31 @@ const NewSupplier = () => {
         } finally {
             setLoading(false);
         }
+    }
+
+    const handleContactNumberInput = (elem) => {
+        const input = elem.target.value?.trim();
+        // Remove all non-numeric characters
+        let digits = input.replace(/\D/g, '');
+        // Restrict to a maximum of 11 digits
+        if (digits.length > 11) {
+            digits = digits.substring(0, 11);
+        }
+    
+        // Format only if the digits start with '09' and have at least 4 digits
+        if (digits.length >= 4 && digits.startsWith('09')) {
+            digits = digits.replace(/(\d{4})(\d{3})?(\d{4})?/, (match, p1, p2, p3) => {
+                if (p2 && p3) {
+                    return `${p1}-${p2}-${p3}`;
+                } else if (p2) {
+                    return `${p1}-${p2}`;
+                } else {
+                    return p1;
+                }
+            });
+        }
+        
+        setData(state => ({...state, contact: digits}))
     }
 
     if(loading) {
@@ -84,9 +113,9 @@ const NewSupplier = () => {
                         <input 
                             id="supplier-name"
                             value={data?.contact}
-                            onChange={elem => setData(state => ({...state, contact: elem.target.value}))}
+                            onChange={handleContactNumberInput}
                             className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
-                            placeholder="Supplier Contact(Optional)"
+                            placeholder="09XX-XXX-XXXX (Optional)"
                         />
                     </div>
                     <div className="sm:px-4 sm:py-2">
