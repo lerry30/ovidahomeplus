@@ -34,7 +34,7 @@ export const sendForm = async (urlPath, form, method="POST") => {
 }
 
 export const getData = async (urlPath) => {
-    const res = await fetch(urlPath);
+    const res = await fetch(urlPath, {credentials: 'include'});
 
     const payload = await res.json();
     if(!res?.ok) {
