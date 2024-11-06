@@ -1,5 +1,6 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
+import { upload } from '../utils/multerConfig.js';
 
 import {
     newSupplier
@@ -7,6 +8,9 @@ import {
 
 const router = express.Router();
 
-router.post('/new', protect, newSupplier);
+(async () => {
+    const uploadMiddleware = await upload('suppliers');
+    router.post('/new', protect, uploadMiddleware.single('file'), newSupplier);
+})();
 
 export default router;
