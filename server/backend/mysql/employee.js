@@ -1,5 +1,6 @@
 export const username = `
-    SELECT 
+    SELECT
+        id AS employeeId,
         firstname,
         lastname,
         username,
@@ -9,7 +10,8 @@ export const username = `
 `;
 
 export const employeeWithPassword = `
-    SELECT 
+    SELECT
+        id AS employeeId,
         firstname,
         lastname,
         username,
