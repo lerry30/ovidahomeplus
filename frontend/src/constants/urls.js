@@ -1,7 +1,8 @@
-const domain = 'http://192.168.1.23:4000';
+const apiUrl = 'http://localhost:4000';
 
 export const urls = {
-    signup: `${domain}/api/users/`,
-    signin: `${domain}/api/users/auth`,
-    newsupplier: `${domain}/api/suppliers/new`,
+    signup: `${apiUrl}/api/users/`,
+    signin: `${apiUrl}/api/users/auth`,
+    user: `${apiUrl}/api/users/user`,
+    newsupplier: `${apiUrl}/api/suppliers/new`,
 };
