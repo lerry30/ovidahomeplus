@@ -19,12 +19,12 @@ const authUser = requestHandler(async (req, res, database) => {
     const [user] = await database.execute(employeeStmt.employeeWithPassword, [username]);
 
     if(user.length > 0) {
-        const {employee_id, firstname, lastname, username, password: hashedPassword} = user[0];
+        const {employeeId, firstname, lastname, username, password: hashedPassword} = user[0];
         if(user && (await bcrypt.compare(password, hashedPassword))) {
-            const value = `${employee_id}-${username}`;
+            const value = `${employeeId}-${username}`;
             generateToken(res, value);
             
-            res.status(200).json({id: employee_id, firstname, lastname, username});
+            res.status(200).json({id: employeeId, firstname, lastname, username});
             return;
         }
     }
@@ -80,7 +80,22 @@ const registerUser = requestHandler(async (req, res, database) => {
     throw {status: 400, message: 'Invalid user data'};
 });
 
+/*
+   desc     Just to get user details
+   route    GET /api/users/user
+   access   private
+*/
+const getUser = requestHandler(async (req, res) => {
+    if(Object.values(req.user).length > 0) {
+        const {employeeId, firstname, lastname, username, image, createdAt} = req.user;
+        res.status(200).json({firstname, lastname, username, image});
+    } else {
+        throw {status: 404, message: 'User not found'}
+    }
+});
+
 export { 
     authUser, 
-    registerUser, 
+    registerUser,
+    getUser,
 };
