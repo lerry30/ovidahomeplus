@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useState } from 'react';
-import { zUser } from '@/store/user';
+//import { zUser } from '@/store/user';
 
 import OvidaHomePlus from '../../public/ovida-front.jpg';
 import Loading from '@/components/Loading';
@@ -38,8 +38,9 @@ const SignUp = () => {
             const payload = {firstname, lastname, username, password};
             const response = await sendJSON(urls?.signup, payload);
             if(response) {
-                zUser.getState().save(response?.firstname, response?.lastname, response?.username);
+                //zUser.getState().save(response?.firstname, response?.lastname, response?.username);
                 navigate('/admin');
+                location.reload();
             }
         } catch(error) {
             console.log(error);
