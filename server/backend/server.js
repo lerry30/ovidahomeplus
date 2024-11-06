@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import { getDir } from './utils/fileDir.js';
 
 dotenv.config();
 // database
@@ -23,6 +24,11 @@ const limiter = rateLimit({
     max: 100, // limit each IP to 100 requests per windowMs
 });
 
+app.use(cors({
+    origin: process.env.FRONTEND_DOMAIN,
+    credentials: true, // Allow cookies to be sent
+}));
+
 // Use Helmet for security
 app.use(helmet());
 //app.use(limiter);
@@ -30,11 +36,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-app.use(cors({
-    origin: process.env.FRONTEND_DOMAIN,
-    credentials: true, // Allow cookies to be sent
-}));
+app.use('/suppliers', express.static(getDir('uploads/suppliers')));
 
 // routes
 app.use('/api/users', userRoutes);

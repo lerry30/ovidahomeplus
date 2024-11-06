@@ -21,6 +21,12 @@ const newSupplier = requestHandler(async (req, res, database) => {
     }
 });
 
+const getSuppliers = requestHandler(async (req, res, database) => {
+    const [result] = await database.query(supplierStmt.suppliers, []);
+    res.status(200).json({result});
+});
+
 export {
     newSupplier,
+    getSuppliers,
 };
