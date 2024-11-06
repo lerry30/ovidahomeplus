@@ -1,25 +1,28 @@
 import { create } from 'zustand';
 import { createFullname } from '@/utils/name';
+import { user as localStorageName } from '@/constants/localStorageNames';
+import { urls } from '@/constants/urls';
+import { getData } from '@/utils/send';
 
 export const zUser = create(set => ({
     firstname: '',
     lastname: '',
     username: '',
     fullname: '',
+    image: '',
 
-    save: (firstname, lastname, username) => {
-        if(!firstname) {
-            console.log('User store firstname is empty');
-            return;
-        } else if(!lastname) {
-            console.log('User store lastname is empty');
-            return;
-        } else if(!username) {
-            console.log('User store username is empty');
-            return;
+    saveUserData: async () => {
+        const isLocalUserDataExist = (Object.keys(JSON.parse(localStorage.getItem(localStorageName) || '{}')).length > 0);
+        if(!isLocalUserDataExist) {
+            const response = await getData(urls.user);
+            localStorage.setItem(localStorageName, JSON.stringify(response));
         }
+        
+        const { firstname, lastname, username, image } = JSON.parse(localStorage.getItem(localStorageName) || '{}');
 
-        const fullName = createFullname(firstname, lastname);
-        set(state => ({firstname, lastname, username, fullName}));
-    }
+        set(state => {
+            const fullname = createFullname(firstname, lastname);
+            return { firstname, lastname, username, fullname, image };
+        });
+    },
 }));
