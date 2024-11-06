@@ -1,0 +1,1 @@
+export const newSupplier = 'INSERT INTO suppliers(name, contact, image) VALUES(?, ?, ?);';
