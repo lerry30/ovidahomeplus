@@ -119,7 +119,9 @@ const NewSupplier = () => {
                         />
                     </div>
                     <div className="sm:px-4 sm:py-2">
-                        <button onClick={supplier} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">Add Supplier</button>
+                        <button onClick={supplier} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">
+                            Add Supplier
+                        </button>
                     </div>
                     <ErrorField message={errorData?.default || ''} />
                 </section>
