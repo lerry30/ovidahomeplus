@@ -6,4 +6,6 @@ export const urls = {
     user: `${apiUrl}/api/users/user`,
     newsupplier: `${apiUrl}/api/suppliers/new`,
     getsuppliers: `${apiUrl}/api/suppliers/get`,
+    updatesupplierstatus: `${apiUrl}/api/suppliers/status`,
+    updatesupplier: `${apiUrl}/api/suppliers/update`,
 };
