@@ -7,6 +7,7 @@ import SignUp from '@/screens/SignUp';
 import SignIn from '@/screens/SignIn';
 import NewItem from '@/screens/NewItem';
 import NewSupplier from '@/screens/NewSupplier';
+import UpdateSupplier from '@/screens/UpdateSupplier';
 import NotFound from '@/screens/NotFound';
 import Loading from '@/components/Loading';
 
@@ -47,6 +48,7 @@ const App = () => {
 			<Route path="/signup" element={<SignUp />} />
 			<Route path="/signin" element={<SignIn />} />
 			<Route path="/admin/new-supplier" element={<NewSupplier />} />
+			<Route path="/admin/update-supplier" element={<UpdateSupplier />} />
 			<Route path="/admin/new-item" element={<NewItem />} />
 			<Route path="/admin/*" element={<SidebarRoute />} />
 			<Route path="*" element={<NotFound />} />
