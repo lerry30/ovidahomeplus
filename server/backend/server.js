@@ -10,6 +10,7 @@ import userRoutes from './routes/userRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { getDir } from './utils/fileDir.js';
+import { allowResourceAccess } from './middleware/corsFileMiddleware.js';
 
 dotenv.config();
 // database
@@ -27,7 +28,9 @@ const limiter = rateLimit({
 app.use(cors({
     origin: process.env.FRONTEND_DOMAIN,
     credentials: true, // Allow cookies to be sent
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
+
 
 // Use Helmet for security
 app.use(helmet());
@@ -36,7 +39,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/suppliers', express.static(getDir('uploads/suppliers')));
+app.use('/suppliers', allowResourceAccess, express.static(getDir('uploads/suppliers')));
 
 // routes
 app.use('/api/users', userRoutes);
