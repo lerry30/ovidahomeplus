@@ -4,7 +4,7 @@ import { toNumber } from '@/utils/number';
 
 const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
-const ImageUpload = ({ fileData: [file, setFile], className='' }) => {
+const ImageUpload = ({fileData: [file, setFile], initialImageSrc=undefined, className=''}) => {
     const inputFileRef = useRef();
     const containersSize = useRef('');
     const [ imageSrc, setImageSrc ] = useState(null);
@@ -57,6 +57,10 @@ const ImageUpload = ({ fileData: [file, setFile], className='' }) => {
     }, [file]);
 
     useEffect(() => {
+        // initial image source
+        if(!imageSrc && initialImageSrc)
+            setImageSrc(initialImageSrc);
+
         const matchedClassSize = className?.match(/size-(\w+)/gi) || [];
         const classSize = matchedClassSize.length > 0 ? matchedClassSize[0] : 'size-full';
         const size = toNumber(classSize.split('-')[1]);
