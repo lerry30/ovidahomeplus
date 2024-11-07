@@ -1,5 +1,5 @@
 export const currentTime = () => {
-    const formatter = new Intl.DateTimeFormat('en-AU', {
+    const formatter = new Intl.DateTimeFormat('en-us', {
         timeZone: process.env.TIMEZONE,
         hour: '2-digit',
         minute: '2-digit',
