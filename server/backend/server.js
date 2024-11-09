@@ -28,7 +28,7 @@ const limiter = rateLimit({
 app.use(cors({
     origin: process.env.FRONTEND_DOMAIN,
     credentials: true, // Allow cookies to be sent
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 }));
 
 
@@ -49,6 +49,6 @@ app.use('/api/suppliers', supplierRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`);
 });
