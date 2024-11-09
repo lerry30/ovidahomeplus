@@ -86,6 +86,10 @@ const ImageUpload = ({fileData: [file, setFile], initialImageSrc=undefined, clas
                             src={ imageSrc }
                             alt="Preview Image"
                             className="w-full h-full object-cover rounded-md"
+                            onError={ev => {
+                                ev.target.src='../../public/image-off.png'
+                                ev.onerror=null;
+                            }}
                         />
                     :
                         <Image size={40} color="#9ca3af" />

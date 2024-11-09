@@ -23,25 +23,6 @@ const UpdateSupplier = () => {
 
     const navigate = useNavigate();
 
-
-    /**
-     * TO DO:
-     * 
-     * Update supplier images error
-     * 
-     * 
-     */
-
-
-
-
-
-
-
-
-
-
-
     // update supplier
     const supplier = async () => {
         try {

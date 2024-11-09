@@ -23,8 +23,8 @@ const newSupplier = requestHandler(async (req, res, database) => {
 });
 
 const getSuppliers = requestHandler(async (req, res, database) => {
-    const [result] = await database.query(supplierStmt.suppliers, []);
-    res.status(200).json({result});
+    const [results] = await database.query(supplierStmt.suppliers, []);
+    res.status(200).json({results});
 });
 
 const changeSupplierStatus = requestHandler(async (req, res, database) => {
@@ -44,15 +44,17 @@ const changeSupplierStatus = requestHandler(async (req, res, database) => {
 
 const updateSupplier = requestHandler(async (req, res, database) => {
     const id = toNumber(req.body?.id);
-    console.log(req.body, id);
     const name = String(req.body?.name)?.trim();
     const contact = String(req.body?.contact).trim();
-    const image = req?.file?.filename || '';
+    const image = req?.file?.filename;
 
     if(!id || id===0) throw new Error('There\'s something wrong.');
-    if(!name) throw {status: 400, message: 'Supplier name is required to update supplier.'}
+    if(!name) throw {status: 400, message: 'Supplier name is required to update supplier.'};
 
-    const [update] = await database.execute(supplierStmt.updateSupplier, [name, contact, image, id]);
+    const [result] = await database.query(supplierStmt.supplier, [id]);
+    const currentImage = result?.length > 0 ? result[0]?.image : '';
+    const newImage = image ? image : currentImage;
+    const [update] = await database.execute(supplierStmt.updateSupplier, [name, contact, newImage, id]);
     if(update?.changedRows > 0) {
         res.status(200).json({message: 'Supplier successfully updated.'});
     } else {

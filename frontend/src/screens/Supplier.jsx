@@ -1,4 +1,4 @@
-import { Plus, Ellipsis } from 'lucide-react';
+import { Plus, Ellipsis, Image } from 'lucide-react';
 import { Prompt } from '@/components/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef, act } from 'react';
@@ -49,7 +49,7 @@ const Supplier = () => {
             const response = await getData(urls?.getsuppliers);
             if(response) {
                 //console.log(response?.result);
-                const data = response?.result || [];
+                const data = response?.results || [];
                 setSuppliers(data);
                 setSupplierActions(Array(data?.length).fill(false));
             }
@@ -119,11 +119,17 @@ const Supplier = () => {
                                             <li key={item?.id}>
                                                 <div className="flex p-1 border border-neutral-300 rounded-lg">
                                                     <img 
-                                                        src={`${apiUrl}/suppliers/${item?.image}`} 
+                                                        src={`${apiUrl}/suppliers/${item?.image}`}
                                                         alt="ovida-supplier" 
                                                         className="size-[80px] rounded-lg border"
+                                                        onError={ev => {
+                                                            ev.target.src='../../public/image-off.png'
+                                                            ev.onerror=null;
+                                                        }}
                                                     />
-                                                    <div className="w-full h-[80px] flex justify-between p-2">
+                                                    <div className="w-full h-[80px] 
+                                                        flex justify-between
+                                                        p-2">
                                                         <div className="flex flex-col">
                                                             <div className="flex justify-center items-center gap-2">
                                                                 <h3 className="font-semibold text-lg">{item?.name}</h3>
