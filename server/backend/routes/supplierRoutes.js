@@ -15,7 +15,7 @@ const router = express.Router();
     const uploadMiddleware = await upload('suppliers');
     router.post('/new', protect, uploadMiddleware.single('file'), newSupplier);
     router.get('/get', getSuppliers);
-    router.put('/status', protect, changeSupplierStatus);
+    router.patch('/status', protect, changeSupplierStatus);
     router.put('/update', protect, uploadMiddleware.single('file'), updateSupplier)
 })();
 
