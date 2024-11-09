@@ -12,13 +12,65 @@ import Loading from '@/components/Loading';
 
 const Supplier = () => {
     const [suppliers, setSuppliers] = useState([]);
+    const [displaySupplier, setDisplaySupplier] = useState([]); // holder
     const [supplierActions, setSupplierActions] = useState([]);
     const [disablePrompt, setDisablePrompt] = useState(false);
     const [enablePrompt, setEnablePrompt] = useState(false);
+    const [tabs, setTabs] = useState({all: true, active: false, inactive: false}); // tabs
     const [loading, setLoading] = useState(false);
 
     const actionId = useRef(null);
+    const searchBar = useRef(null);
     const navigate = useNavigate();
+
+    const tabNavigate = (tab) => {
+        if(searchBar.current) searchBar.current.value = '';
+        setTabs({all: false, active: false, inactive: false, [tab]: true});
+
+        if(tab === 'all') {
+            setDisplaySupplier(suppliers);
+            return;
+        }
+
+        const nSuppliers = [];
+        for(let i = 0; i < suppliers.length; i++) {
+            const supplier = suppliers[i];
+            if(supplier?.status===tab) nSuppliers.push(supplier);
+        }
+
+        setDisplaySupplier(nSuppliers);
+    }
+
+    const search = (ev) => {
+        try {
+            const input = ev.target.value.trim().toLowerCase();
+            let tabSelected = 'all';
+            for(const index in tabs) {
+                tabSelected = tabs[index] ? index : tabSelected;
+            }
+
+            if(!input) {
+                tabNavigate(tabSelected);
+                return;
+            }
+
+            const searched = [];
+            const isTabAll = tabs?.all;
+            for(let i = 0; i < suppliers.length; i++) {
+                const name = String(suppliers[i]?.name || '')?.trim()?.toLowerCase();
+                const status = suppliers[i]?.status;
+                if(name?.match(input)) {
+                    if(tabs[status] || isTabAll){
+                        searched.push(suppliers[i]);
+                    }
+                }
+            }
+
+            setDisplaySupplier(searched);
+        } catch(error) {
+            console.log(error);
+        } finally {}
+    }
 
     const changeSupplierStatus = async (changeTo) => {
         try {
@@ -30,9 +82,9 @@ const Supplier = () => {
             if(!actionId.current) throw new Error('Supplier not recognized');
 
             const payload = {id: actionId.current, changeTo};
-            const response = await sendJSON(urls?.updatesupplierstatus, payload, 'PUT');
+            const response = await sendJSON(urls?.updatesupplierstatus, payload, 'PATCH');
             if(response) {
-                console.log(response?.message || '');
+                // console.log(response?.message || '');
                 await getSuppliers();
             }
         } catch(error) {
@@ -59,6 +111,15 @@ const Supplier = () => {
             setLoading(false);
         }
     }
+
+    useLayoutEffect(() => {
+        let tabSelected = 'all';
+        for(const index in tabs) {
+            tabSelected = tabs[index] ? index : tabSelected;
+        }
+
+        tabNavigate(tabSelected);
+    }, [suppliers]);
 
     useLayoutEffect(() => {
         getSuppliers();
@@ -97,7 +158,7 @@ const Supplier = () => {
         >
             <section className="flex justify-between items-center gap-4">
                 <h1 className="hidden sm:flex font-semibold text-lg">Supplier</h1>
-                <Searchbar />
+                <Searchbar ref={searchBar} search={search} />
                 <Link
                     to="/admin/new-supplier"
                     className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
@@ -108,93 +169,107 @@ const Supplier = () => {
             </section>
             <h1 className="flex sm:hidden font-semibold text-lg">Supplier</h1>
             <div className="grow w-full h-full relative">
-                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md">
+                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
+                    <div className="h-[40px] border-b p-2 flex gap-2">
+                        <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
+                        <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
+                        <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
+                    </div>
                     {
                         suppliers?.length > 0 ? (
-                            <ul className="flex flex-col gap-2 p-2">
-                                {
-                                    suppliers.map((item, index) => {
-                                        const isActive = item?.status==='active';
-                                        return (
-                                            <li key={item?.id}>
-                                                <div className="flex p-1 border border-neutral-300 rounded-lg">
-                                                    <img 
-                                                        src={`${apiUrl}/suppliers/${item?.image}`}
-                                                        alt="ovida-supplier" 
-                                                        className="size-[80px] rounded-lg border"
-                                                        onError={ev => {
-                                                            ev.target.src='../../public/image-off.png'
-                                                            ev.onerror=null;
-                                                        }}
-                                                    />
-                                                    <div className="w-full h-[80px] 
-                                                        flex justify-between
-                                                        p-2">
-                                                        <div className="flex flex-col">
-                                                            <div className="flex justify-center items-center gap-2">
-                                                                <h3 className="font-semibold text-lg">{item?.name}</h3>
-                                                                <p className={`h-6 text-white text-sm px-2 rounded-full ${isActive?'bg-green-500':'bg-red-500'}`}>{item?.status}</p>
+                            <>{displaySupplier?.length > 0 ? (
+                                <ul className="flex flex-col gap-2 p-2">
+                                    {
+                                        displaySupplier.map((item, index) => {
+                                            const isActive = item?.status==='active';
+                                            return (
+                                                <li key={item?.id}>
+                                                    <div className="h-[190px] md:h-fit flex p-1 border border-neutral-300 rounded-lg">
+                                                        <img 
+                                                            src={`${apiUrl}/suppliers/${item?.image}`}
+                                                            alt="ovida-supplier" 
+                                                            className="size-[80px] rounded-lg border"
+                                                            onError={ev => {
+                                                                ev.target.src='../../public/image-off.png'
+                                                                ev.onerror=null;
+                                                            }}
+                                                        />
+                                                        <div className="w-full h-full md:h-[80px] 
+                                                            flex md:justify-between
+                                                            p-2">
+                                                            <div className="w-full flex flex-col md:w-fit">
+                                                                <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                                                                    <h3 className="font-semibold text-lg">{item?.name}</h3>
+                                                                    <p className={`w-fit h-6 text-white text-sm px-2 rounded-full ${isActive?'bg-green-500':'bg-red-500'}`}>{item?.status}</p>
+                                                                </div>
+                                                                <p className="text-[14px] md:text-base">{item?.contact}</p>
+                                                                {/* display only for small screen */}
+                                                                <p className="flex md:hidden text-[14px]">{formattedDateAndTime(new Date(item?.createdAt))}</p>
                                                             </div>
-                                                            <p>{item?.contact}</p>
-                                                        </div>
-                                                        <div className="flex flex-col items-end">
-                                                            <div className="relative size-[26px] rounded-full hover:cursor-pointer hover:bg-gray-200">
-                                                                <button onClick={(ev) => {
-                                                                        ev.stopPropagation();
-                                                                        setSupplierActions(state => state.map((_, i) => i===index))
-                                                                    }}
-                                                                    className="z-0"
-                                                                >
-                                                                    <Ellipsis />
-                                                                </button>
-                                                                <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border p-1 ${supplierActions[index]?'block':'hidden'}`}>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            actionId.current = item?.id;
-                                                                            setEnablePrompt(true)} 
-                                                                        }
-                                                                        className={`w-full hover:bg-gray-100 p-1 rounded-lg ${isActive?'opacity-50':'opacity-100'}`}
-                                                                        disabled={isActive}
-                                                                    >
-                                                                        Enable
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            actionId.current = item?.id;
-                                                                            setDisablePrompt(true)} 
-                                                                        }
-                                                                        className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
-                                                                        disabled={!isActive}
-                                                                    >
-                                                                        Disable
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            if(isActive) {
-                                                                                const {id, name, contact, image, status} = item;
-                                                                                zSupplier.getState()?.saveSupplierData(id, name, contact, image, status);
-                                                                                navigate('/admin/update-supplier');
-                                                                            }
+                                                            <div className="flex flex-col md:items-end md:justify-start">
+                                                                <div className="relative size-[26px] rounded-full hover:cursor-pointer hover:bg-gray-200">
+                                                                    <button onClick={(ev) => {
+                                                                            ev.stopPropagation();
+                                                                            setSupplierActions(state => state.map((_, i) => i===index))
                                                                         }}
-                                                                        className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
-                                                                        disabled={!isActive}
+                                                                        className="z-0"
                                                                     >
-                                                                            Update
+                                                                        <Ellipsis />
+                                                                    </button>
+                                                                    <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border p-1 ${supplierActions[index]?'block':'hidden'}`}>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                actionId.current = item?.id;
+                                                                                setEnablePrompt(true)} 
+                                                                            }
+                                                                            className={`w-full hover:bg-gray-100 p-1 rounded-lg ${isActive?'opacity-50':'opacity-100'}`}
+                                                                            disabled={isActive}
+                                                                        >
+                                                                            Enable
                                                                         </button>
-                                                                </article>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                actionId.current = item?.id;
+                                                                                setDisablePrompt(true)} 
+                                                                            }
+                                                                            className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
+                                                                            disabled={!isActive}
+                                                                        >
+                                                                            Disable
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                if(isActive) {
+                                                                                    const {id, name, contact, image, status} = item;
+                                                                                    zSupplier.getState()?.saveSupplierData(id, name, contact, image, status);
+                                                                                    navigate('/admin/update-supplier');
+                                                                                }
+                                                                            }}
+                                                                            className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
+                                                                            disabled={!isActive}
+                                                                        >
+                                                                                Update
+                                                                            </button>
+                                                                    </article>
+                                                                </div>
+                                                                {/* display only for large screen */}
+                                                                <p className="hidden md:flex">{formattedDateAndTime(new Date(item?.createdAt))}</p>
                                                             </div>
-                                                            <p>{formattedDateAndTime(new Date(item?.createdAt))}</p>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </li>
-                                        )
-                                    })
-                                }
-                            </ul>
+                                                </li>
+                                            )
+                                        })
+                                    }
+                                </ul>
+                            ) : (
+                                <div className="w-full h-screen flex justify-center items-center">
+                                    <h3>Search not found</h3>
+                                </div>
+                            )}</>
                         ) : (
                             <div className="w-full h-screen flex justify-center items-center">
-                                <h3>No Suppliers Found</h3>
+                                <h3>No Suppliers found</h3>
                             </div>
                         )
                     }
