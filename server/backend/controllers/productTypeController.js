@@ -17,7 +17,7 @@ const newProductType = requestHandler(async (req, res, database) => {
     if(insert?.insertId > 0) {
         res.status(201).json({message: 'Inserted successfully.'});
     } else {
-        throw {status: 401, message: 'New supplier failed to insert.'};
+        throw {status: 401, message: 'New product type failed to insert.'};
     }
 });
 
