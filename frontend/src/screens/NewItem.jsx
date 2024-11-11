@@ -1,65 +1,139 @@
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, CircleX } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
 import { toNumber } from '@/utils/number';
+import { isValidDate } from '@/utils/datetime';
 
 import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
-import TitleFormat from '@/utils/titleFormat';
 import Select from '@/components/DropDown';
 
 const NewItem = () => {
     const [data, setData] = useState({
-        supplier: '', 
+        productType: '', // to display
+        productTypeId: 0, // to send
+        description: [],
+        supplier: '',  // to display
+        supplierId: 0, // to send
         deliveryPrice: 0,
         deliveryDate: '',
+        itemCode: '',
         srp: 0,
         units: 'pcs',
-        name: '',
+        quantity: 1,
     });
     const [errorData, setErrorData] = useState({
+        productType: '',
         supplier: '',
         deliveryPrice: '',
         deliveryDate: '',
-        srp: 0,
+        itemCode: '',
+        srp: '',
         units: '',
-        name: '', 
+        quantity: '',
         default: ''
     });
-    const [suppliers, setSuppliers] = useState([]);
     const [image, setImage] = useState(undefined);
+    const [suppliers, setSuppliers] = useState([]);
+    const [productTypes, setProductTypes] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const PROFIT_MARGIN = 0.4576;
 
+    const enterNewDescription = (ev) => {
+        const input = ev.key;
+        if(input === 'Enter') {
+            if(data?.description?.length >= 4) return;
+            const inputValue = ev.target.value;
+            setData(state => ({...state, description: [...state?.description, inputValue]}));
+            ev.target.value = '';
+        }
+    }
+
     const item = async () => {
         try {
             setLoading(true);
 
-            // const name = data?.name?.trim();
-            // const contact = data?.contact?.trim();
+            const productType = data?.productType?.trim();
+            const productTypeId = toNumber(data?.productTypeId);
+            const description = data?.description?.join(', ');
 
-            // if(!name) {
-            //     setErrorData(state => ({...state, name: 'Item name is empty.'}));
-            //     throw new Error('All fields are required.');
-            // }
+            const supplier = data?.supplier?.trim();
+            const supplierId = toNumber(data?.supplierId);
+            const deliveryPrice = toNumber(data?.deliveryPrice);
+            const deliveryDate = data?.deliveryDate; // don't forget to validate date
 
-            // const form = new FormData();
-            // form.append('name', TitleFormat(name));
-            // form.append('contact', contact);
-            // form.append('file', image);
+            const itemCode = data?.itemCode?.trim();
+            const srp = toNumber(data?.srp);
+            const unit = data?.units?.trim();
+            const quantity = toNumber(data?.quantity);
 
-            // const response = await sendForm(urls?.newsupplier, form);
-            // if(response) {
-            //     console.log(response?.message);
-            //     navigate('/admin/supplier');
-            // }
+            let hasError = false;
+            if(!productType || !productTypeId) {
+                setErrorData(state => ({...state, productType: 'Please select a product type from the dropdown menu.'}));
+                hasError = true;
+            }
+
+            if(!supplier || !supplierId) {
+                setErrorData(state => ({...state, supplier: 'Please select a supplier from the dropdown menu.'}));
+                hasError = true;
+            }
+
+            if(deliveryPrice <= 0) {
+                setErrorData(state => ({...state, deliveryPrice: 'Delivery price must be greater than zero.'}));
+                hasError = true;
+            }
+
+            if(!isValidDate(deliveryDate)) {
+                setErrorData(state => ({...state, deliveryDate: 'Ensure the date is complete and in the correct format.'}));
+                hasError = true;
+            }
+
+            if(!itemCode) {
+                setErrorData(state => ({...state, itemCode: 'Please provide an item code.'}));
+                hasError = true;
+            }
+
+            if(srp <= 0) {
+                setErrorData(state => ({...state, srp: 'SRP must be greater than zero.'}));
+                hasError = true;
+            }
+
+            if(!unit) {
+                setErrorData(state => ({...state, units: 'Please select units from the dropdown menu.'}));
+                hasError = true;
+            }
+
+            if(quantity <= 0) {
+                setErrorData(state => ({...state, quantity: 'Quantity must be greater than zero.'}));
+                hasError = true;
+            }
+
+            if(hasError) throw new Error('Ensure all fields above are filled.');
+
+            const form = new FormData();
+            form.append('productTypeId', productTypeId);
+            form.append('description', description);
+            form.append('supplierId', supplierId);
+            form.append('deliveryPrice', deliveryPrice);
+            form.append('deliveryDate', deliveryDate);
+            form.append('itemCode', itemCode);
+            form.append('srp', srp);
+            form.append('unit', unit);
+            form.append('quantity', quantity);
+            form.append('file', image);
+
+            const response = await sendForm(urls?.newitem, form);
+            if(response) {
+                console.log(response?.message);
+                navigate('/admin/inventory');
+            }
         } catch(error) {
             console.log(error);
             setErrorData(state => ({...state, default: error?.message}));
@@ -84,6 +158,22 @@ const NewItem = () => {
         }
     }
 
+    const getProductTypes = async () => {
+        try {
+            setLoading(true);
+            const response = await getData(urls?.getproducttypes);
+            if(response) {
+                // console.log(response);
+                const data = response?.results || [];
+                setProductTypes(data);
+            }
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     useLayoutEffect(() => {
         const profitMargin = toNumber(data?.deliveryPrice) * PROFIT_MARGIN + toNumber(data?.deliveryPrice);
         setData(state => ({...state, srp: profitMargin}));
@@ -91,6 +181,7 @@ const NewItem = () => {
 
     useLayoutEffect(() => {
         getSuppliers();
+        getProductTypes();
     }, []);
 
     if(loading) {
@@ -109,7 +200,7 @@ const NewItem = () => {
                 <div className="hidden md:flex">
                     <AppLogo />
                 </div>
-                <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Create New Product</h1>
+                <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Create New Item</h1>
             </header>
             <main className="grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 p-4">    
                 <section className="bg-white rounded-md p-4">
@@ -119,24 +210,21 @@ const NewItem = () => {
                     <h3 className="font-bold text-lg">Product Details</h3>
                     {/* Product */}
                     <hr />
-                    
-                    {/* Supplier */}
-                    <hr />
                     <div className="flex flex-col sm:px-4 gap-2">
                         <h3 className="font-semibold">
-                            Supplier
+                            Product Type
                             <span className="text-red-500">*</span>
                         </h3>
                         <div className="flex items-center gap-4">
-                            <Select name="Suppliers" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400">
+                            <Select name="Select Product Type" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10">
                                 {
-                                    suppliers.map((item, index) => {
+                                    productTypes.map((item, index) => {
                                         if(item?.status !== 'active') return null;
                                         return (
                                             <button
                                                 key={index}
                                                 onClick={() => {
-                                                    setData(state => ({...state, supplier: item?.name}));
+                                                    setData(state => ({...state, productType: item?.name, productTypeId: item?.id}));
                                                 }}
                                                 className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
                                             >
@@ -147,7 +235,69 @@ const NewItem = () => {
                                 }
                             </Select>
                             {/* Dropdown output */}
-                            <span>{data?.supplier}</span>
+                            {data?.productType && <span className="bg-green-400/50 p-2 rounded-md">{data?.productType}</span>}
+                        </div>
+                        <ErrorField message={errorData?.productType || ''} />
+                    </div>
+                    <div className="w-full sm:px-4">
+                        <h3 className="font-semibold">
+                            Description
+                            {/* <span className="text-red-500">*</span> */}
+                        </h3>
+                        <small>Add up to a maximum of 4 description categories.</small>
+                        <article className="w-full min-h-[50px] flex flex-wrap gap-2 border rounded-lg p-2">
+                            {data.description.map((item, index) => {
+                                return (
+                                    <div key={index} className="flex items-center gap-2 border rounded-lg p-2">
+                                        <span className="text-wrap">
+                                            {item}
+                                        </span>
+                                        <button 
+                                            onClick={() => {
+                                                const descriptionArray = data?.description?.filter((_, i) => i!==index);
+                                                setData(state => ({...state, description: descriptionArray}));
+                                            }}
+                                        >
+                                            <CircleX size={20} />
+                                        </button>
+                                    </div>
+                                )
+                            })}
+                            <input 
+                                onKeyDown={enterNewDescription} 
+                                className="min-w-[100px] outline-none" 
+                            />
+                        </article>
+                    </div>
+
+                    {/* Supplier */}
+                    <hr />
+                    <div className="flex flex-col sm:px-4 gap-2">
+                        <h3 className="font-semibold">
+                            Supplier
+                            <span className="text-red-500">*</span>
+                        </h3>
+                        <div className="flex items-center gap-4">
+                            <Select name="Select Supplier" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400">
+                                {
+                                    suppliers.map((item, index) => {
+                                        if(item?.status !== 'active') return null;
+                                        return (
+                                            <button
+                                                key={index}
+                                                onClick={() => {
+                                                    setData(state => ({...state, supplier: item?.name, supplierId: item?.id}));
+                                                }}
+                                                className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                            >
+                                                {item?.name}
+                                            </button>
+                                        )
+                                    })
+                                }
+                            </Select>
+                            {/* Dropdown output */}
+                            {data?.supplier && <span className="bg-green-400/50 p-2 rounded-md">{data?.supplier}</span>}
                         </div>
                         <ErrorField message={errorData?.supplier || ''} />
                     </div>
@@ -233,7 +383,7 @@ const NewItem = () => {
                             <span className="text-red-500">*</span>
                         </h3>
                         <div className="flex items-center gap-4">
-                            <Select name="Units" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400">
+                            <Select name="Select Unit" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400">
                                 <button
                                     onClick={() => {
                                         setData(state => ({...state, units: 'pcs'}));
@@ -252,12 +402,29 @@ const NewItem = () => {
                                 </button>
                             </Select>
                             {/* Dropdown output */}
-                            <span>{data?.units}</span>
+                            {data?.units && <span className="bg-green-400/50 p-2 rounded-md">{data?.units}</span>}
                         </div>
                         <ErrorField message={errorData?.units || ''} />
                     </div>
+                    <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                        <label htmlFor="quantity" className="font-semibold">
+                            Quantity
+                            <span className="text-red-500">*</span>
+                        </label>
+                        <input 
+                            id="quantity"
+                            value={data?.quantity}
+                            onChange={elem => {
+                                const input = Math.max(0, toNumber(elem.target.value));
+                                setData(state => ({...state, quantity: input}));
+                            }}
+                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            required
+                        />
+                        <ErrorField message={errorData?.quantity || ''} />
+                    </div>
 
-                    <div className="sm:px-4 sm:py-2">
+                    <div className="w-full flex justify-end sm:px-4 sm:py-2">
                         <button onClick={item} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">
                             Add New Item
                         </button>
