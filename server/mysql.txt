@@ -17,5 +17,47 @@ CREATE TABLE suppliers(
 	contact VARCHAR(255) NOT NULL,
 	image VARCHAR(255) NOT NULL,
 	status ENUM('active', 'inactive') DEFAULT 'active',
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE deliveries(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	supplier_id INT NOT NULL,
+	price DOUBLE NOT NULL,
+	date DATE NOT NULL,
+	FOREIGN KEY(supplier_id) REFERENCES suppliers(id)
+);
+
+CREATE TABLE product_types(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	image VARCHAR(255) NOT NULL,
+	status ENUM('active', 'inactive') DEFAULT 'active',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE modification_history(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	employee_id INT NOT NULL,
+	category ENUM('item', 'supplier', 'product') DEFAULT 'item',
+	action ENUM('added', 'updated', 'deleted') DEFAULT 'added',
+	modification_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE items(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	delivery_id INT NOT NULL,
+	product_type_id INT NOT NULL,
+	item_code VARCHAR(255) NOT NULL,
+	quantity INT NOT NULL,
+	barcode INT NOT NULL,
+	srp DOUBLE NOT NULL,
+	max_discount DOUBLE NOT NULL,
+	unit ENUM('pcs', 'set') DEFAULT 'pcs',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY(delivery_id) REFERENCES deliveries(id),
+	FOREIGN KEY(product_type_id) REFERENCES product_types(id)
 );

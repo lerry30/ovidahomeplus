@@ -5,7 +5,7 @@ import * as supplierStmt from '../mysql/supplier.js';
 /*
    desc     New Supplier
    route    POST /api/suppliers/new
-   access   public
+   access   private
 */
 const newSupplier = requestHandler(async (req, res, database) => {
     const name = String(req.body?.name).trim();
@@ -22,11 +22,21 @@ const newSupplier = requestHandler(async (req, res, database) => {
     }
 });
 
+/*
+   desc     Get Supplier
+   route    GET /api/suppliers/get
+   access   public
+*/
 const getSuppliers = requestHandler(async (req, res, database) => {
     const [results] = await database.query(supplierStmt.suppliers, []);
     res.status(200).json({results});
 });
 
+/*
+   desc     Update Status of Supplier
+   route    PATCH /api/suppliers/status
+   access   private
+*/
 const changeSupplierStatus = requestHandler(async (req, res, database) => {
     const id = toNumber(req.body?.id);
     const changeTo = String(req.body?.changeTo).toLowerCase().trim();
@@ -42,6 +52,11 @@ const changeSupplierStatus = requestHandler(async (req, res, database) => {
     }
 });
 
+/*
+   desc     Update Supplier
+   route    PUT /api/suppliers/update
+   access   private
+*/
 const updateSupplier = requestHandler(async (req, res, database) => {
     const id = toNumber(req.body?.id);
     const name = String(req.body?.name)?.trim();

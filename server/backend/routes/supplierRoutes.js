@@ -16,7 +16,7 @@ const router = express.Router();
     router.post('/new', protect, uploadMiddleware.single('file'), newSupplier);
     router.get('/get', getSuppliers);
     router.patch('/status', protect, changeSupplierStatus);
-    router.put('/update', protect, uploadMiddleware.single('file'), updateSupplier)
+    router.put('/update', protect, uploadMiddleware.single('file'), updateSupplier);
 })();
 
 export default router;

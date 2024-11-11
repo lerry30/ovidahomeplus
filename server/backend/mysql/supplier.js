@@ -5,9 +5,9 @@ export const suppliers = `
         contact,
         image,
         status,
-        created_at AS createdAt
+        updated_at AS updatedAt
     FROM suppliers
-    ORDER BY created_at DESC;
+    ORDER BY updated_at DESC;
 `;
 
 export const supplier = `
@@ -17,7 +17,7 @@ export const supplier = `
         contact,
         image,
         status,
-        created_at AS createdAt
+        updated_at AS updatedAt
     FROM suppliers
     WHERE id=?;
 `;

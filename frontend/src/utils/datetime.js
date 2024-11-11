@@ -32,3 +32,27 @@ export const formatTimeFromString = (timeString) => {
 
     return `${hours}:${minutes} ${ampm}`;
 }
+
+export const isValidDate = (dateString) => {
+    // Check if the date string matches the format YYYY-MM-DD
+    const regex = /^\d{4}-\d{1,2}-\d{1,2}$/;
+    if (!regex.test(dateString)) {
+        return false;
+    }
+
+    // Parse the date string to a Date object
+    const date = new Date(dateString);
+
+    // Check if the Date object is valid
+    if (isNaN(date.getTime())) {
+        return false;
+    }
+
+    // Additional check: ensure the day, month, and year are correct
+    const [year, month, day] = dateString.split('-').map(Number);
+    if (date.getUTCFullYear() !== year || date.getUTCMonth() + 1 !== month || date.getUTCDate() !== day) {
+        return false;
+    }
+
+    return true;
+};

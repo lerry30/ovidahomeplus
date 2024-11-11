@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, ListCollapse, Truck } from 'lucide-react';
+import { LayoutDashboard, ListChecks, Truck, Package } from 'lucide-react';
 import AppLogo from '@/components/AppLogo';
 
 const SidebarLayout = () => {
@@ -15,8 +15,13 @@ const SidebarLayout = () => {
             </NavLink>
             <NavLink to="/admin/inventory" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
                 className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
-                    <ListCollapse />
+                    <ListChecks />
                     <span className="hidden lg:flex">Inventory</span>
+            </NavLink>
+            <NavLink to="/admin/product-types" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
+                className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
+                    <Package />
+                    <span className="hidden lg:flex">Product Types</span>
             </NavLink>
             <NavLink to="/admin/supplier" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
                 className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">

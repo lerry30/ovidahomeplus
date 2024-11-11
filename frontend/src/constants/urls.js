@@ -8,4 +8,8 @@ export const urls = {
     getsuppliers: `${apiUrl}/api/suppliers/get`,
     updatesupplierstatus: `${apiUrl}/api/suppliers/status`,
     updatesupplier: `${apiUrl}/api/suppliers/update`,
+    newproducttype: `${apiUrl}/api/producttype/new`,
+    getproducttypes: `${apiUrl}/api/producttype/get`,
+    updateproducttypestatus: `${apiUrl}/api/producttype/status`,
+    updateproducttype: `${apiUrl}/api/producttype/update`,
 };

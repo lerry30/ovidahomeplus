@@ -5,15 +5,15 @@ import { useLayoutEffect, useState, useRef, act } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDateAndTime } from '@/utils/datetime';
-import { zSupplier } from '@/store/supplier';
+import { zProductType } from '@/store/productType';
 
 import Searchbar from '@/components/Searchbar';
 import Loading from '@/components/Loading';
 
-const Supplier = () => {
-    const [suppliers, setSuppliers] = useState([]);
-    const [displaySupplier, setDisplaySupplier] = useState([]); // holder
-    const [supplierActions, setSupplierActions] = useState([]);
+const ProductTypes = () => {
+    const [productTypes, setProductTypes] = useState([]);
+    const [displayProductTypes, setDisplayProductTypes] = useState([]); // holder
+    const [productTypeActions, setProductTypeActions] = useState([]);
     const [disablePrompt, setDisablePrompt] = useState(false);
     const [enablePrompt, setEnablePrompt] = useState(false);
     const [tabs, setTabs] = useState({all: true, active: false, inactive: false}); // tabs
@@ -28,17 +28,17 @@ const Supplier = () => {
         setTabs({all: false, active: false, inactive: false, [tab]: true});
 
         if(tab === 'all') {
-            setDisplaySupplier(suppliers);
+            setDisplayProductTypes(productTypes);
             return;
         }
 
-        const nSuppliers = [];
-        for(let i = 0; i < suppliers.length; i++) {
-            const supplier = suppliers[i];
-            if(supplier?.status===tab) nSuppliers.push(supplier);
+        const nProductTypes = [];
+        for(let i = 0; i < productTypes.length; i++) {
+            const productType = productTypes[i];
+            if(productType?.status===tab) nProductTypes.push(productType);
         }
 
-        setDisplaySupplier(nSuppliers);
+        setDisplayProductTypes(nProductTypes);
     }
 
     const search = (ev) => {
@@ -56,36 +56,36 @@ const Supplier = () => {
 
             const searched = [];
             const isTabAll = tabs?.all;
-            for(let i = 0; i < suppliers.length; i++) {
-                const name = String(suppliers[i]?.name || '')?.trim()?.toLowerCase();
-                const status = suppliers[i]?.status;
+            for(let i = 0; i < productTypes.length; i++) {
+                const name = String(productTypes[i]?.name || '')?.trim()?.toLowerCase();
+                const status = productTypes[i]?.status;
                 if(name?.match(input)) {
                     if(tabs[status] || isTabAll){
-                        searched.push(suppliers[i]);
+                        searched.push(productTypes[i]);
                     }
                 }
             }
 
-            setDisplaySupplier(searched);
+            setDisplayProductTypes(searched);
         } catch(error) {
             console.log(error);
         } finally {}
     }
 
-    const changeSupplierStatus = async (changeTo) => {
+    const changeProductTypeStatus = async (changeTo) => {
         try {
             setLoading(true);
             if(changeTo==='active') setEnablePrompt(false);
             else if(changeTo==='inactive') setDisablePrompt(false);
             else throw new Error('Error status type is undefined');
 
-            if(!actionId.current) throw new Error('Supplier not recognized');
+            if(!actionId.current) throw new Error('Product type not recognized');
 
             const payload = {id: actionId.current, changeTo};
-            const response = await sendJSON(urls?.updatesupplierstatus, payload, 'PATCH');
+            const response = await sendJSON(urls?.updateproducttypestatus, payload, 'PATCH');
             if(response) {
                 // console.log(response?.message || '');
-                await getSuppliers();
+                await getProductTypes();
             }
         } catch(error) {
             console.log(error);
@@ -95,15 +95,15 @@ const Supplier = () => {
         }
     }
 
-    const getSuppliers = async () => {
+    const getProductTypes = async () => {
         try {
             setLoading(true);
-            const response = await getData(urls?.getsuppliers);
+            const response = await getData(urls?.getproducttypes);
             if(response) {
-                //console.log(response?.results);
+                // console.log(response);
                 const data = response?.results || [];
-                setSuppliers(data);
-                setSupplierActions(Array(data?.length).fill(false));
+                setProductTypes(data);
+                setProductTypeActions(Array(data?.length).fill(false));
             }
         } catch(error) {
             console.log(error);
@@ -119,12 +119,12 @@ const Supplier = () => {
         }
 
         tabNavigate(tabSelected);
-    }, [suppliers]);
+    }, [productTypes]);
 
     useLayoutEffect(() => {
-        getSuppliers();
+        getProductTypes();
 
-        const closeActions = () => setSupplierActions(state => state.map(item => false));
+        const closeActions = () => setProductTypeActions(state => state.map(item => false));
         addEventListener('click', closeActions);
         return () => {
             removeEventListener('click', closeActions);
@@ -134,9 +134,9 @@ const Supplier = () => {
     if(disablePrompt) {
         return (
             <Prompt 
-                header="Are you sure you want to disable this supplier?" 
-                message="Disabled suppliers will not be available for new transactions but can still be viewed in the system." 
-                callback={()=>changeSupplierStatus('inactive')} 
+                header="Are you sure you want to disable this product type?" 
+                message="Disabled product types will not be available for new transactions but can still be viewed in the system." 
+                callback={()=>changeProductTypeStatus('inactive')} 
                 onClose={()=>setDisablePrompt(false)} 
             />
         )
@@ -145,9 +145,9 @@ const Supplier = () => {
     if(enablePrompt) {
         return (
             <Prompt 
-                header="Would you like to enable this supplier?" 
+                header="Would you like to enable this product type?" 
                 message="Once enabled, they will be available for new transactions." 
-                callback={()=>changeSupplierStatus('active')} 
+                callback={()=>changeProductTypeStatus('active')} 
                 onClose={()=>setEnablePrompt(false)} 
             />
         )
@@ -167,17 +167,17 @@ const Supplier = () => {
             flex flex-col"
         >
             <section className="flex justify-between items-center gap-4">
-                <h1 className="hidden sm:flex font-semibold text-lg">Suppliers</h1>
+                <h1 className="hidden sm:flex font-semibold text-lg">Product Types</h1>
                 <Searchbar ref={searchBar} search={search} />
                 <Link
-                    to="/admin/new-supplier"
+                    to="/admin/new-product-type"
                     className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
                 >
                     <Plus />
-                    <span className="hidden sm:flex text-nowrap">New Supplier</span>
+                    <span className="hidden sm:flex text-nowrap">New Product Type</span>
                 </Link>
             </section>
-            <h1 className="flex sm:hidden font-semibold text-lg">Supplier</h1>
+            <h1 className="flex sm:hidden font-semibold text-lg">Product Types</h1>
             <div className="grow w-full h-full relative">
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
                     <div className="h-[40px] border-b p-2 flex gap-2">
@@ -186,18 +186,18 @@ const Supplier = () => {
                         <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
                     </div>
                     {
-                        suppliers?.length > 0 ? (
-                            <>{displaySupplier?.length > 0 ? (
+                        productTypes?.length > 0 ? (
+                            <>{displayProductTypes?.length > 0 ? (
                                 <ul className="flex flex-col gap-2 p-2">
                                     {
-                                        displaySupplier.map((item, index) => {
+                                        displayProductTypes.map((item, index) => {
                                             const isActive = item?.status==='active';
                                             return (
                                                 <li key={item?.id}>
-                                                    <div className="h-[190px] md:h-fit flex p-1 border border-neutral-300 rounded-lg">
+                                                    <div className="h-[120px] md:h-fit flex p-1 border border-neutral-300 rounded-lg">
                                                         <img 
-                                                            src={`${apiUrl}/suppliers/${item?.image}`}
-                                                            alt="ovida-supplier" 
+                                                            src={`${apiUrl}/producttypes/${item?.image}`}
+                                                            alt="ovida-product-type" 
                                                             className="size-[80px] rounded-lg border"
                                                             onError={ev => {
                                                                 ev.target.src='../../public/image-off.png'
@@ -208,7 +208,7 @@ const Supplier = () => {
                                                             flex md:justify-between
                                                             p-2">
                                                             <div className="w-full flex flex-col md:w-fit">
-                                                                <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                                                                <div className="flex flex-col">
                                                                     <h3 className="font-semibold text-lg">{item?.name}</h3>
                                                                     <p className={`w-fit h-6 text-white text-sm px-2 rounded-full ${isActive?'bg-green-500':'bg-red-500'}`}>
                                                                         {item?.status}
@@ -222,15 +222,16 @@ const Supplier = () => {
                                                             </div>
                                                             <div className="flex flex-col md:items-end md:justify-start">
                                                                 <div className="relative size-[26px] rounded-full hover:cursor-pointer hover:bg-gray-200">
-                                                                    <button onClick={(ev) => {
+                                                                    <button 
+                                                                        onClick={(ev) => {
                                                                             ev.stopPropagation();
-                                                                            setSupplierActions(state => state.map((_, i) => i===index))
+                                                                            setProductTypeActions(state => state.map((_, i) => i===index))
                                                                         }}
                                                                         className="z-0"
                                                                     >
                                                                         <Ellipsis />
                                                                     </button>
-                                                                    <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border p-1 ${supplierActions[index]?'block':'hidden'}`}>
+                                                                    <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border p-1 ${productTypeActions[index]?'block':'hidden'}`}>
                                                                         <button
                                                                             onClick={() => {
                                                                                 actionId.current = item?.id;
@@ -254,9 +255,9 @@ const Supplier = () => {
                                                                         <button
                                                                             onClick={() => {
                                                                                 if(isActive) {
-                                                                                    const {id, name, contact, image, status} = item;
-                                                                                    zSupplier.getState()?.saveSupplierData(id, name, contact, image, status);
-                                                                                    navigate('/admin/update-supplier');
+                                                                                    const {id, name, image, status} = item;
+                                                                                    zProductType.getState()?.saveProductTypeData(id, name, image, status);
+                                                                                    navigate('/admin/update-product-type');
                                                                                 }
                                                                             }}
                                                                             className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
@@ -283,7 +284,7 @@ const Supplier = () => {
                             )}</>
                         ) : (
                             <div className="w-full h-screen flex justify-center items-center">
-                                <h3>No Suppliers found</h3>
+                                <h3>No Product Types found</h3>
                             </div>
                         )
                     }
@@ -293,4 +294,4 @@ const Supplier = () => {
     );
 }
 
-export default Supplier;
+export default ProductTypes;

@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 
 import userRoutes from './routes/userRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
+import productTypeRoutes from './routes/productTypeRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { getDir } from './utils/fileDir.js';
 import { allowResourceAccess } from './middleware/corsFileMiddleware.js';
@@ -40,10 +41,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/suppliers', allowResourceAccess, express.static(getDir('uploads/suppliers')));
+app.use('/producttypes', allowResourceAccess, express.static(getDir('uploads/producttypes')));
 
 // routes
 app.use('/api/users', userRoutes);
 app.use('/api/suppliers', supplierRoutes);
+app.use('/api/producttype', productTypeRoutes);
 
 // fall back when route is not found
 app.use(notFound);
