@@ -44,6 +44,7 @@ app.use(cookieParser());
 app.use('/suppliers', allowResourceAccess, express.static(getDir('uploads/suppliers')));
 app.use('/producttypes', allowResourceAccess, express.static(getDir('uploads/producttypes')));
 app.use('/items', allowResourceAccess, express.static(getDir('uploads/items')));
+app.use('/barcodes', allowResourceAccess, express.static(getDir('uploads/barcodes')));
 
 // routes
 app.use('/api/users', userRoutes);
