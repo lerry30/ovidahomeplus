@@ -62,7 +62,7 @@ const NewItem = () => {
 
             const productType = data?.productType?.trim();
             const productTypeId = toNumber(data?.productTypeId);
-            const description = data?.description?.join(', ');
+            const description = data?.description?.join(',');
 
             const supplier = data?.supplier?.trim();
             const supplierId = toNumber(data?.supplierId);
@@ -406,7 +406,7 @@ const NewItem = () => {
                         </div>
                         <ErrorField message={errorData?.units || ''} />
                     </div>
-                    <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                    {/* <div className="w-1/2 flex flex-col sm:px-4 gap-2">
                         <label htmlFor="quantity" className="font-semibold">
                             Quantity
                             <span className="text-red-500">*</span>
@@ -422,7 +422,7 @@ const NewItem = () => {
                             required
                         />
                         <ErrorField message={errorData?.quantity || ''} />
-                    </div>
+                    </div> */}
 
                     <div className="w-full flex justify-end sm:px-4 sm:py-2">
                         <button onClick={item} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">
