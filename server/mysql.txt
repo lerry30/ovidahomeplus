@@ -21,14 +21,6 @@ CREATE TABLE suppliers(
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE deliveries(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	supplier_id INT NOT NULL,
-	price DOUBLE NOT NULL,
-	date DATE NOT NULL,
-	FOREIGN KEY(supplier_id) REFERENCES suppliers(id)
-);
-
 CREATE TABLE product_types(
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
@@ -36,6 +28,14 @@ CREATE TABLE product_types(
 	status ENUM('active', 'inactive') DEFAULT 'active',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE deliveries(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	supplier_id INT NOT NULL,
+	price DOUBLE NOT NULL,
+	date DATE NOT NULL,
+	FOREIGN KEY(supplier_id) REFERENCES suppliers(id)
 );
 
 CREATE TABLE modification_history(
@@ -53,10 +53,11 @@ CREATE TABLE items(
 	description VARCHAR(255) NOT NULL,
 	item_code VARCHAR(255) NOT NULL,
 	quantity INT NOT NULL,
-	barcode VARCHAR(255) NOT NULL,
+	barcode VARCHAR(255) UNIQUE NOT NULL,
 	srp DOUBLE NOT NULL,
 	max_discount DOUBLE NOT NULL,
 	unit ENUM('pcs', 'set') DEFAULT 'pcs',
+	status ENUM('active', 'inactive') DEFAULT 'active',
 	image VARCHAR(255) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
