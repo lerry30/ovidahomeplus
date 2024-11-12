@@ -1,6 +1,7 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
 import { isValidDate } from '../utils/datetime.js';
+import { generateBarcode } from '../utils/generateBarcode.js';
 import * as itemStmt from '../mysql/item.js';
 import * as deliveryStmt from '../mysql/delivery.js';
 
@@ -35,14 +36,40 @@ const newItem = requestHandler(async (req, res, database) => {
 
     const maxDiscount = srp - srp * 0.05;
 
-    const barcode = '0010101010100001'
+    // create barcode
+    const fCode =  String(productTypeId).padStart(3, '0');
+    // get items to verify barcode uniqueness
+    const [getItems] = await database.query(itemStmt.items, []);
+    const lastItemBarcode = getItems?.length > 0 ? getItems[0]?.barcode?.substring(3) : ''; // get the last item so new barcode will be increment for uniqueness
+    
+    let itemBarcode = fCode + String(toNumber(lastItemBarcode)+1).padStart(11, '0');
+    let maxIteration = 1000;
+
+    // convert to object
+    const barcodes = {};
+    for(let i = 0; i < getItems.length; i++) {
+        const barcode = getItems[i]?.barcode;
+        barcodes[barcode] = true;
+    }
+
+    while(maxIteration > 0) {
+        maxIteration--;
+        if(barcodes[itemBarcode]) {
+            itemBarcode = fCode + String(toNumber(lastItemBarcode)+1).padStart(11, '0');
+        } else {
+            break;
+        }
+    }
+
+    console.log({maxIteration});
 
     const [deliveryInserted] = await database.execute(deliveryStmt.newDelivery, [supplierId, deliveryPrice, deliveryDate]);
     const deliveryId = deliveryInserted?.insertId;
     if(deliveryId > 0) {
         const [itemInserted] = await database.execute(itemStmt.newItem, 
-            [deliveryId, productTypeId, description, itemCode, quantity, barcode, srp, maxDiscount, unit, image]);
+            [deliveryId, productTypeId, description, itemCode, quantity, itemBarcode, srp, maxDiscount, unit, image]);
         if(itemInserted?.insertId > 0) {
+            generateBarcode(itemBarcode);
             res.status(201).json({message: 'Inserted successfully.'});
             return;
         }
@@ -51,6 +78,17 @@ const newItem = requestHandler(async (req, res, database) => {
     throw {status: 401, message: 'New item failed to insert.'};
 });
 
+/*
+   desc     Get items
+   route    GET /api/items/get
+   access   public
+*/
+const getItems = requestHandler(async (req, res, database) => {
+    const [results] = await database.query(itemStmt.items, []);
+    res.status(200).json({results});
+});
+
 export {
     newItem,
+    getItems,
 };
