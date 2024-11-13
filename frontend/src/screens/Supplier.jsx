@@ -204,11 +204,11 @@ const Supplier = () => {
                                             const isActive = item?.status==='active';
                                             return (
                                                 <li key={item?.id}>
-                                                    <div className="h-[190px] md:h-fit flex p-1 border border-neutral-300 rounded-lg">
+                                                    <div className="h-[180px] md:h-fit flex p-1 border border-neutral-300 rounded-lg">
                                                         <img 
                                                             src={`${apiUrl}/suppliers/${item?.image}`}
                                                             alt="ovida-supplier" 
-                                                            className="size-[80px] rounded-lg border"
+                                                            className="size-[80px] rounded-lg border object-contain"
                                                             onError={ev => {
                                                                 ev.target.src='../../public/image-off.png'
                                                                 ev.onerror=null;

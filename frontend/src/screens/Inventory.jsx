@@ -5,6 +5,7 @@ import { useLayoutEffect, useState, useRef } from 'react';
 import { getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDateAndTime } from '@/utils/datetime';
+import { zItem } from '@/store/item';
 
 import Searchbar from '@/components/Searchbar';
 import Loading from '@/components/Loading';
@@ -37,7 +38,7 @@ const Inventory = () => {
 
             const response = await getData(urls?.getitems);
             if(response) {
-                console.log(response?.results);
+                // console.log(response?.results);
                 const data = response?.results;
                 setItems(data);
                 setItemActions(Array(data.length).fill(false));
@@ -52,6 +53,12 @@ const Inventory = () => {
 
     useLayoutEffect(() => {
         getItems();
+
+        const closeActions = () => setItemActions(state => state.map(item => false));
+        addEventListener('click', closeActions);
+        return () => {
+            removeEventListener('click', closeActions);
+        }
     }, []);
 
     if(loading) {
@@ -105,60 +112,38 @@ const Inventory = () => {
                                         const isActive = item?.status==='active';
                                         return (
                                             <li key={item?.id}>
-                                                <div className="h-[270px] lg:h-fit flex p-1 pb-2 border border-neutral-300 rounded-lg">
+                                                <div className="h-[420px] md:h-[290px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
                                                     <img 
                                                         src={`${apiUrl}/items/${item?.image}`}
                                                         alt="ovida-product" 
-                                                        className="size-[80px] rounded-lg border"
+                                                        className="w-[80px] h-[80px] object-contain rounded-lg border mb-2"
                                                         onError={ev => {
                                                             ev.target.src='../../public/image-off.png'
                                                             ev.onerror=null;
                                                         }}
                                                     />
-                                                    <div className="w-full h-full md:h-[80px] 
-                                                        grid grid-cols-[repeat(auto-fit,_minmax(150px,_1fr))] gap-4
+                                                    <hr />
+                                                    <div className="w-full xl:h-[90px] 
+                                                        grid grid-cols-2 lg:grid-cols-4 gap-4
                                                         p-2">
-                                                        <div className="w-full flex flex-col md:w-fit">
+                                                        <div className="w-full flex flex-col md:w-fit 
+                                                            col-start-1">
                                                             <div className="flex flex-col md:flex-row md:items-center md:gap-2">
-                                                                <h3 className="font-semibold text-lg">{item?.productTypeName}</h3>
+                                                                <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
                                                                 <p className={`w-fit h-6 text-white text-sm px-2 rounded-full ${isActive?'bg-green-500':'bg-red-500'}`}>
                                                                     {item?.status}
                                                                 </p>
                                                             </div>
-                                                            <p className="text-[14px] md:text-base">{item?.description}</p>
-                                                            <p>Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
-                                                            {/* ------------------------small screen for responsiveness---------------------- */}
-                                                            <img 
-                                                                src={`${apiUrl}/barcodes/${item?.barcode}.png`}
-                                                                alt="ovida-product-barcode" 
-                                                                className="w-[120px] h-[50px] object-contain lg:hidden py-2"
-                                                                onError={ev => {
-                                                                    ev.target.src='../../public/image-off.png'
-                                                                    ev.onerror=null;
-                                                                }}
-                                                            />
-                                                            <div className="flex flex-col lg:hidden">
-                                                                <article>
-                                                                    <span>SRP:&nbsp;&nbsp;</span>
-                                                                    <span className="font-semibold">
-                                                                        ₱ {item?.srp}
-                                                                    </span>
-                                                                </article>
-                                                                <article>
-                                                                    <span>Max discount:&nbsp;&nbsp;</span>
-                                                                    <span className="font-semibold">
-                                                                        ₱ {item?.maxDiscount}
-                                                                    </span>
-                                                                </article>
-                                                            </div>
+                                                            <p className="text-[12px] md:text-base">{item?.description}</p>
+                                                            <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
                                                             {/* -------------------------------------------------- */}
                                                             {/* display only for small screen */}
-                                                            <p className="flex md:hidden text-[14px]">
-                                                                {formattedDateAndTime(new Date(item?.updatedAt))}
+                                                            <p className="flex md:hidden text-[12px]">
+                                                                {formattedDateAndTime(new Date(item?.deliveryDate))}
                                                             </p>
                                                         </div>
-                                                        {/* ------------------------large screen for responsiveness---------------------- */}
-                                                        <div className="hidden lg:flex flex-col">
+                                                        <div className="flex flex-col text-sm 
+                                                            row-start-3 lg:row-start-1 lg:col-start-2">
                                                             <article>
                                                                 <span>SRP:&nbsp;&nbsp;</span>
                                                                 <span className="font-semibold">
@@ -172,16 +157,20 @@ const Inventory = () => {
                                                                 </span>
                                                             </article>
                                                         </div>
-                                                        <img 
-                                                            src={`${apiUrl}/barcodes/${item?.barcode}.png`}
-                                                            alt="ovida-product-barcode" 
-                                                            className="w-[120px] h-[50px] object-contain hidden lg:flex"
-                                                            onError={ev => {
-                                                                ev.target.src='../../public/image-off.png'
-                                                                ev.onerror=null;
-                                                            }}
-                                                        />
-                                                        <div className="flex flex-col md:items-end md:justify-start">
+                                                        <div className="w-full flex lg:justify-center 
+                                                            row-start-2 lg:row-start-1 lg:col-start-3">
+                                                            <img 
+                                                                src={`${apiUrl}/barcodes/${item?.barcode}.png`}
+                                                                alt="ovida-product-barcode" 
+                                                                className="w-[120px] h-[50px] object-contain"
+                                                                onError={ev => {
+                                                                    ev.target.src='../../public/image-off.png'
+                                                                    ev.onerror=null;
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex flex-col items-end md:justify-start
+                                                            row-start-1 col-start-2 lg:col-start-4">
                                                             <div className="relative size-[26px] rounded-full hover:cursor-pointer hover:bg-gray-200">
                                                                 <button 
                                                                     onClick={(ev) => {
@@ -216,9 +205,8 @@ const Inventory = () => {
                                                                     <button
                                                                         onClick={() => {
                                                                             if(isActive) {
-                                                                                const {id, name, image, status} = item;
-                                                                                zProductType.getState()?.saveProductTypeData(id, name, image, status);
-                                                                                navigate('/admin/update-product-type');
+                                                                                zItem.getState()?.saveItemData(item);
+                                                                                navigate('/admin/update-item');
                                                                             }
                                                                         }}
                                                                         className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
@@ -229,7 +217,7 @@ const Inventory = () => {
                                                                 </article>
                                                             </div>
                                                             {/* display only for large screen */}
-                                                            <p className="hidden md:flex">{formattedDateAndTime(new Date(item?.updatedAt))}</p>
+                                                            <p className="hidden text-[12px] md:flex">{formattedDateAndTime(new Date(item?.deliveryDate))}</p>
                                                         </div>
                                                     </div>
                                                 </div>

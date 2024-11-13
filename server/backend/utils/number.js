@@ -6,3 +6,7 @@ export const toNumber = (value) => {
         return 0;
     }
 }
+
+export const roundToTwo = (number) => {
+    return Math.round(number * 100) / 100;
+}

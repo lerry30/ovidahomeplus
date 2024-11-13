@@ -10,6 +10,7 @@ import NewSupplier from '@/screens/NewSupplier';
 import UpdateSupplier from '@/screens/UpdateSupplier';
 import NewProductType from '@/screens/NewProductType';
 import UpdateProductType from '@/screens/UpdateProductType';
+import UpdateItem from '@/screens/UpdateItem';
 import NotFound from '@/screens/NotFound';
 import Loading from '@/components/Loading';
 
@@ -54,6 +55,7 @@ const App = () => {
 			<Route path="/admin/new-item" element={<NewItem />} />
 			<Route path="/admin/new-product-type" element={<NewProductType />} />
 			<Route path="/admin/update-product-type" element={<UpdateProductType />} />
+			<Route path="/admin/update-item" element={<UpdateItem />} />
 			<Route path="/admin/*" element={<SidebarRoute />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>

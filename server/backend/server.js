@@ -28,7 +28,8 @@ const limiter = rateLimit({
 });
 
 app.use(cors({
-    origin: process.env.FRONTEND_DOMAIN,
+    // origin: process.env.FRONTEND_DOMAIN, // for specific ip
+    origin: true, // allow any ip
     credentials: true, // Allow cookies to be sent
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 }));

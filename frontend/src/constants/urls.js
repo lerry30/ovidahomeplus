@@ -1,4 +1,4 @@
-export const apiUrl = 'http://localhost:4000';
+export const apiUrl = 'http://192.168.1.19:4000';
 
 export const urls = {
     signup: `${apiUrl}/api/users/`,
@@ -14,4 +14,5 @@ export const urls = {
     updateproducttype: `${apiUrl}/api/producttype/update`,
     newitem: `${apiUrl}/api/items/new`,
     getitems: `${apiUrl}/api/items/get`,
+    updateitem: `${apiUrl}/api/items/update`,
 };

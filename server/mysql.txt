@@ -23,7 +23,7 @@ CREATE TABLE suppliers(
 
 CREATE TABLE product_types(
 	id INT PRIMARY KEY AUTO_INCREMENT,
-	name VARCHAR(255) NOT NULL,
+	name VARCHAR(255) NOT NULL UNIQUE,
 	image VARCHAR(255) NOT NULL,
 	status ENUM('active', 'inactive') DEFAULT 'active',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -33,7 +33,7 @@ CREATE TABLE product_types(
 CREATE TABLE deliveries(
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	supplier_id INT NOT NULL,
-	price DOUBLE NOT NULL,
+	price DECIMAL(10, 2) NOT NULL,
 	date DATE NOT NULL,
 	FOREIGN KEY(supplier_id) REFERENCES suppliers(id)
 );
@@ -54,8 +54,8 @@ CREATE TABLE items(
 	item_code VARCHAR(255) NOT NULL,
 	quantity INT NOT NULL,
 	barcode VARCHAR(255) UNIQUE NOT NULL,
-	srp DOUBLE NOT NULL,
-	max_discount DOUBLE NOT NULL,
+	srp DECIMAL(10, 2) NOT NULL,
+	max_discount DECIMAL(10, 2) NOT NULL,
 	unit ENUM('pcs', 'set') DEFAULT 'pcs',
 	status ENUM('active', 'inactive') DEFAULT 'active',
 	image VARCHAR(255) NOT NULL,
