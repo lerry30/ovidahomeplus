@@ -424,7 +424,13 @@ const NewItem = () => {
                         <ErrorField message={errorData?.quantity || ''} />
                     </div> */}
 
-                    <div className="w-full flex justify-end sm:px-4 sm:py-2">
+                    <div className="w-full flex justify-end gap-2 sm:px-4 sm:py-2">
+                        <Link 
+                            to="/admin/inventory" 
+                            className="flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
+                        >
+                            Cancel
+                        </Link>
                         <button onClick={item} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">
                             Add New Item
                         </button>

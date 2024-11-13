@@ -1,7 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 import { sendForm } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { zSupplier } from '@/store/supplier';
 import { toNumber } from '@/utils/number';
 
@@ -137,8 +137,17 @@ const UpdateSupplier = () => {
                             placeholder="09XX-XXX-XXXX (Optional)"
                         />
                     </div>
-                    <div className="sm:px-4 sm:py-2">
-                        <button onClick={supplier} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">
+                    <div className="sm:px-4 sm:py-2 flex gap-2">
+                        <Link 
+                            to="/admin/supplier" 
+                            className="flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
+                        >
+                            Cancel
+                        </Link>
+                        <button 
+                            onClick={supplier} 
+                            className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800"
+                        >
                             Update Supplier
                         </button>
                     </div>

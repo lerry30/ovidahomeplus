@@ -1,11 +1,11 @@
 import { Plus, Ellipsis } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDateAndTime } from '@/utils/datetime';
 import { zItem } from '@/store/item';
+import { formattedNumber } from '@/utils/number';
 
 import Searchbar from '@/components/Searchbar';
 import Loading from '@/components/Loading';
@@ -147,13 +147,13 @@ const Inventory = () => {
                                                             <article>
                                                                 <span>SRP:&nbsp;&nbsp;</span>
                                                                 <span className="font-semibold">
-                                                                    ₱ {item?.srp}
+                                                                    ₱ {formattedNumber(item?.srp)}
                                                                 </span>
                                                             </article>
                                                             <article>
                                                                 <span>Max discount:&nbsp;&nbsp;</span>
                                                                 <span className="font-semibold">
-                                                                    ₱ {item?.maxDiscount}
+                                                                    ₱ {formattedNumber(item?.maxDiscount)}
                                                                 </span>
                                                             </article>
                                                         </div>

@@ -85,7 +85,13 @@ const NewProductType = () => {
                         />
                         <ErrorField message={errorData?.name || ''} />
                     </div>
-                    <div className="sm:px-4 sm:py-2">
+                    <div className="sm:px-4 sm:py-2 flex gap-2">
+                        <Link 
+                            to="/admin/product-types" 
+                            className="flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
+                        >
+                            Cancel
+                        </Link>
                         <button 
                             onClick={productType} 
                             className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800"

@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
-import { toNumber } from '@/utils/number';
+import { toNumber, formattedNumber } from '@/utils/number';
 import { isValidDate } from '@/utils/datetime';
 import { zItem } from '@/store/item';
 
@@ -382,9 +382,10 @@ const UpdateItem = () => {
                             </label>
                             <input 
                                 id="delivery-price"
-                                value={data?.deliveryPrice}
+                                value={formattedNumber(data?.deliveryPrice)}
                                 onChange={elem => {
                                     const input = Math.max(0, toNumber(elem.target.value));
+                                    console.log(typeof input);
                                     setData(state => ({...state, deliveryPrice: input}))
                                 }}
                                 className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
@@ -439,7 +440,7 @@ const UpdateItem = () => {
                             </label>
                             <input 
                                 id="srp"
-                                value={data?.srp}
+                                value={formattedNumber(data?.srp)}
                                 onChange={elem => {
                                     const input = Math.max(0, toNumber(elem.target.value));
                                     setData(state => ({...state, srp: input}));
@@ -497,10 +498,10 @@ const UpdateItem = () => {
                         <ErrorField message={errorData?.quantity || ''} />
                     </div> */}
 
-                    <div className="w-full flex justify-end gap-4 sm:px-4 sm:py-2">
+                    <div className="w-full flex justify-end gap-2 sm:px-4 sm:py-2">
                         <Link 
                             to="/admin/inventory" 
-                            className="flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-300 hover:bg-gray-400"
+                            className="flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
                         >
                             Cancel
                         </Link>

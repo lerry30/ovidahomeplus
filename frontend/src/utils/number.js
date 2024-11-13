@@ -6,3 +6,10 @@ export const toNumber = (value) => {
         return 0;
     }
 }
+
+export const formattedNumber = (number) => {
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: number % 1 === 0 ? 0 : 2, // Only show decimals if they exist
+        maximumFractionDigits: 2,
+    }).format(number);
+};

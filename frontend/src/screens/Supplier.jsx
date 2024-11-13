@@ -272,8 +272,8 @@ const Supplier = () => {
                                                                             className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
                                                                             disabled={!isActive}
                                                                         >
-                                                                                Update
-                                                                            </button>
+                                                                            Update
+                                                                        </button>
                                                                     </article>
                                                                 </div>
                                                                 {/* display only for large screen */}
