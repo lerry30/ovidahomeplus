@@ -1,7 +1,8 @@
 import { Plus, Ellipsis } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { PromptTextBox, Prompt, ErrorModal } from '@/components/Modal';
 import { useLayoutEffect, useState, useRef } from 'react';
-import { getData } from '@/utils/send';
+import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDateAndTime } from '@/utils/datetime';
 import { zItem } from '@/store/item';
@@ -18,15 +19,76 @@ const Inventory = () => {
     const [enablePrompt, setEnablePrompt] = useState(false);
     const [tabs, setTabs] = useState({all: true, active: false, inactive: false}); // tabs
     const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
+    const actionId = useRef(null);
     const searchBar = useRef(null);
     const navigate = useNavigate();
+
+    const tabNavigate = (tab) => {
+        if(searchBar.current) searchBar.current.value = '';
+        setTabs({all: false, active: false, inactive: false, [tab]: true});
+
+        if(tab === 'all') {
+            setDisplayItems(items);
+            return;
+        }
+
+        const nItems = [];
+        for(let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const isActive = !item?.disabledNote;
+            if(isActive && tab==='active') nItems.push(item);
+            if(!isActive && tab==='inactive') nItems.push(item);
+        }
+
+        setDisplayItems(nItems);
+    }
 
     const search = (ev) => {
         try {
             const input = ev.target.value.trim().toLowerCase();
             let tabSelected = 'all';
-            
+            for(const index in tabs) {
+                tabSelected = tabs[index] ? index : tabSelected;
+            }
+
+            if(!input) {
+                tabNavigate(tabSelected);
+                return;
+            }
+
+            const searched = [];
+            const isTabAll = tabs?.all;
+            for(let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const productTypeName = String(item?.productTypeName).trim().toLowerCase();
+                const deliveryDate = String(item?.deliveryDate).trim();
+                const description = String(item?.description).trim().toLocaleLowerCase();
+                const itemCode = String(item?.itemCode).trim().toLowerCase();
+                const maxDiscount = String(item?.maxDiscount);
+                const srp = String(item?.srp);
+                const supplierName = String(item?.supplierName).trim().toLowerCase();
+                const unit = String(item?.unit).trim().toLocaleLowerCase();
+
+                const isActive = !item?.disabledNote;
+                if(
+                    productTypeName?.match(input) ||
+                    deliveryDate?.match(input) ||
+                    description?.match(input) ||
+                    itemCode?.match(input) ||
+                    maxDiscount?.match(input) ||
+                    srp?.match(input) ||
+                    supplierName?.match(input) ||
+                    unit?.match(input)
+                ) {
+                    if(isActive || isTabAll){
+                        searched.push(item);
+                    }
+                }
+            }
+
+            setDisplayItems(searched);
         } catch(error) {
             console.log(error);
         } finally {}
@@ -52,6 +114,10 @@ const Inventory = () => {
     }
 
     useLayoutEffect(() => {
+        setTimeout(() => setErrorMessage({header: '', message: ''}), 5000);
+    }, [errorMessage]);
+
+    useLayoutEffect(() => {
         getItems();
 
         const closeActions = () => setItemActions(state => state.map(item => false));
@@ -60,6 +126,89 @@ const Inventory = () => {
             removeEventListener('click', closeActions);
         }
     }, []);
+
+    if(disablePrompt) {
+        return (
+            <PromptTextBox 
+                header="Disabling Item" 
+                message="Disabling an item requires a note." 
+                callback={async (value) => {
+                    try {
+                        setLoading(true);
+                        const payload = {
+                            id: actionId.current,
+                            note: String(value).trim()
+                        };
+                        const response = await sendJSON(urls.disableitem, payload, 'PATCH');
+                        if(response) {
+                            console.log(response?.message);
+                            if(response?.message) 
+                                setErrorMessage({
+                                    header: 'Status Updated Successfully', 
+                                    message: response?.message
+                                });
+                            getItems();
+                        }
+                    } catch(error) {
+                        console.log(error?.message);
+                        setErrorMessage({
+                            header: 'Failed to Update Status', 
+                            message: 'There\'s something wrong'
+                        });
+                    } finally {
+                        setLoading(false);
+                        setDisablePrompt(false);
+                    }
+                }} 
+                onClose={() => setDisablePrompt(false)} 
+            />
+        )
+    }
+
+    if(enablePrompt) {
+        return (
+            <Prompt 
+                header="Would you like to enable this item?" 
+                message="Once enabled, they will be available for new transactions." 
+                callback={async () => {
+                    try {
+                        setLoading(true);
+                        if(!actionId?.current) throw new Error('Item not found'); 
+                        const response = await sendJSON(urls.enableitem, {id: actionId.current}, 'PATCH');
+                        if(response) {
+                            console.log(response?.message);
+                            if(response?.message) 
+                                setErrorMessage({
+                                    header: 'Status Updated Successfully', 
+                                    message: response?.message
+                                });
+                            getItems();
+                        }
+                    } catch(error) {
+                        console.log(error?.message);
+                        setErrorMessage({
+                            header: 'Failed to Update Status', 
+                            message: 'There\'s something wrong'
+                        });
+                    } finally {
+                        setLoading(false);
+                        setEnablePrompt(false);
+                    }
+                }}
+                onClose={()=>setEnablePrompt(false)} 
+            />
+        )
+    }
+
+    if(errorMessage?.header || errorMessage?.message) {
+        return (
+            <ErrorModal 
+                header={errorMessage?.header}
+                message={errorMessage?.message} 
+                callback={() => setErrorMessage({header: '', message: ''})} 
+            />
+        )
+    }
 
     if(loading) {
         return (
@@ -109,14 +258,15 @@ const Inventory = () => {
                                 <ul className="flex flex-col gap-2 p-2">
                                 {
                                     displayItems.map((item, index) => {
-                                        const isActive = item?.status==='active';
+                                        const isActive = !item?.disabledNote;
+                                        const status = isActive ? 'active' : 'inactive';
                                         return (
                                             <li key={item?.id}>
-                                                <div className="h-[420px] md:h-[290px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
+                                                <div className="h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
                                                     <img 
                                                         src={`${apiUrl}/items/${item?.image}`}
                                                         alt="ovida-product" 
-                                                        className="w-[80px] h-[80px] object-contain rounded-lg border mb-2"
+                                                        className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                         onError={ev => {
                                                             ev.target.src='../../public/image-off.png'
                                                             ev.onerror=null;
@@ -131,7 +281,7 @@ const Inventory = () => {
                                                             <div className="flex flex-col md:flex-row md:items-center md:gap-2">
                                                                 <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
                                                                 <p className={`w-fit h-6 text-white text-sm px-2 rounded-full ${isActive?'bg-green-500':'bg-red-500'}`}>
-                                                                    {item?.status}
+                                                                    {status}
                                                                 </p>
                                                             </div>
                                                             <p className="text-[12px] md:text-base">{item?.description}</p>
@@ -141,9 +291,18 @@ const Inventory = () => {
                                                             <p className="flex md:hidden text-[12px]">
                                                                 {formattedDateAndTime(new Date(item?.deliveryDate))}
                                                             </p>
+                                                            <p className="text-red-500 font-semibold italic text-[14px]">
+                                                                {item?.disabledNote}
+                                                            </p>
                                                         </div>
                                                         <div className="flex flex-col text-sm 
                                                             row-start-3 lg:row-start-1 lg:col-start-2">
+                                                            <article>
+                                                                <span>Supplier:&nbsp;&nbsp;</span>
+                                                                <span className="font-semibold">
+                                                                    {item.supplierName}
+                                                                </span>
+                                                            </article>
                                                             <article>
                                                                 <span>SRP:&nbsp;&nbsp;</span>
                                                                 <span className="font-semibold">

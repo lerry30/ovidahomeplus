@@ -15,4 +15,6 @@ export const urls = {
     newitem: `${apiUrl}/api/items/new`,
     getitems: `${apiUrl}/api/items/get`,
     updateitem: `${apiUrl}/api/items/update`,
+    disableitem: `${apiUrl}/api/items/status/disable`,
+    enableitem: `${apiUrl}/api/items/status/enable`,
 };

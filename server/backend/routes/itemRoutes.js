@@ -6,6 +6,8 @@ import {
     newItem,
     getItems,
     updateItem,
+    disableItem,
+    enableItem,
 } from '../controllers/itemController.js';
 
 const router = express.Router();
@@ -15,6 +17,8 @@ const router = express.Router();
     router.post('/new', protect, uploadMiddleware.single('file'), newItem);
     router.get('/get', getItems);
     router.put('/update', protect, uploadMiddleware.single('file'), updateItem);
+    router.patch('/status/disable', protect, disableItem);
+    router.patch('/status/enable/', protect, enableItem);
 })();
 
 export default router;

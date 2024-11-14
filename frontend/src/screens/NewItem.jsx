@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
-import { toNumber } from '@/utils/number';
+import { toNumber, formattedNumber } from '@/utils/number';
 import { isValidDate } from '@/utils/datetime';
 
 import AppLogo from '@/components/AppLogo';
@@ -309,7 +309,7 @@ const NewItem = () => {
                             </label>
                             <input 
                                 id="delivery-price"
-                                value={data?.deliveryPrice}
+                                value={formattedNumber(data?.deliveryPrice)}
                                 onChange={elem => {
                                     const input = Math.max(0, toNumber(elem.target.value));
                                     setData(state => ({...state, deliveryPrice: input}))
@@ -366,7 +366,7 @@ const NewItem = () => {
                             </label>
                             <input 
                                 id="srp"
-                                value={data?.srp}
+                                value={formattedNumber(data?.srp)}
                                 onChange={elem => {
                                     const input = Math.max(0, toNumber(elem.target.value));
                                     setData(state => ({...state, srp: input}));

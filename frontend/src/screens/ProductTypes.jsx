@@ -1,4 +1,4 @@
-import { Plus, Ellipsis, Image } from 'lucide-react';
+import { Plus, Ellipsis } from 'lucide-react';
 import { Prompt } from '@/components/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef, act } from 'react';

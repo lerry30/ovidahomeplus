@@ -7,6 +7,7 @@ import { unlink } from 'fs/promises';
 import { getDir } from '../utils/fileDir.js';
 import * as itemStmt from '../mysql/item.js';
 import * as deliveryStmt from '../mysql/delivery.js';
+import * as disabledItemStmt from '../mysql/disabledItem.js';
 
 /*
    desc     New Item
@@ -142,8 +143,47 @@ const updateItem = requestHandler(async (req, res, database) => {
     throw {status: 401, message: 'Updating item failed.'};
 });
 
+/*
+   desc     Update Status of Item
+   route    PATCH /api/items/status/disable
+   access   private
+*/
+const disableItem = requestHandler(async (req, res, database) => {
+    const id = toNumber(req.body?.id);
+    const note = String(req.body?.note).trim();
+
+    if(!id) throw {status: 404, message: 'Product item not recognized.'};
+    if(!note) throw {status: 400, message: 'Disabling an item requires a note.'}
+
+    const [result] = await database.execute(disabledItemStmt.newInactive, [id, note]);
+    if(result?.insertId > 0) {
+        res.status(200).json({message: 'Item status updated.'});
+    } else {
+        throw {status: 400, message: 'Updating item status failed.'}
+    }
+});
+
+/*
+   desc     Update Status of Item
+   route    PATCH /api/items/status/enable
+   access   private
+*/
+const enableItem = requestHandler(async (req, res, database) => {
+    const id = toNumber(req.body?.id);
+    if(!id) throw {status: 404, message: 'Product item not recognized.'};
+
+    const [result] = await database.execute(disabledItemStmt.removeInactive, [id]);
+    if(result?.affectedRows > 0) {
+        res.status(200).json({message: 'Item status updated.'});
+    } else {
+        throw {status: 400, message: 'Updating item status failed.'}
+    }
+});
+
 export {
     newItem,
     getItems,
     updateItem,
+    disableItem,
+    enableItem,
 };
