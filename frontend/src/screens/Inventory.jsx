@@ -217,7 +217,7 @@ const Inventory = () => {
     }
 
     return (
-        <div className="absolute top-0 
+        <main className="absolute top-0 
             left-admin-sidebar-sm lg:left-admin-sidebar-lg 
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))] 
             min-h-screen bg-neutral-100 p-4 lg:px-6
@@ -235,7 +235,7 @@ const Inventory = () => {
                 </Link>
             </section>
             <h1 className="flex sm:hidden font-semibold text-lg">Inventory</h1>
-            <div className="grow w-full h-full relative">
+            <section className="grow w-full h-full relative">
                 {/* container with scroll bar */}
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md
                     overflow-auto
@@ -284,7 +284,7 @@ const Inventory = () => {
                                                                     {status}
                                                                 </p>
                                                             </div>
-                                                            <p className="text-[12px] md:text-base">{item?.description}</p>
+                                                            <p className="text-[12px]">{item?.description}</p>
                                                             <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
                                                             {/* -------------------------------------------------- */}
                                                             {/* display only for small screen */}
@@ -397,8 +397,8 @@ const Inventory = () => {
                         )
                     }
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     );
 }
 
