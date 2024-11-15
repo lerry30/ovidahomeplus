@@ -12,10 +12,11 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointE
 
 const Dashboard = () => {
     const [reservations, setReservations] = useState({ pending: 10, approved: 50, rejected: 5 });
+    const [itemsSoldToday, setItemsSoldToday] = useState(0);
+    const [itemsSold, setItemsSold] = useState(0);
     const [users, setUsers] = useState(0);
     const [venues, setVenues] = useState(0);
     const [dishes, setDishes] = useState(0);
-    const [drinks, setDrinks] = useState(0);
     const [serviceSatisfactionRate, setServiceSatisfactionRate] = useState({});
     const [monthlyComparison, setMonthlyComparison] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     const [monthlyAccount, setMonthlyAccount] = useState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -106,27 +107,27 @@ const Dashboard = () => {
 
             const response = await getData('/api/dashboard');
             if(response) {
-                const countData = response?.data;
-                const userCount = toNumber(countData?.users);
-                const dishCount = toNumber(countData?.dishes);
-                const drinkCount = toNumber(countData?.drinks);
-                const venueCount = toNumber(countData?.venues);
-                const reservationStatusesCount = countData?.reservations
-                const setOfRatings = countData?.ratings;
-                const monthlyReservation = countData?.months;
-                const monthlyUserAccount = countData?.monthlyUserAccount;
-                const venuePopularity = countData?.venuePopularity;
+                // const countData = response?.data;
+                // const userCount = toNumber(countData?.users);
+                // const dishCount = toNumber(countData?.dishes);
+                // const drinkCount = toNumber(countData?.drinks);
+                // const venueCount = toNumber(countData?.venues);
+                // const reservationStatusesCount = countData?.reservations
+                // const setOfRatings = countData?.ratings;
+                // const monthlyReservation = countData?.months;
+                // const monthlyUserAccount = countData?.monthlyUserAccount;
+                // const venuePopularity = countData?.venuePopularity;
 
-                setUsers(userCount);
-                setDishes(dishCount);
-                setDrinks(drinkCount);
-                setVenues(venueCount);
+                // setUsers(userCount);
+                // setDishes(dishCount);
+                // setDrinks(drinkCount);
+                // setVenues(venueCount);
 
-                setReservations(reservationStatusesCount);
-                satisfactionComputation(setOfRatings);
-                setMonthlyComparison(monthlyReservation);
-                setMonthlyAccount(monthlyUserAccount);
-                setPopularVenues(venuePopularity);
+                // setReservations(reservationStatusesCount);
+                // satisfactionComputation(setOfRatings);
+                // setMonthlyComparison(monthlyReservation);
+                // setMonthlyAccount(monthlyUserAccount);
+                // setPopularVenues(venuePopularity);
             }
         } catch(error) {
             console.log(error);
@@ -146,7 +147,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="absolute top-0 
+        <main className="absolute top-0 
             left-admin-sidebar-sm lg:left-admin-sidebar-lg 
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
             h-full bg-neutral-100 p-4 overflow-y-auto
@@ -161,27 +162,27 @@ const Dashboard = () => {
             <section className="bg-neutral-100 min-h-screen">
                 <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                        <h2 className="font-semibold text-lg mb-2">Today Sold Items</h2>
-                        <AnimateNumber number={ drinks } size={ 40 } />
+                    <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
+                        <h2 className="font-semibold text-lg mb-2">Items Sold Today</h2>
+                        <AnimateNumber number={itemsSoldToday} size={40} />
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Sold Items</h2>
-                        <AnimateNumber number={ drinks } size={ 40 } />
+                        <AnimateNumber number={itemsSold} size={40} />
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Items</h2>
                         <AnimateNumber number={ users } size={ 40 } />
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Suppliers</h2>
                         <AnimateNumber number={ venues } size={ 40 } />
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Product Types</h2>
                         <AnimateNumber number={ dishes } size={ 40 } />
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">bar</h2>
                         <Bar data={reservationData} />
                     </div>
@@ -203,7 +204,7 @@ const Dashboard = () => {
                     </div>
                 </div>
             </section>
-        </div>
+        </main>
     );
 }
 
