@@ -10,14 +10,14 @@ export const zSupplier = create(set => ({
 
     saveSupplierData: (id, name, contact, image, status) => {
         localStorage.setItem(localStorageName, JSON.stringify({id, name, contact, image, status}));
-        set(state => ({id, name, contact, image, status}));
+        set({id, name, contact, image, status});
     },
 
     reloadSupplierData: () => {
         const localSupplierData = JSON.parse(localStorage.getItem(localStorageName) || '{}');
         if(Object.keys(localSupplierData)?.length > 0) {
             const {id, name, contact, image, status} = localSupplierData;
-            set(state => ({id, name, contact, image, status}));
+            set({id, name, contact, image, status});
         }
     }
 }));
