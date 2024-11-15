@@ -50,7 +50,7 @@ export const zItem = create(set => ({
         };
 
         localStorage.setItem(localStorageName, JSON.stringify(dataSet));
-        set(state => dataSet)
+        set(dataSet)
     },
 
     reloadItemData: () => {
@@ -77,7 +77,7 @@ export const zItem = create(set => ({
                 createdAt: String(data?.createdAt).trim(),
                 updatedAt: String(data?.updatedAt).trim(),
             };
-            set(state => dataSet);
+            set(dataSet);
         }
     }
 }));
