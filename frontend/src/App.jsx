@@ -1,6 +1,6 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState } from 'react';
-import { zUser } from './store/user';
+import { zUser } from '@/store/user';
 
 import SidebarRoute from '@/routes/SidebarRoute';
 import SignUp from '@/screens/SignUp';
@@ -11,6 +11,7 @@ import UpdateSupplier from '@/screens/UpdateSupplier';
 import NewProductType from '@/screens/NewProductType';
 import UpdateProductType from '@/screens/UpdateProductType';
 import UpdateItem from '@/screens/UpdateItem';
+import SelectItem from '@/screens/SelectItem';
 import NotFound from '@/screens/NotFound';
 import Loading from '@/components/Loading';
 
@@ -56,6 +57,7 @@ const App = () => {
 			<Route path="/admin/new-product-type" element={<NewProductType />} />
 			<Route path="/admin/update-product-type" element={<UpdateProductType />} />
 			<Route path="/admin/update-item" element={<UpdateItem />} />
+			<Route path="/admin/select-item" element={<SelectItem />} />
 			<Route path="/admin/*" element={<SidebarRoute />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>
