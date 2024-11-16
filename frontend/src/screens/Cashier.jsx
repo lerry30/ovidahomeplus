@@ -6,8 +6,10 @@ import { getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDateAndTime } from '@/utils/datetime';
 import { formattedNumber } from '@/utils/number';
+import { breadcrumbsOrder as localStorageName } from '@/constants/localStorageNames';
 
 import Loading from '@/components/Loading';
+import Breadcrumbs from '@/components/BreadCrumbs';
 
 const Cashier = () => {
     const [items, setItems] = useState([]);
@@ -57,15 +59,33 @@ const Cashier = () => {
         <main className="absolute top-0 
             left-admin-sidebar-sm lg:left-admin-sidebar-lg 
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
-            h-screen bg-neutral-100 p-4 overflow-hidden
-            flex flex-col"
+            min-h-screen md:h-screen bg-neutral-100 p-4
+            flex flex-col
+            overflow-y-auto
+            [&::-webkit-scrollbar]:w-2
+            [&::-webkit-scrollbar-track]:rounded-full
+            [&::-webkit-scrollbar-track]:bg-gray-100
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:bg-gray-300
+            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
         >
-            <section className="w-full flex justify-between items-center gap-4">
-                <h1 className="font-semibold text-lg">Cashier</h1>
+            {/* the height has fixed value to properly compute the remaining space available of screen */}
+            <section className="w-full h-[30px] flex justify-between items-center gap-4">
+                <h1 className="text-nowrap font-semibold text-lg">Order Details</h1>
+                <div className="hidden md:flex">
+                    <Breadcrumbs 
+                        tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
+                        tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
+                        localStorageName={localStorageName}
+                    />
+                </div>
+                {/* Proceed */}
             </section>
-            <section className="grow w-full flex flex-col md:flex-row gap-2">
+            {/* this container has fixed value that depends on the header above. Also the 26px is for padding */}
+            <section className="grow w-full h-[calc(100vh-30px-26px)] flex flex-col md:flex-row gap-4">
                 <div className="w-full md:w-1/2
-                    h-full p-2 bg-white shadow-md rounded-lg overflow-hidden">
+                    min-h-full md:h-full p-2 bg-white shadow-md rounded-lg overflow-hidden">
                     <header className="w-full flex justify-between pb-2">
                         <h2>Items</h2>
                         <Link
@@ -76,22 +96,13 @@ const Cashier = () => {
                             <span className="hidden sm:flex text-nowrap">Select Item</span>
                         </Link>
                     </header>
-                    <hr />
-                    <ul className="w-full h-full flex flex-col gap-2 py-2
-                        overflow-y-auto
-                        [&::-webkit-scrollbar]:w-2
-                        [&::-webkit-scrollbar-track]:rounded-full
-                        [&::-webkit-scrollbar-track]:bg-gray-100
-                        [&::-webkit-scrollbar-thumb]:rounded-full
-                        [&::-webkit-scrollbar-thumb]:bg-gray-300
-                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+                    <ul className="w-full h-full flex flex-col gap-2 pb-[40px]">
                         {
                             selectedItems?.length > 0 ? (
                                 <>{
                                     selectedItems.map(item => (
                                         <li key={item?.id}>
-                                            <div className="h-[310px] md:h-[220px] flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
+                                            <div className="h-[340px] md:h-[240px] lg:h-[210px] flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
                                                 <img 
                                                     src={`${apiUrl}/items/${item?.image}`}
                                                     alt="ovida-product" 
@@ -138,28 +149,56 @@ const Cashier = () => {
                                                         </article>
                                                     </div>
                                                     <p className="text-[12px] md:flex">{formattedDateAndTime(new Date(item?.deliveryDate))}</p>
-                                                    <div className="flex justify-end gap-2 py-4">
-                                                        <button 
-                                                            className="flex gap-2 items-center justify-center leading-none bg-purple-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-purple-800 text-[12px]
-                                                            sm:pr-4"
-                                                        >
-                                                            <Minus />
-                                                            Apply Discount
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => {
-                                                                // remove
-                                                                const selected = zSelectedItem.getState()?.items || [];
-                                                                const newSelected = selected.filter(itemId => itemId!==item?.id)
-                                                                zSelectedItem.getState()?.saveSelectedItemData(newSelected);
-                                                                setSelected();
-                                                            }}
-                                                            className="flex gap-2 items-center justify-center leading-none bg-red-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-red-800 text-[12px]
-                                                            sm:pr-4"
-                                                        >
-                                                            <CircleX />
-                                                            Remove
-                                                        </button>
+                                                    <div className="flex flex-col lg:flex-row gap-2 pt-1">
+                                                        <div className="flex gap-2">
+                                                            {/* <button 
+                                                                onClick={() => {
+                                                                    // remove
+                                                                    const selected = zSelectedItem.getState()?.items || [];
+                                                                    const newSelected = selected.filter(itemId => itemId!==item?.id)
+                                                                    zSelectedItem.getState()?.saveSelectedItemData(newSelected);
+                                                                    setSelected();
+                                                                }}
+                                                                className="flex gap-2 items-center justify-center leading-none bg-red-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-red-800 text-[12px]
+                                                                sm:pr-4"
+                                                            >
+                                                                <CircleX />
+                                                                Remove
+                                                            </button> */}
+                                                            <button 
+                                                                className="flex gap-2 items-center justify-center leading-none bg-purple-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-purple-800 text-[12px]
+                                                                sm:pr-4"
+                                                            >
+                                                                <Minus />
+                                                                Apply Discount
+                                                            </button>
+                                                        </div>
+                                                        <div className="w-full flex justify-end items-center gap-2">
+                                                            <button  
+                                                                onClick={() => {
+                                                                    const selected = zSelectedItem.getState()?.items || [];
+                                                                    const newSelected = [];
+                                                                    console.log(selected);
+                                                                    for(const sItem of selected) {
+                                                                        console.log(sItem, item?.id);
+                                                                        if(sItem === item?.id) {
+                                                                            if(item?.quantity<=1) continue;
+                                                                            item.quantity--;
+                                                                        }
+                                                                        newSelected.push(sItem);
+                                                                    }
+                                                                    zSelectedItem.getState()?.saveSelectedItemData(newSelected);
+                                                                    setSelected();
+                                                                }}
+                                                                className="bg-neutral-500 rounded-lg text-white"
+                                                            >
+                                                                <Minus />
+                                                            </button>
+                                                            <span className="text-nowrap">{`${item.quantity} ${item.unit}`}</span>
+                                                            <button className="bg-neutral-500 rounded-lg text-white">
+                                                                <Plus />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -174,9 +213,21 @@ const Cashier = () => {
                         }
                     </ul>
                 </div>
-                <div className="w-full md:w-1/2 h-full 
-                    p-2">
-                
+                <div className="w-full md:w-1/2
+                    h-full p-2 bg-white shadow-md rounded-lg overflow-hidden">
+                    <header className="w-full flex justify-between pb-2">
+                        <h2>Summary</h2>
+                    </header>
+                    <ul className="w-full h-full flex flex-col gap-2
+                        overflow-y-auto pb-[40px]
+                        [&::-webkit-scrollbar]:w-2
+                        [&::-webkit-scrollbar-track]:rounded-full
+                        [&::-webkit-scrollbar-track]:bg-gray-100
+                        [&::-webkit-scrollbar-thumb]:rounded-full
+                        [&::-webkit-scrollbar-thumb]:bg-gray-300
+                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+                    </ul>
                 </div>
             </section>
         </main>
