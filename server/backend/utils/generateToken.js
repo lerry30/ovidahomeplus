@@ -5,9 +5,11 @@ const generateToken = (res, value) => {
         expiresIn: '30d'
     });
 
+    const isInProduction = String(process.env.NODE_ENV).toLocaleLowerCase().trim()==='production'
+
     res.cookie('jwt', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV==='production',
+        httpOnly: isInProduction,
+        secure: isInProduction,
         sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000
     });
