@@ -3,6 +3,8 @@ import { createFullname } from '@/utils/name';
 import { user as localStorageName } from '@/constants/localStorageNames';
 import { urls } from '@/constants/urls';
 import { getData } from '@/utils/send';
+import { signout } from '@/utils/signout';
+import { checkCookieExists } from '@/utils/cookie';
 
 export const zUser = create(set => ({
     firstname: '',
@@ -12,6 +14,10 @@ export const zUser = create(set => ({
     image: '',
 
     saveUserData: async () => {
+        if(!checkCookieExists('jwt')) {
+            signout();
+        }
+
         const isLocalUserDataExist = (Object.keys(JSON.parse(localStorage.getItem(localStorageName) || '{}')).length > 0);
         if(!isLocalUserDataExist) {
             const response = await getData(urls.user);
@@ -25,4 +31,13 @@ export const zUser = create(set => ({
             return { firstname, lastname, username, fullname, image };
         });
     },
+
+    wipeOutData: () => {
+        set({firstname: '',
+            lastname: '',
+            username: '',
+            fullname: '',
+            image: ''
+        });
+    }
 }));
