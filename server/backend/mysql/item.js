@@ -1,5 +1,5 @@
 export const items = `
-        SELECT
+    SELECT
         items.id,
         
         suppliers.name AS supplierName,
