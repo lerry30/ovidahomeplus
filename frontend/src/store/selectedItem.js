@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { selectedItems as localStorageName } from '@/constants/localStorageNames';
 
 export const zSelectedItem = create(set => ({
-    items: [],
+    items: {}, // -> each item {id: {quantity: 0, isDiscounted: 0}}
 
     saveSelectedItemData: (items) => {
         localStorage.setItem(localStorageName, JSON.stringify(items));
