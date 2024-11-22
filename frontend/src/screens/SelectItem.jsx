@@ -14,7 +14,7 @@ import Loading from '@/components/Loading';
 const SelectItem = () => {
     const [items, setItems] = useState([]);
     const [displayItems, setDisplayItems] = useState([]);
-    const [selectedItems, setSelectedItems] = useState([]);
+    const [selectedItems, setSelectedItems] = useState({});
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
@@ -23,7 +23,8 @@ const SelectItem = () => {
     const navigate = useNavigate();
 
     const handleSelectedItems = () => {
-        if(selectedItems?.length > 0) {
+        if(Object.keys(selectedItems).length > 0) {
+            // with additional data
             zSelectedItem.getState()?.saveSelectedItemData(selectedItems);
             navigate('/admin/cashier');
         } else {
@@ -38,10 +39,13 @@ const SelectItem = () => {
         const isChecked = checkBoxes.current[index].checked;
         checkBoxes.current[index].checked = !isChecked;
 
-        setSelectedItems((state) => {
-            if (state.includes(itemId))
-                return state.filter((id) => id !== itemId);
-            return [...state, itemId];
+        setSelectedItems(state => {
+            if(state.hasOwnProperty(itemId)) {
+                delete state[itemId];
+                return {...state};
+            } else {
+                return {...state, [itemId]: {quantity: 1, isDiscounted: false}};
+            }
         });
     }
 
@@ -61,6 +65,7 @@ const SelectItem = () => {
                 const srp = String(item?.srp);
                 const supplierName = String(item?.supplierName).trim().toLowerCase();
                 const unit = String(item?.unit).trim().toLocaleLowerCase();
+                const barcode = String(item?.barcode).trim();
 
                 const isActive = !item?.disabledNote;
                 if(
@@ -71,7 +76,8 @@ const SelectItem = () => {
                     maxDiscount?.match(input) ||
                     srp?.match(input) ||
                     supplierName?.match(input) ||
-                    unit?.match(input)
+                    unit?.match(input) ||
+                    barcode?.match(input)
                 ) {
                     if(isActive){
                         searched.push(item);
@@ -92,9 +98,17 @@ const SelectItem = () => {
             const response = await getData(urls?.getitems);
             if(response) {
                 // console.log(response?.results);
+                // filter data if it has 
                 const data = response?.results;
-                setItems(data);
-                setDisplayItems(data);
+                const fData = [];
+                for(const item of data) {
+                    if(!item?.disabledNote && item?.quantity > 0) {
+                        fData.push(item);
+                    }
+                }
+
+                setItems(fData);
+                setDisplayItems(fData);
             }
         } catch(error) {
             console.log(error?.message);
@@ -164,6 +178,7 @@ const SelectItem = () => {
                                 displayItems.map((item, index) => {
                                     const isActive = !item?.disabledNote;
                                     const status = isActive ? 'active' : 'inactive';
+                                    const isSelected = selectedItems.hasOwnProperty(item?.id);
                                     return (
                                         <li 
                                             key={item?.id}
@@ -171,12 +186,12 @@ const SelectItem = () => {
                                         >
                                             <div className={`h-[420px] md:h-[320px] lg:h-fit 
                                                 flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg
-                                                ${selectedItems.includes(item?.id) ? 'bg-green-200/75' : 'bg-white'}`}>
+                                                ${isSelected ? 'bg-green-200/75' : 'bg-white'}`}>
                                                 <input 
                                                     ref={elem => checkBoxes.current[index] = elem}
                                                     type="checkbox"
                                                     className="size-5 mr-2 mb-2"
-                                                    checked={selectedItems.includes(item?.id)}
+                                                    checked={isSelected}
                                                     onChange={() => checkBox(index, item?.id)}
                                                 />
                                                 <img 
