@@ -237,16 +237,7 @@ const Inventory = () => {
             <h1 className="flex sm:hidden font-semibold text-lg">Inventory</h1>
             <section className="grow w-full h-full relative">
                 {/* container with scroll bar */}
-                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md
-                    overflow-auto
-                    [&::-webkit-scrollbar]:w-2
-                    [&::-webkit-scrollbar-track]:rounded-full
-                    [&::-webkit-scrollbar-track]:bg-gray-100
-                    [&::-webkit-scrollbar-thumb]:rounded-full
-                    [&::-webkit-scrollbar-thumb]:bg-gray-300
-                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
-                ">
+                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md">
                     <div className="h-[40px] border-b p-2 flex gap-2">
                         <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
                         <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
@@ -255,7 +246,16 @@ const Inventory = () => {
                     {
                         items?.length > 0 ? (
                             <>{displayItems?.length > 0 ? (
-                                <ul className="flex flex-col gap-2 p-2">
+                                <ul className="flex flex-col gap-2 p-2
+                                    overflow-x-hidden overflow-y-auto
+                                    [&::-webkit-scrollbar]:w-2
+                                    [&::-webkit-scrollbar-track]:rounded-full
+                                    [&::-webkit-scrollbar-track]:bg-gray-100
+                                    [&::-webkit-scrollbar-thumb]:rounded-full
+                                    [&::-webkit-scrollbar-thumb]:bg-gray-300
+                                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+                                ">
                                 {
                                     displayItems.map((item, index) => {
                                         const isActive = !item?.disabledNote;
