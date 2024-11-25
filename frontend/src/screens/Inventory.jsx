@@ -98,7 +98,7 @@ const Inventory = () => {
 
             const response = await getData(urls?.getitems);
             if(response) {
-                console.log(response?.results);
+                // console.log(response?.results);
                 const data = response?.results;
                 setItems(data);
                 setItemActions(Array(data.length).fill(false));

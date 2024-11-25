@@ -102,7 +102,7 @@ const SelectItem = () => {
                 const data = response?.results;
                 const fData = [];
                 for(const item of data) {
-                    if(!item?.disabledNote) {
+                    if(!item?.disabledNote && item?.quantity > 0) {
                         fData.push(item);
                     }
                 }
@@ -249,7 +249,13 @@ const SelectItem = () => {
                                                     </div>
                                                     <div className="w-full flex lg:justify-center 
                                                         row-start-2 lg:row-start-1 lg:col-start-3">
-                                                        <img 
+                                                        <article>
+                                                            <span>Quantity:&nbsp;&nbsp;</span>
+                                                            <span className="font-semibold">
+                                                                {item?.quantity}
+                                                            </span>
+                                                        </article>
+                                                        {/* <img 
                                                             src={`${apiUrl}/barcodes/${item?.barcode}.png`}
                                                             alt="ovida-product-barcode" 
                                                             className="w-[120px] h-[50px] object-contain"
@@ -257,7 +263,7 @@ const SelectItem = () => {
                                                                 ev.target.src='../../public/image-off.png'
                                                                 ev.onerror=null;
                                                             }}
-                                                        />
+                                                        /> */}
                                                     </div>
                                                     <div className="flex flex-col items-end md:justify-start
                                                         row-start-1 col-start-2 lg:col-start-4">

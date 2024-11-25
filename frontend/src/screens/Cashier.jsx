@@ -85,6 +85,7 @@ const Cashier = () => {
             const response = await getData(urls?.getitems);
             if (response) {      
                 const data = response?.results;
+                // console.log(data);
                 const fData = [];
                 for(const item of data) {
                     if(!item?.disabledNote && item?.quantity > 0) {
