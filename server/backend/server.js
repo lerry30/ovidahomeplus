@@ -10,7 +10,7 @@ import userRoutes from './routes/userRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import productTypeRoutes from './routes/productTypeRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
-// import batchNoRoutes from './routes/batchNoRoutes.js';
+import batchRoutes from './routes/batchRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { getDir } from './utils/fileDir.js';
 import { allowResourceAccess } from './middleware/corsFileMiddleware.js';
@@ -51,9 +51,9 @@ app.use('/barcodes', allowResourceAccess, express.static(getDir('uploads/barcode
 // routes
 app.use('/api/users', userRoutes);
 app.use('/api/suppliers', supplierRoutes);
-app.use('/api/producttype', productTypeRoutes);
+app.use('/api/producttypes', productTypeRoutes);
 app.use('/api/items', itemRoutes);
-// app.use('/api/batchno', batchNoRoutes);
+app.use('/api/batches', batchRoutes);
 
 // fall back when route is not found
 app.use(notFound);

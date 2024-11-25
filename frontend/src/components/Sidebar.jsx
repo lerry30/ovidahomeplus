@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, ListChecks, Truck, Package, UserRoundPen } from 'lucide-react';
+import { LayoutDashboard, ListChecks, Truck, Package, UserRoundPen, Barcode } from 'lucide-react';
 import AppLogo from '@/components/AppLogo';
 
 const SidebarLayout = () => {
@@ -14,9 +14,14 @@ const SidebarLayout = () => {
                     <span className="hidden lg:flex">Dashboard</span>
             </NavLink>
             <NavLink to="/admin/cashier" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}}
-                className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none mt-2">
+                className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
                     <UserRoundPen />
                     <span className="hidden lg:flex">Cashier</span>
+            </NavLink>
+            <NavLink to="/admin/barcodes" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}}
+                className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
+                    <Barcode />
+                    <span className="hidden lg:flex">Barcodes</span>
             </NavLink>
             <NavLink to="/admin/inventory" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
                 className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
@@ -28,10 +33,10 @@ const SidebarLayout = () => {
                     <Package />
                     <span className="hidden lg:flex">Product Types</span>
             </NavLink>
-            <NavLink to="/admin/supplier" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
+            <NavLink to="/admin/suppliers" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}} 
                 className="flex items-center gap-4 rounded-l-full px-4 py-2 leading-none">
                     <Truck />
-                    <span className="hidden lg:flex">Supplier</span>
+                    <span className="hidden lg:flex">Suppliers</span>
             </NavLink>
             <Outlet />
         </div>

@@ -12,6 +12,7 @@ import NewProductType from '@/screens/NewProductType';
 import UpdateProductType from '@/screens/UpdateProductType';
 import UpdateItem from '@/screens/UpdateItem';
 import SelectItem from '@/screens/SelectItem';
+import NewBatch from '@/screens/NewBatch';
 import NotFound from '@/screens/NotFound';
 import Loading from '@/components/Loading';
 
@@ -55,6 +56,7 @@ const App = () => {
 			<Route path="/admin/update-supplier" element={<UpdateSupplier />} />
 			<Route path="/admin/new-item" element={<NewItem />} />
 			<Route path="/admin/new-product-type" element={<NewProductType />} />
+			<Route path="/admin/new-batch" element={<NewBatch />} />
 			<Route path="/admin/update-product-type" element={<UpdateProductType />} />
 			<Route path="/admin/update-item" element={<UpdateItem />} />
 			<Route path="/admin/select-item" element={<SelectItem />} />

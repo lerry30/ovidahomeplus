@@ -6,6 +6,7 @@ import Inventory from '@/screens/Inventory';
 import Supplier from '@/screens/Supplier';
 import ProductTypes from '@/screens/ProductTypes';
 import Cashier from '@/screens/Cashier';
+import Barcode from '@/screens/Barcode';
 
 const SidebarRoute = () => {
     return (
@@ -13,9 +14,10 @@ const SidebarRoute = () => {
             <Route element={<Sidebar />}>
                 <Route index element={<Dashboard />} />
                 <Route path="/cashier" element={<Cashier />}/>
+                <Route path="/barcodes" element={<Barcode />}/>
                 <Route path="/inventory" element={<Inventory />}/>
                 <Route path="/product-types" element={<ProductTypes />} />
-                <Route path="/supplier" element={<Supplier />}/>
+                <Route path="/suppliers" element={<Supplier />}/>
             </Route>
         </Routes>
     );

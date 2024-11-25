@@ -232,7 +232,9 @@ const Inventory = () => {
                     <span className="hidden sm:flex text-nowrap">New Item</span>
                 </Link>
             </section>
-            <h1 className="flex sm:hidden font-semibold text-lg">Inventory</h1>
+            <section>
+                <h1 className="flex sm:hidden font-semibold text-lg">Inventory</h1>
+            </section>
             <section className="grow w-full h-full relative">
                 {/* container with scroll bar */}
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">

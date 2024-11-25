@@ -1,9 +1,9 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber, roundToTwo } from '../utils/number.js';
-import { generateBarcode } from '../utils/generateBarcode.js';
-import { setBarcodeSequence } from '../helper/item.js';
-import { unlink } from 'fs/promises';
-import { getDir } from '../utils/fileDir.js';
+// import { generateBarcode } from '../utils/generateBarcode.js';
+// import { setBarcodeSequence } from '../helper/item.js';
+// import { unlink } from 'fs/promises';
+// import { getDir } from '../utils/fileDir.js';
 import * as itemStmt from '../mysql/item.js';
 import * as disabledItemStmt from '../mysql/disabledItem.js';
 

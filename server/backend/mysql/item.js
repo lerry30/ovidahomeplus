@@ -21,7 +21,9 @@ export const items = `
             JSON_OBJECT(
                 'id', barcodes.id,
                 'barcode', barcodes.barcode,
-                'deliveryReceiptNo', barcodes.delivery_reciept_no,
+                'batchNo', batches.batch_no,
+                'deliveryReceiptNo', batches.delivery_reciept_no,
+                'deliveryDate', batches.delivery_date,
                 'createdAt', barcodes.created_at,
                 'updatedAt', barcodes.updated_at
             )
@@ -31,6 +33,7 @@ export const items = `
     INNER JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN disabled_items ON disabled_items.item_id = items.id
     LEFT JOIN barcodes ON barcodes.item_id = items.id
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     WHERE suppliers.status = 'active' 
       AND product_types.status = 'active'
     GROUP BY
