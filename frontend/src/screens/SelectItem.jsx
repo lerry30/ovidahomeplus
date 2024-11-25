@@ -102,7 +102,7 @@ const SelectItem = () => {
                 const data = response?.results;
                 const fData = [];
                 for(const item of data) {
-                    if(!item?.disabledNote && item?.quantity > 0) {
+                    if(!item?.disabledNote) {
                         fData.push(item);
                     }
                 }

@@ -4,7 +4,7 @@ import { sendForm, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
 import { toNumber, formattedNumber } from '@/utils/number';
-import { isValidDate } from '@/utils/datetime';
+// import { isValidDate } from '@/utils/datetime';
 
 import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
@@ -20,21 +20,17 @@ const NewItem = () => {
         supplier: '',  // to display
         supplierId: 0, // to send
         deliveryPrice: 0,
-        deliveryDate: '',
         itemCode: '',
         srp: 0,
         units: 'pcs',
-        quantity: 1,
     });
     const [errorData, setErrorData] = useState({
         productType: '',
         supplier: '',
         deliveryPrice: '',
-        deliveryDate: '',
         itemCode: '',
         srp: '',
         units: '',
-        quantity: '',
         default: ''
     });
     const [image, setImage] = useState(undefined);
@@ -67,12 +63,10 @@ const NewItem = () => {
             const supplier = data?.supplier?.trim();
             const supplierId = toNumber(data?.supplierId);
             const deliveryPrice = toNumber(data?.deliveryPrice);
-            const deliveryDate = data?.deliveryDate; // don't forget to validate date
 
             const itemCode = data?.itemCode?.trim();
             const srp = toNumber(data?.srp);
             const unit = data?.units?.trim();
-            const quantity = toNumber(data?.quantity);
 
             let hasError = false;
             if(!productType || !productTypeId) {
@@ -87,11 +81,6 @@ const NewItem = () => {
 
             if(deliveryPrice <= 0) {
                 setErrorData(state => ({...state, deliveryPrice: 'Delivery price must be greater than zero.'}));
-                hasError = true;
-            }
-
-            if(!isValidDate(deliveryDate)) {
-                setErrorData(state => ({...state, deliveryDate: 'Ensure the date is complete and in the correct format.'}));
                 hasError = true;
             }
 
@@ -110,11 +99,6 @@ const NewItem = () => {
                 hasError = true;
             }
 
-            if(quantity <= 0) {
-                setErrorData(state => ({...state, quantity: 'Quantity must be greater than zero.'}));
-                hasError = true;
-            }
-
             if(hasError) throw new Error('Ensure all fields above are filled.');
 
             const form = new FormData();
@@ -122,11 +106,9 @@ const NewItem = () => {
             form.append('description', description);
             form.append('supplierId', supplierId);
             form.append('deliveryPrice', deliveryPrice);
-            form.append('deliveryDate', deliveryDate);
             form.append('itemCode', itemCode);
             form.append('srp', srp);
             form.append('unit', unit);
-            form.append('quantity', quantity);
             form.append('file', image);
 
             const response = await sendForm(urls?.newitem, form);
@@ -216,7 +198,7 @@ const NewItem = () => {
                             <span className="text-red-500">*</span>
                         </h3>
                         <div className="flex items-center gap-4">
-                            <Select name="Select Product Type" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10">
+                            <Select name="Select Product Type" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-30">
                                 {
                                     productTypes.map((item, index) => {
                                         if(item?.status !== 'active') return null;
@@ -272,36 +254,36 @@ const NewItem = () => {
 
                     {/* Supplier */}
                     <hr />
-                    <div className="flex flex-col sm:px-4 gap-2">
-                        <h3 className="font-semibold">
-                            Supplier
-                            <span className="text-red-500">*</span>
-                        </h3>
-                        <div className="flex items-center gap-4">
-                            <Select name="Select Supplier" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400">
-                                {
-                                    suppliers.map((item, index) => {
-                                        if(item?.status !== 'active') return null;
-                                        return (
-                                            <button
-                                                key={index}
-                                                onClick={() => {
-                                                    setData(state => ({...state, supplier: item?.name, supplierId: item?.id}));
-                                                }}
-                                                className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                            >
-                                                {item?.name}
-                                            </button>
-                                        )
-                                    })
-                                }
-                            </Select>
-                            {/* Dropdown output */}
-                            {data?.supplier && <span className="bg-green-400/50 p-2 rounded-md">{data?.supplier}</span>}
-                        </div>
-                        <ErrorField message={errorData?.supplier || ''} />
-                    </div>
                     <div className="w-full flex flex-col md:flex-row gap-2">
+                        <div className="flex flex-col sm:px-4 gap-2">
+                            <h3 className="font-semibold">
+                                Supplier
+                                <span className="text-red-500">*</span>
+                            </h3>
+                            <div className="flex items-center gap-4">
+                                <Select name="Select Supplier" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20">
+                                    {
+                                        suppliers.map((item, index) => {
+                                            if(item?.status !== 'active') return null;
+                                            return (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setData(state => ({...state, supplier: item?.name, supplierId: item?.id}));
+                                                    }}
+                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                                >
+                                                    {item?.name}
+                                                </button>
+                                            )
+                                        })
+                                    }
+                                </Select>
+                                {/* Dropdown output */}
+                                {data?.supplier && <span className="bg-green-400/50 p-2 rounded-md">{data?.supplier}</span>}
+                            </div>
+                            <ErrorField message={errorData?.supplier || ''} />
+                        </div>
                         <div className="w-1/2 flex flex-col sm:px-4 gap-2">
                             <label htmlFor="delivery-price" className="font-semibold">
                                 Delivery Price
@@ -319,7 +301,7 @@ const NewItem = () => {
                             />
                             <ErrorField message={errorData?.deliveryPrice || ''} />
                         </div>
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                        {/* <div className="w-1/2 flex flex-col sm:px-4 gap-2">
                             <label htmlFor="delivery-date" className="font-semibold">
                                 Delivery Date
                                 <span className="text-red-500">*</span>
@@ -336,7 +318,7 @@ const NewItem = () => {
                                 required
                             />
                             <ErrorField message={errorData?.deliveryDate || ''} />
-                        </div>
+                        </div> */}
                     </div>
                     {/* Item details */}
                     <hr />
@@ -383,7 +365,7 @@ const NewItem = () => {
                             <span className="text-red-500">*</span>
                         </h3>
                         <div className="flex items-center gap-4">
-                            <Select name="Select Unit" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400">
+                            <Select name="Select Unit" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10">
                                 <button
                                     onClick={() => {
                                         setData(state => ({...state, units: 'pcs'}));
@@ -406,23 +388,6 @@ const NewItem = () => {
                         </div>
                         <ErrorField message={errorData?.units || ''} />
                     </div>
-                    {/* <div className="w-1/2 flex flex-col sm:px-4 gap-2">
-                        <label htmlFor="quantity" className="font-semibold">
-                            Quantity
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <input 
-                            id="quantity"
-                            value={data?.quantity}
-                            onChange={elem => {
-                                const input = Math.max(0, toNumber(elem.target.value));
-                                setData(state => ({...state, quantity: input}));
-                            }}
-                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
-                            required
-                        />
-                        <ErrorField message={errorData?.quantity || ''} />
-                    </div> */}
 
                     <div className="w-full flex justify-end gap-2 sm:px-4 sm:py-2">
                         <Link 

@@ -33,7 +33,8 @@ CREATE TABLE product_types(
 CREATE TABLE deliveries(
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	supplier_id INT NOT NULL,
-	price DECIMAL(10, 2) NOT NULL,
+	batch_no INT NOT NULL,
+	delivery_reciept_no VARCHAR(255) NOT NULL,
 	date DATE NOT NULL,
 	FOREIGN KEY(supplier_id) REFERENCES suppliers(id)
 );
@@ -41,27 +42,26 @@ CREATE TABLE deliveries(
 CREATE TABLE modification_history(
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	employee_id INT NOT NULL,
-	category ENUM('item', 'supplier', 'product') DEFAULT 'item',
+	category ENUM('item', 'supplier', 'product', 'delivered') DEFAULT 'item',
 	action ENUM('added', 'updated', 'deleted') DEFAULT 'added',
 	modification_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE items(
 	id INT PRIMARY KEY AUTO_INCREMENT,
-	delivery_id INT NOT NULL,
+	supplier_id INT NOT NULL,
 	product_type_id INT NOT NULL,
 	description VARCHAR(255) NOT NULL,
 	item_code VARCHAR(255) NOT NULL,
-	quantity INT NOT NULL,
-	barcode VARCHAR(255) UNIQUE NOT NULL,
+	delivery_price DECIMAL(10, 2) NOT NULL,
 	srp DECIMAL(10, 2) NOT NULL,
 	max_discount DECIMAL(10, 2) NOT NULL,
 	unit ENUM('pcs', 'set') DEFAULT 'pcs',
 	image VARCHAR(255) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY(delivery_id) REFERENCES deliveries(id),
-	FOREIGN KEY(product_type_id) REFERENCES product_types(id)
+	FOREIGN KEY(product_type_id) REFERENCES product_types(id),
+	FOREIGN KEY(supplier_id) REFERENCES suppliers(id)
 );
 
 CREATE TABLE disabled_items(
@@ -69,5 +69,15 @@ CREATE TABLE disabled_items(
 	item_id INT NOT NULL,
 	note VARCHAR(255) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY(item_id) REFERENCES items(id)
+);
+
+CREATE TABLE barcodes(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	item_id INT NOT NULL,
+	barcode VARCHAR(255) NOT NULL,
+	delivery_reciept_no VARCHAR(255) NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY(item_id) REFERENCES items(id)
 );

@@ -4,7 +4,7 @@ import { PromptTextBox, Prompt, ErrorModal } from '@/components/Modal';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
-import { formattedDateAndTime } from '@/utils/datetime';
+// import { formattedDateAndTime } from '@/utils/datetime';
 import { zItem } from '@/store/item';
 import { formattedNumber } from '@/utils/number';
 
@@ -63,7 +63,6 @@ const Inventory = () => {
             for(let i = 0; i < items.length; i++) {
                 const item = items[i];
                 const productTypeName = String(item?.productTypeName).trim().toLowerCase();
-                const deliveryDate = String(item?.deliveryDate).trim();
                 const description = String(item?.description).trim().toLocaleLowerCase();
                 const itemCode = String(item?.itemCode).trim().toLowerCase();
                 const maxDiscount = String(item?.maxDiscount);
@@ -74,7 +73,6 @@ const Inventory = () => {
                 const isActive = !item?.disabledNote;
                 if(
                     productTypeName?.match(input) ||
-                    deliveryDate?.match(input) ||
                     description?.match(input) ||
                     itemCode?.match(input) ||
                     maxDiscount?.match(input) ||
@@ -100,7 +98,7 @@ const Inventory = () => {
 
             const response = await getData(urls?.getitems);
             if(response) {
-                // console.log(response?.results);
+                console.log(response?.results);
                 const data = response?.results;
                 setItems(data);
                 setItemActions(Array(data.length).fill(false));
@@ -237,7 +235,7 @@ const Inventory = () => {
             <h1 className="flex sm:hidden font-semibold text-lg">Inventory</h1>
             <section className="grow w-full h-full relative">
                 {/* container with scroll bar */}
-                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md">
+                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
                     <div className="h-[40px] border-b p-2 flex gap-2">
                         <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
                         <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
@@ -246,8 +244,8 @@ const Inventory = () => {
                     {
                         items?.length > 0 ? (
                             <>{displayItems?.length > 0 ? (
-                                <ul className="flex flex-col gap-2 p-2
-                                    overflow-x-hidden overflow-y-auto
+                                <ul className="w-full h-full flex flex-col gap-2 p-2 pb-20
+                                    overflow-y-auto
                                     [&::-webkit-scrollbar]:w-2
                                     [&::-webkit-scrollbar-track]:rounded-full
                                     [&::-webkit-scrollbar-track]:bg-gray-100
@@ -262,7 +260,7 @@ const Inventory = () => {
                                         const status = isActive ? 'active' : 'inactive';
                                         return (
                                             <li key={item?.id}>
-                                                <div className="h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
+                                                <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border  rounded-lg ${isActive?'border-neutral-300':'border-red-600 bg-gray-200/50'}`}>
                                                     <img 
                                                         src={`${apiUrl}/items/${item?.image}`}
                                                         alt="ovida-product" 
@@ -288,9 +286,9 @@ const Inventory = () => {
                                                             <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
                                                             {/* -------------------------------------------------- */}
                                                             {/* display only for small screen */}
-                                                            <p className="flex md:hidden text-[12px]">
+                                                            {/* <p className="flex md:hidden text-[12px]">
                                                                 {formattedDateAndTime(new Date(item?.deliveryDate))}
-                                                            </p>
+                                                            </p> */}
                                                             <p className="text-red-500 font-semibold italic text-[14px]">
                                                                 {item?.disabledNote}
                                                             </p>
@@ -318,7 +316,13 @@ const Inventory = () => {
                                                         </div>
                                                         <div className="w-full flex lg:justify-center 
                                                             row-start-2 lg:row-start-1 lg:col-start-3">
-                                                            <img 
+                                                            <article>
+                                                                <span>Quantity:&nbsp;&nbsp;</span>
+                                                                <span className="font-semibold">
+                                                                    {item?.quantity}
+                                                                </span>
+                                                            </article>
+                                                            {/* <img 
                                                                 src={`${apiUrl}/barcodes/${item?.barcode}.png`}
                                                                 alt="ovida-product-barcode" 
                                                                 className="w-[120px] h-[50px] object-contain"
@@ -326,7 +330,7 @@ const Inventory = () => {
                                                                     ev.target.src='../../public/image-off.png'
                                                                     ev.onerror=null;
                                                                 }}
-                                                            />
+                                                            /> */}
                                                         </div>
                                                         <div className="flex flex-col items-end md:justify-start
                                                             row-start-1 col-start-2 lg:col-start-4">
@@ -376,7 +380,7 @@ const Inventory = () => {
                                                                 </article>
                                                             </div>
                                                             {/* display only for large screen */}
-                                                            <p className="hidden text-[12px] md:flex">{formattedDateAndTime(new Date(item?.deliveryDate))}</p>
+                                                            {/* <p className="hidden text-[12px] md:flex">{formattedDateAndTime(new Date(item?.deliveryDate))}</p> */}
                                                         </div>
                                                     </div>
                                                 </div>

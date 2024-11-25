@@ -15,6 +15,8 @@ const Cashier = () => {
     const [items, setItems] = useState([]); // from database
     const [selectedItems, setSelectedItems] = useState([]);
     const [itemDetails, setItemDetails] = useState({});
+    const [total, setTotal] = useState(0);
+    const [recomputeTotal, setRecomputeTotal] = useState(false); // trigger
     const [loading, setLoading] = useState(false);
 
     // to reset the UI
@@ -28,6 +30,16 @@ const Cashier = () => {
             }
         }
         setSelectedItems(selectedData);
+        setRecomputeTotal(!recomputeTotal);
+    }
+
+    const computeTotal = () => {
+        const overAllTotal = selectedItems.reduce((t, item) => {
+            const {quantity, isDiscounted} = itemDetails[item?.id];
+            if(isDiscounted) return t + toNumber(item?.maxDiscount) * toNumber(quantity)
+            return t + toNumber(item?.srp) * toNumber(quantity);
+        }, 0);
+        setTotal(overAllTotal);
     }
 
     const enableDiscount = (item) => {
@@ -37,6 +49,7 @@ const Cashier = () => {
         }
         zSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
+        setRecomputeTotal(!recomputeTotal);
     }
 
     const increaseItemQuantity = (item) => {
@@ -46,6 +59,7 @@ const Cashier = () => {
         }
         zSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
+        setRecomputeTotal(!recomputeTotal);
     }
 
     const decreaseItemQuantity = (item) => {
@@ -53,7 +67,8 @@ const Cashier = () => {
         // console.log(sItem, item?.id);
         if (selected.hasOwnProperty(item?.id)) {
             if(selected[item?.id]?.quantity <= 1) {
-                delete selected[item?.id]
+                delete selected[item?.id] 
+                setSelectedItems(state => state?.filter(sItem => sItem?.id!==item?.id));
             } else {
                 selected[item?.id].quantity--;
             }
@@ -61,6 +76,7 @@ const Cashier = () => {
 
         zSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
+        setRecomputeTotal(!recomputeTotal);
     }
 
     const getItems = async () => {
@@ -86,6 +102,10 @@ const Cashier = () => {
     }
 
     useLayoutEffect(() => {
+        computeTotal();
+    }, [recomputeTotal])
+
+    useLayoutEffect(() => {
         setSelectedToDisplay();
     }, [items]);
 
@@ -95,14 +115,6 @@ const Cashier = () => {
         setItemDetails({...selected});
         getItems();
     }, []);
-
-    const getTotal = () => {
-        const total = selectedItems.reduce((t, item) => {
-            if(item?.isDiscounted) return t + toNumber(item?.maxDiscount);
-            return t + toNumber(item?.srp);
-        }, 0);
-        return <>₱ {formattedNumber(total)}</>;
-    }
 
     if (loading) {
         return (
@@ -282,7 +294,11 @@ const Cashier = () => {
                                         <h3 className="text-nowrap font-semibold">{item?.productTypeName}</h3>
                                         <div className="w-full border-t border-neutral-500 border-dashed mx-2 mt-1"></div>
                                         <h3 className="text-nowrap">
-                                            ₱ {itemDetails[item?.id]?.isDiscounted?item?.maxDiscount:item?.srp}
+                                            ₱ {formattedNumber(itemDetails[item?.id]?.isDiscounted ? 
+                                                toNumber(item?.maxDiscount) * toNumber(itemDetails[item?.id]?.quantity)
+                                            :
+                                                toNumber(item?.srp) * toNumber(itemDetails[item?.id]?.quantity)
+                                            )}
                                         </h3>
                                     </li>
                                 ))
@@ -291,7 +307,7 @@ const Cashier = () => {
                     <article className="w-full px-4 flex justify-between items-center">
                         <span className="text-nowrap font-semibold text-lg">Total</span>
                         <div className="w-full border-t border-neutral-500 border-dashed mx-2 mt-1"></div>
-                        <span className="text-nowrap font-semibold text-lg">{getTotal()}</span>
+                        <span className="text-nowrap font-semibold text-lg">₱ {formattedNumber(total)}</span>
                     </article>
                 </div>
             </section>
