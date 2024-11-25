@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Pencil } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { urls } from '@/constants/urls';
 import { getData } from '@/utils/send';
@@ -46,13 +46,22 @@ const Barcode = () => {
         ">
             <section className="flex justify-between items-center gap-4">
                 <h1 className="hidden sm:flex font-semibold text-lg">Barcodes</h1>
-                <Link
-                    to="/admin/new-batch"
-                    className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
-                >
-                    <Plus />
-                    <span className="hidden sm:flex text-nowrap">New Batch</span>
-                </Link>
+                <div className="flex gap-2">
+                    <Link
+                        to="/admin/new-batch"
+                        className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:px-4 hover:bg-green-800"
+                    >
+                        <Pencil size={20} />
+                        <span className="hidden sm:flex text-nowrap">Edit Batch</span>
+                    </Link>
+                    <Link
+                        to="/admin/new-batch"
+                        className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
+                    >
+                        <Plus />
+                        <span className="hidden sm:flex text-nowrap">New Batch</span>
+                    </Link>
+                </div>
             </section>
             <section>
                 <h1 className="flex sm:hidden font-semibold text-lg">Barcodes</h1>
