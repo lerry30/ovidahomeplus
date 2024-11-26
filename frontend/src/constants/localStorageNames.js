@@ -2,14 +2,16 @@ const user = 'user-data';
 const supplier = 'supplier-data';
 const productType = 'product-type';
 const item = 'item-data';
-const selectedItems = 'selected-items-data';
+const selectedItemsForCashier = 'selected-items-cashier-data';
 const breadcrumbsOrder = 'breadcrumbs-order-status';
+const selectedItemFormNewBarcode = 'selected-item-new-barcode-data';
 
 export { 
    user,
    supplier,
    productType,
    item,
-   selectedItems,
+   selectedItemsForCashier,
    breadcrumbsOrder,
+   selectedItemFormNewBarcode,
 };
