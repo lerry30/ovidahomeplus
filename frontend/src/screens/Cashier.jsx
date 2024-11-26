@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Plus, Minus } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
-import { zSelectedItem } from '@/store/selectedItem';
+import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
 import { getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDateAndTime } from '@/utils/datetime';
@@ -21,7 +21,7 @@ const Cashier = () => {
 
     // to reset the UI
     const setSelectedToDisplay = () => {
-        const selected = zSelectedItem.getState()?.items || {};
+        const selected = zCashierSelectedItem.getState()?.items || {};
         const selectedData = [];
         // I just get the items details in database to avoid setting it all in localstorage
         for(const item of items) {
@@ -43,27 +43,27 @@ const Cashier = () => {
     }
 
     const enableDiscount = (item) => {
-        const selected = zSelectedItem.getState()?.items || [];
+        const selected = zCashierSelectedItem.getState()?.items || [];
         if (selected.hasOwnProperty(item?.id) && selected[item?.id].hasOwnProperty('isDiscounted')) {
             selected[item?.id].isDiscounted = !selected[item?.id].isDiscounted;
         }
-        zSelectedItem.getState()?.saveSelectedItemData(selected);
+        zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
         setRecomputeTotal(!recomputeTotal);
     }
 
     const increaseItemQuantity = (item) => {
-        const selected = zSelectedItem.getState()?.items || [];
+        const selected = zCashierSelectedItem.getState()?.items || [];
         if (selected.hasOwnProperty(item?.id)) {
             selected[item?.id].quantity++;
         }
-        zSelectedItem.getState()?.saveSelectedItemData(selected);
+        zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
         setRecomputeTotal(!recomputeTotal);
     }
 
     const decreaseItemQuantity = (item) => {
-        const selected = zSelectedItem.getState()?.items || [];
+        const selected = zCashierSelectedItem.getState()?.items || [];
         // console.log(sItem, item?.id);
         if (selected.hasOwnProperty(item?.id)) {
             if(selected[item?.id]?.quantity <= 1) {
@@ -74,7 +74,7 @@ const Cashier = () => {
             }
         }
 
-        zSelectedItem.getState()?.saveSelectedItemData(selected);
+        zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
         setRecomputeTotal(!recomputeTotal);
     }
@@ -111,8 +111,8 @@ const Cashier = () => {
     }, [items]);
 
     useLayoutEffect(() => {
-        zSelectedItem.getState()?.reloadSelectedItemData();
-        const selected = zSelectedItem.getState()?.items || [];
+        zCashierSelectedItem.getState()?.reloadSelectedItemData();
+        const selected = zCashierSelectedItem.getState()?.items || [];
         setItemDetails({...selected});
         getItems();
     }, []);
@@ -223,9 +223,9 @@ const Cashier = () => {
                                                         {/* <button 
                                                             onClick={() => {
                                                                 // remove
-                                                                const selected = zSelectedItem.getState()?.items || [];
+                                                                const selected = zCashierSelectedItem.getState()?.items || [];
                                                                 const newSelected = selected.filter(itemId => itemId!==item?.id)
-                                                                zSelectedItem.getState()?.saveSelectedItemData(newSelected);
+                                                                zCashierSelectedItem.getState()?.saveSelectedItemData(newSelected);
                                                                 setSelectedToDisplay();
                                                             }}
                                                             className="flex gap-2 items-center justify-center leading-none bg-red-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-red-800 text-[12px]
