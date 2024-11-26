@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Pencil } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { urls } from '@/constants/urls';
-import { getData } from '@/utils/send';
+import { getData, sendJSON } from '@/utils/send';
 
 import Loading from '@/components/Loading';
 import Select from '@/components/DropDown';
@@ -12,8 +12,22 @@ const Barcode = () => {
     const [batches, setBatches] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const selectBatch = (batchNo) => {
-        setSelectedBatchNo(batchNo);
+    const selectBatch = async (batchNo) => {
+        try {
+            setLoading(true);
+            setSelectedBatchNo(batchNo);
+
+            const payload = {batchNo};
+            const response = await sendJSON(urls.batchdata, payload);
+            if(response) {
+                const data = response?.results;
+                // console.log(data);
+            }
+        } catch(error) {
+            console.log(error?.message);
+        } finally {
+            setLoading(false);
+        }
     }
 
     const getBatches = async () => {
@@ -22,7 +36,7 @@ const Barcode = () => {
             const response = await getData(urls.getbatches);
             if(response) {
                 const data = response?.results;
-                console.log(data);
+                // console.log(data);
                 setBatches(data);
             }
         } catch(error) {
@@ -73,23 +87,32 @@ const Barcode = () => {
             </section>
             <section className="grow w-full h-full relative">
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
-                    <div className="h-[60px] border-b p-2 flex gap-2">
-                        <Select name="Select Batch Number" className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
-                            {
-                                batches.map((item, index) => {
-                                    return (
-                                        <button
-                                            key={index}
-                                            onClick={() => selectBatch(item?.batchNo)}
-                                            className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                        >
-                                            Batch {item?.batchNo}
-                                        </button>
-                                    )
-                                })
-                            }
-                        </Select>
-                        {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">Batch {selectedBatchNo}</span>}
+                    <div className="h-[60px] border-b p-2 flex justify-between items-center">
+                        <div className="flex gap-2">
+                            <Select name="Select Batch Number" className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
+                                {
+                                    batches.map((item, index) => {
+                                        return (
+                                            <button
+                                                key={index}
+                                                onClick={() => selectBatch(item?.batchNo)}
+                                                className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                            >
+                                                Batch {item?.batchNo}
+                                            </button>
+                                        )
+                                    })
+                                }
+                            </Select>
+                            {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">Batch {selectedBatchNo}</span>}
+                        </div>
+                        <Link
+                            to="/admin/new-barcode"
+                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                            <Plus size={20} />
+                            <span className="hidden sm:flex text-nowrap">New Item</span>
+                        </Link>
                     </div>
                     {/* container with scroll bar */}
 
