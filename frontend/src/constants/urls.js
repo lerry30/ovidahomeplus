@@ -21,4 +21,5 @@ export const urls = {
     newbatch: `${apiUrl}/api/batches/new`,
     getbatch: `${apiUrl}/api/batches/batch`,
     updatebatch: `${apiUrl}/api/batches/update`,
+    batchdata: `${apiUrl}/api/batches/batch-data`,
 };
