@@ -14,6 +14,7 @@ import UpdateItem from '@/screens/UpdateItem';
 import SelectItem from '@/screens/SelectItem';
 import NewBatch from '@/screens/NewBatch';
 import UpdateBatch from '@/screens/UpdateBatch';
+import NewBarcode from '@/screens/NewBarcode';
 import NotFound from '@/screens/NotFound';
 import Loading from '@/components/Loading';
 
@@ -62,6 +63,7 @@ const App = () => {
 			<Route path="/admin/update-item" element={<UpdateItem />} />
 			<Route path="/admin/update-batch/:batch" element={<UpdateBatch/>} />
 			<Route path="/admin/select-item" element={<SelectItem />} />
+			<Route path="/admin/new-barcode" element={<NewBarcode />} />
 			<Route path="/admin/*" element={<SidebarRoute />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>
