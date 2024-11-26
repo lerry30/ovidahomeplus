@@ -236,13 +236,13 @@ const Inventory = () => {
                 <h1 className="flex sm:hidden font-semibold text-lg">Inventory</h1>
             </section>
             <section className="grow w-full h-full relative">
-                {/* container with scroll bar */}
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
                     <div className="h-[40px] border-b p-2 flex gap-2">
                         <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
                         <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
                         <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
                     </div>
+                    {/* container with scroll bar */}
                     {
                         items?.length > 0 ? (
                             <>{displayItems?.length > 0 ? (
