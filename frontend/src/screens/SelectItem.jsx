@@ -6,7 +6,7 @@ import { getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDateAndTime } from '@/utils/datetime';
 import { formattedNumber } from '@/utils/number';
-import { zSelectedItem } from '@/store/selectedItem';
+import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
 
 import Searchbar from '@/components/Searchbar';
 import Loading from '@/components/Loading';
@@ -25,7 +25,7 @@ const SelectItem = () => {
     const handleSelectedItems = () => {
         if(Object.keys(selectedItems).length > 0) {
             // with additional data
-            zSelectedItem.getState()?.saveSelectedItemData(selectedItems);
+            zCashierSelectedItem.getState()?.saveSelectedItemData(selectedItems);
             navigate('/admin/cashier');
         } else {
             setErrorMessage({
@@ -52,13 +52,16 @@ const SelectItem = () => {
     const search = (ev) => {
         try {
             const input = ev.target.value.trim().toLowerCase();
-            if(!input) return;
+            if(!input) {
+                setDisplayItems(items);
+                return;
+            }
 
             const searched = [];
             for(let i = 0; i < items.length; i++) {
                 const item = items[i];
                 const productTypeName = String(item?.productTypeName).trim().toLowerCase();
-                const deliveryDate = String(item?.deliveryDate).trim();
+                const updatedAt = String(item?.updatedAt).trim();
                 const description = String(item?.description).trim().toLocaleLowerCase();
                 const itemCode = String(item?.itemCode).trim().toLowerCase();
                 const maxDiscount = String(item?.maxDiscount);
@@ -70,7 +73,7 @@ const SelectItem = () => {
                 const isActive = !item?.disabledNote;
                 if(
                     productTypeName?.match(input) ||
-                    deliveryDate?.match(input) ||
+                    updatedAt?.match(input) ||
                     description?.match(input) ||
                     itemCode?.match(input) ||
                     maxDiscount?.match(input) ||
@@ -97,7 +100,7 @@ const SelectItem = () => {
 
             const response = await getData(urls?.getitems);
             if(response) {
-                // console.log(response?.results);
+                console.log(response?.results);
                 // filter data if it has 
                 const data = response?.results;
                 const fData = [];
@@ -120,8 +123,8 @@ const SelectItem = () => {
     useLayoutEffect(() => {
         getItems();
 
-        zSelectedItem.getState()?.reloadSelectedItemData();
-        const currentSelectedItems = zSelectedItem.getState()?.items || [];
+        zCashierSelectedItem.getState()?.reloadSelectedItemData();
+        const currentSelectedItems = zCashierSelectedItem.getState()?.items || [];
         setSelectedItems(currentSelectedItems);
     }, []);
 
@@ -144,7 +147,7 @@ const SelectItem = () => {
     return (
         <main className=" 
             min-h-screen bg-neutral-100 p-4 lg:px-6
-            flex flex-col"
+            flex flex-col overflow-hidden"
         >
             <section className="flex justify-between items-center gap-4">
                 <h1 className="hidden sm:flex font-semibold text-lg">Select Item(s)</h1>
@@ -160,20 +163,20 @@ const SelectItem = () => {
             <h1 className="flex sm:hidden font-semibold text-lg">Inventory</h1>
             <section className="grow w-full h-full relative">
                 {/* container with scroll bar */}
-                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md
-                    overflow-auto
-                    [&::-webkit-scrollbar]:w-2
-                    [&::-webkit-scrollbar-track]:rounded-full
-                    [&::-webkit-scrollbar-track]:bg-gray-100
-                    [&::-webkit-scrollbar-thumb]:rounded-full
-                    [&::-webkit-scrollbar-thumb]:bg-gray-300
-                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
-                ">
+                <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
                 {
                     items?.length > 0 ? (
                         <>{displayItems?.length > 0 ? (
-                            <ul className="flex flex-col gap-2 p-2">
+                            <ul className="w-full h-full flex flex-col gap-2 p-2
+                                overflow-y-auto
+                                [&::-webkit-scrollbar]:w-2
+                                [&::-webkit-scrollbar-track]:rounded-full
+                                [&::-webkit-scrollbar-track]:bg-gray-100
+                                [&::-webkit-scrollbar-thumb]:rounded-full
+                                [&::-webkit-scrollbar-thumb]:bg-gray-300
+                                dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                                dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+                            ">
                             {
                                 displayItems.map((item, index) => {
                                     const isActive = !item?.disabledNote;
@@ -181,7 +184,7 @@ const SelectItem = () => {
                                     const isSelected = selectedItems.hasOwnProperty(item?.id);
                                     return (
                                         <li 
-                                            key={item?.id}
+                                            key={index}
                                             onClick={() => checkBox(index, item?.id)}
                                         >
                                             <div className={`h-[420px] md:h-[320px] lg:h-fit 
@@ -220,7 +223,7 @@ const SelectItem = () => {
                                                         {/* -------------------------------------------------- */}
                                                         {/* display only for small screen */}
                                                         <p className="flex md:hidden text-[12px]">
-                                                            {formattedDateAndTime(new Date(item?.deliveryDate))}
+                                                            {formattedDateAndTime(new Date(item?.updatedAt))}
                                                         </p>
                                                         <p className="text-red-500 font-semibold italic text-[14px]">
                                                             {item?.disabledNote}
@@ -268,7 +271,7 @@ const SelectItem = () => {
                                                     <div className="flex flex-col items-end md:justify-start
                                                         row-start-1 col-start-2 lg:col-start-4">
                                                         {/* display only for large screen */}
-                                                        <p className="hidden text-[12px] md:flex">{formattedDateAndTime(new Date(item?.deliveryDate))}</p>
+                                                        <p className="hidden text-[12px] md:flex">{formattedDateAndTime(new Date(item?.updatedAt))}</p>
                                                     </div>
                                                 </div>
                                             </div>
