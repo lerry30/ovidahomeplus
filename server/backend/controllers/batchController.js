@@ -21,6 +21,9 @@ const newBatch = requestHandler(async (req, res, database) => {
         deliveryDate = null;
     }
 
+    const [selectBatch] = await database.execute(batchStmt.batch, [batchNo]);
+    if(selectBatch && selectBatch?.length > 0) throw {status: 400, message: `Batch ${batchNo} already exists.`}
+
     const [batch] = await database.execute(batchStmt.newBatch, [batchNo, deliveryRecieptNo, deliveryDate]);
     if(batch?.insertId > 0) {
         res.status(200).json({batchNo, deliveryRecieptNo, deliveryDate});
@@ -37,8 +40,46 @@ const getBatches = requestHandler(async (req, res, database) => {
     res.status(200).json({results});
 });
 
+/*
+   desc     Get specific batch
+   route    POST /api/batches/batch
+   access   public
+*/
+const getBatch = requestHandler(async (req, res, database) => {
+    const batchNo = toNumber(req.body?.batchNo);
+    const [results] = await database.execute(batchStmt.batch, [batchNo]);
+    const data = results?.length > 0 ? results[0] : {};
+    res.status(200).json({results: data});
+});
+
+/*
+   desc     Get batches
+   route    PUT /api/batches/update
+   access   private
+*/
+const updateBatch = requestHandler(async (req, res, database) => {
+    const batchNo = toNumber(req.body?.batchNo);
+    const deliveryRecieptNo = String(req.body?.deliveryRecieptNo).trim().replace(/[^0-9]+/g, '');
+    let deliveryDate = String(req.body?.deliveryDate)?.trim();
+
+    if(batchNo < 1) throw new Error('Batch number is invalid.');
+    if(deliveryDate) {
+        if(!isValidDate(deliveryDate)) {
+            throw {status: 400, message: 'Invalid Date'}
+        }
+    } else {
+        deliveryDate = null;
+    }
+
+    const [batch] = await database.execute(batchStmt.updateBatch, [deliveryRecieptNo, deliveryDate, batchNo]);
+    if(batch?.insertId > 0) {
+        res.status(200).json({batchNo, deliveryRecieptNo, deliveryDate});
+    }
+});
 
 export {
     newBatch,
     getBatches,
+    getBatch,
+    updateBatch,
 };

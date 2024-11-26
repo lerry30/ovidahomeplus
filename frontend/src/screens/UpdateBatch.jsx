@@ -1,22 +1,22 @@
 import { ChevronLeft } from 'lucide-react';
 import { useState, useLayoutEffect } from 'react';
-import { getData, sendJSON } from '@/utils/send';
+import { sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toNumber } from '@/utils/number';
 import { isValidDate } from '@/utils/datetime';
-import { quickSort } from '@/utils/sort';
 
 import AppLogo from '@/components/AppLogo';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
 
-const NewBatch = () => {
+const UpdateBatch = () => {
     const [data, setData] = useState({batchNo: 0, deliveryRecieptNo: '', deliveryDate: ''});
     const [errorData, setErrorData] = useState({batchNo: '', deliveryRecieptNo: '', deliveryDate: '', default: ''});
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const selectedBatchNo = useParams()?.batch;
 
     const batch = async () => {
         try {
@@ -39,7 +39,7 @@ const NewBatch = () => {
             }
 
             const payload = {batchNo, deliveryRecieptNo, deliveryDate};
-            const response = await sendJSON(urls.newbatch, payload);
+            const response = await sendJSON(urls.updatebatch, payload, 'PUT');
             if(response) {
                 navigate('/admin/barcodes');
             }
@@ -51,17 +51,15 @@ const NewBatch = () => {
         }
     }
 
-    const getBatches = async () => {
+    const getBatch = async () => {
         try {
             setLoading(true);
-            const response = await getData(urls.getbatches);
+            const payload = {batchNo: selectedBatchNo};
+            const response = await sendJSON(urls.getbatch, payload);
             if(response) {
                 const data = response?.results;
-                // console.log(data);
-                const batchesNo = data.map(item => item?.batchNo);
-                const sortedNo = quickSort(batchesNo);
-                const suggestedBatchNo = sortedNo[sortedNo.length-1] + 1;
-                setData(state => ({...state, batchNo: suggestedBatchNo}));
+                console.log(data);
+                setData(state => ({...state, deliveryRecieptNo: data?.deliveryRecieptNo, deliveryDate: data?.deliveryDate}));
             }
         } catch(error) {
             console.log(error);
@@ -72,8 +70,11 @@ const NewBatch = () => {
     }
 
     useLayoutEffect(() => {
-        getBatches();
-    }, []);
+        if(selectedBatchNo) {
+            setData(state => ({...state, batchNo: selectedBatchNo}));
+            getBatch();
+        }
+    }, [selectedBatchNo]);
 
     if(loading) {
         return (
@@ -91,13 +92,13 @@ const NewBatch = () => {
                 <div className="hidden md:flex">
                     <AppLogo />
                 </div>
-                <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Create New Batch</h1>
+                <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Edit Batch {selectedBatchNo}</h1>
             </header>
             <main className="bg-neutral-100 p-4">    
                 <section className="bg-white rounded-md p-4 flex flex-col gap-2">
                     <h3 className="font-bold text-lg">Batch Details</h3>
                     <hr />
-                    <div className="flex flex-col sm:px-4 gap-2">
+                    {/* <div className="flex flex-col sm:px-4 gap-2">
                         <label htmlFor="batch-number" className="font-semibold">
                             Batch Number
                             <span className="text-red-500">*</span>
@@ -106,12 +107,13 @@ const NewBatch = () => {
                             id="batch-number"
                             value={data?.batchNo}
                             onChange={elem => setData(state => ({...state, batchNo: elem.target.value}))}
-                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4 pointer-events-none" 
                             placeholder="Batch Number"
                             required
                         />
                         <ErrorField message={errorData?.batchNo || ''} />
-                    </div>
+                    </div> */}
+                    <span className="bg-green-400/50 p-2 rounded-md">Batch {selectedBatchNo}</span>
                     <div className="flex flex-col sm:px-4 gap-2">
                         <label htmlFor="delivery-reciept_no" className="font-semibold">Delivery Reciept Number</label>
                         <input 
@@ -154,7 +156,7 @@ const NewBatch = () => {
                             onClick={batch} 
                             className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800"
                         >
-                            Add Batch
+                            Edit Batch
                         </button>
                     </div>
                     <ErrorField message={errorData?.default || ''} />
@@ -164,4 +166,4 @@ const NewBatch = () => {
     )
 }
 
-export default NewBatch;
+export default UpdateBatch;
