@@ -4,7 +4,7 @@ import { sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toNumber } from '@/utils/number';
-import { isValidDate } from '@/utils/datetime';
+import { isValidDate, formatDateForHtmlInput } from '@/utils/datetime';
 
 import AppLogo from '@/components/AppLogo';
 import Loading from '@/components/Loading';
@@ -49,7 +49,7 @@ const UpdateBatch = () => {
         } finally {
             setLoading(false);
         }
-    }
+    }   
 
     const getBatch = async () => {
         try {
@@ -58,8 +58,12 @@ const UpdateBatch = () => {
             const response = await sendJSON(urls.getbatch, payload);
             if(response) {
                 const data = response?.results;
-                console.log(data);
-                setData(state => ({...state, deliveryRecieptNo: data?.deliveryRecieptNo, deliveryDate: data?.deliveryDate}));
+                // console.log(data);
+               
+                console.log(data?.deliveryDate);
+                const nDate = formatDateForHtmlInput(data?.deliveryDate);
+                console.log(nDate);
+                setData(state => ({...state, deliveryRecieptNo: data?.deliveryRecieptNo, deliveryDate: nDate}));
             }
         } catch(error) {
             console.log(error);
