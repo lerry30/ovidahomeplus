@@ -5,7 +5,7 @@ import { urls } from '@/constants/urls';
 //import { zUser } from '@/store/user';
 import { Eye, EyeOff } from 'lucide-react';
 
-import OvidaHomePlus from '../../public/ovida-front.jpg';
+import OvidaHomePlus from '@/ovida-front.jpg';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
 
