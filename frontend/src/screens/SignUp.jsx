@@ -4,7 +4,7 @@ import { urls } from '@/constants/urls';
 import { useState } from 'react';
 //import { zUser } from '@/store/user';
 
-import OvidaHomePlus from '../../public/ovida-front.jpg';
+import OvidaHomePlus from '@/ovida-front.jpg';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
 
