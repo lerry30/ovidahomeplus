@@ -56,3 +56,15 @@ export const isValidDate = (dateString) => {
 
     return true;
 };
+
+export const formatDateForHtmlInput = (date) => {
+    // Ensure the date exists
+    if (!date) return '';
+    
+    const fDate = new Date(date);
+    const year = fDate.getFullYear();
+    const month = String(fDate.getMonth() + 1).padStart(2, '0'); // Add 1 to get correct month
+    const day = String(fDate.getDate()).padStart(2, '0'); // Use getDate for day of the month
+
+    return `${year}-${month}-${day}`; // Format for HTML input
+}; 
