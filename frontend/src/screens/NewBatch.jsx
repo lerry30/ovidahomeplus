@@ -60,7 +60,7 @@ const NewBatch = () => {
                 // console.log(data);
                 const batchesNo = data.map(item => item?.batchNo);
                 const sortedNo = quickSort(batchesNo);
-                const suggestedBatchNo = sortedNo[sortedNo.length-1] + 1;
+                const suggestedBatchNo = sortedNo?.length > 0 ? sortedNo[sortedNo.length-1] + 1 : 1;
                 setData(state => ({...state, batchNo: suggestedBatchNo}));
             }
         } catch(error) {
