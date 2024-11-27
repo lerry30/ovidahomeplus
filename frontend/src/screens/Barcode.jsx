@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Plus, Pencil } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
-import { urls } from '@/constants/urls';
+import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
+import { formattedNumber } from '@/utils/number';
 
 import Loading from '@/components/Loading';
 import Select from '@/components/DropDown';
@@ -10,6 +11,7 @@ import Select from '@/components/DropDown';
 const Barcode = () => {
     const [selectedBatchNo, setSelectedBatchNo] = useState(null);
     const [batches, setBatches] = useState([]);
+    const [batchItems, setBatchItems] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const selectBatch = async (batchNo) => {
@@ -21,7 +23,8 @@ const Barcode = () => {
             const response = await sendJSON(urls.batchdata, payload);
             if(response) {
                 const data = response?.results;
-                // console.log(data);
+                console.log(data);
+                setBatchItems(data);
             }
         } catch(error) {
             console.log(error?.message);
@@ -115,7 +118,98 @@ const Barcode = () => {
                         </Link>
                     </div>
                     {/* container with scroll bar */}
-
+                    <ul className="w-full h-full p-2 flex flex-col gap-2 pb-32
+                        overflow-y-auto
+                        [&::-webkit-scrollbar]:w-2
+                        [&::-webkit-scrollbar-track]:rounded-full
+                        [&::-webkit-scrollbar-track]:bg-gray-100
+                        [&::-webkit-scrollbar-thumb]:rounded-full
+                        [&::-webkit-scrollbar-thumb]:bg-gray-300
+                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+                        {batchItems?.map((item, index) => {
+                            return (
+                                <li 
+                                    key={index}
+                                    className="flex flex-col gap-2"
+                                >
+                                    {item?.barcodes?.map(barcode => (
+                                        <div key={barcode?.id}>
+                                            <div className="h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border  rounded-lg">
+                                                <img 
+                                                    src={`${apiUrl}/items/${item?.image}`}
+                                                    alt="ovida-product" 
+                                                    className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
+                                                    onError={ev => {
+                                                        ev.target.src='../../public/image-off.png'
+                                                        ev.onerror=null;
+                                                    }}
+                                                />
+                                                <hr />
+                                                <div className="w-full xl:h-[90px] 
+                                                    grid grid-cols-2 lg:grid-cols-4 gap-4
+                                                    p-2">
+                                                    <div className="w-full flex flex-col md:w-fit 
+                                                        col-start-1">
+                                                        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                                                            <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
+                                                        </div>
+                                                        <p className="text-[12px]">{item?.description}</p>
+                                                        <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
+                                                        {/* -------------------------------------------------- */}
+                                                        {/* display only for small screen */}
+                                                        {/* <p className="flex md:hidden text-[12px]">
+                                                            {formattedDateAndTime(new Date(item?.deliveryDate))}
+                                                        </p> */}
+                                                        <p className="text-red-500 font-semibold italic text-[14px]">
+                                                            {item?.disabledNote}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col text-sm 
+                                                        row-start-3 lg:row-start-1 lg:col-start-2">
+                                                        <article>
+                                                            <span>Supplier:&nbsp;&nbsp;</span>
+                                                            <span className="font-semibold">
+                                                                {item.supplierName}
+                                                            </span>
+                                                        </article>
+                                                        <article>
+                                                            <span>SRP:&nbsp;&nbsp;</span>
+                                                            <span className="font-semibold">
+                                                                ₱ {formattedNumber(item?.srp)}
+                                                            </span>
+                                                        </article>
+                                                        <article>
+                                                            <span>Max discount:&nbsp;&nbsp;</span>
+                                                            <span className="font-semibold">
+                                                                ₱ {formattedNumber(item?.maxDiscount)}
+                                                            </span>
+                                                        </article>
+                                                    </div>
+                                                    <div className="w-full flex lg:justify-center 
+                                                        row-start-2 lg:row-start-1 lg:col-start-3">
+                                                        <img 
+                                                            src={`${apiUrl}/barcodes/${barcode?.barcode}.png`}
+                                                            alt="ovida-product-barcode" 
+                                                            className="w-[120px] h-[50px] object-contain"
+                                                            onError={ev => {
+                                                                ev.target.src='../../public/image-off.png'
+                                                                ev.onerror=null;
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col items-end md:justify-start
+                                                        row-start-1 col-start-2 lg:col-start-4">
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </li>
+                            )
+                        })}
+                    </ul>
                 </div>
             </section>
         </main>
