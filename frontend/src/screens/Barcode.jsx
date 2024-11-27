@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Plus, Pencil } from 'lucide-react';
+import { Plus, Pencil, Printer } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
@@ -23,7 +23,7 @@ const Barcode = () => {
             const response = await sendJSON(urls.batchdata, payload);
             if(response) {
                 const data = response?.results;
-                console.log(data);
+                // console.log(data);
                 setBatchItems(data);
             }
         } catch(error) {
@@ -101,7 +101,7 @@ const Barcode = () => {
                                                 onClick={() => selectBatch(item?.batchNo)}
                                                 className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
                                             >
-                                                Batch {item?.batchNo}
+                                                Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
                                             </button>
                                         )
                                     })
@@ -200,7 +200,12 @@ const Barcode = () => {
                                                     </div>
                                                     <div className="flex flex-col items-end md:justify-start
                                                         row-start-1 col-start-2 lg:col-start-4">
-                                                        
+                                                        <button
+                                                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                        >
+                                                            <Printer />
+                                                            <span className="hidden sm:flex text-nowrap">Print Barcode</span>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
