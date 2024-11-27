@@ -1,10 +1,11 @@
 import { Plus } from 'lucide-react';
 import { ErrorModal } from '@/components/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef } from 'react';
-import { getData } from '@/utils/send';
+import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedNumber } from '@/utils/number';
+import { toNumber } from '@/utils/number';
 
 import Searchbar from '@/components/Searchbar';
 import Loading from '@/components/Loading';
@@ -14,26 +15,47 @@ const NewBarcode = () => {
     const [items, setItems] = useState([]);
     const [displayItems, setDisplayItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [quantity, setQuantity] = useState(0);
+    const [quantity, setQuantity] = useState(1);
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
     const [errorData, setErrorData] = useState({quantity: ''});
     const [loading, setLoading] = useState(false);
 
     const searchBar = useRef(null);
     const navigate = useNavigate();
+    const selectedBatchNo = useParams()?.batch;
 
     const handleNewBarcode = async () => {
         try{
             setLoading(true);
+            if(!selectedBatchNo) {
+                setErrorMessage({
+                    header: 'Undefined batch number.',
+                    message: 'Batch number is required.'
+                });
+                throw new Error('Batch number is required.');
+            }
+
             if(!selectedItem) {
                 setErrorMessage({
                     header: 'No Selected Item',
                     message: 'Item selection is required.'
                 });
+                throw new Error('Item selection is required.');
             }
 
+            if(!quantity || quantity <= 0) {
+                setErrorData(state => ({...state, quantity: 'Quantity must be greater than zero.'}));
+                throw new Error('Quantity must be greater than zero.');
+            }
 
-            navigate('/admin/cashier');
+            const payload = {batchNo: selectedBatchNo, itemId: selectedItem, quantity};
+            const response = await sendJSON(urls.newbarcode, payload);
+
+            if(response) {
+                const data = response?.results;
+                console.log(data);
+                navigate('/admin/barcodes');
+            }
         } catch(error) {
             console.log(error?.message);
         } finally {
@@ -118,6 +140,10 @@ const NewBarcode = () => {
     }
 
     useLayoutEffect(() => {
+        if(errorMessage) setTimeout(() => setErrorMessage({}), 2000)
+    }, [errorMessage]);
+
+    useLayoutEffect(() => {
         getItems();
     }, []);
 
@@ -168,6 +194,12 @@ const NewBarcode = () => {
                         <Plus />
                         <span className="hidden sm:flex text-nowrap">Create Item</span>
                     </button>
+                    <Link 
+                        to="/admin/barcodes" 
+                        className="h-[40px] flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
+                    >
+                        Cancel
+                    </Link>
                 </div>
             </section>
             <section className="grow w-full h-full relative">

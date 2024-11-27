@@ -63,7 +63,7 @@ const App = () => {
 			<Route path="/admin/update-item" element={<UpdateItem />} />
 			<Route path="/admin/update-batch/:batch" element={<UpdateBatch/>} />
 			<Route path="/admin/select-item" element={<SelectItem />} />
-			<Route path="/admin/new-barcode" element={<NewBarcode />} />
+			<Route path="/admin/new-barcode/:batch" element={<NewBarcode />} />
 			<Route path="/admin/*" element={<SidebarRoute />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>

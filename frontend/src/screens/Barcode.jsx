@@ -107,7 +107,7 @@ const Barcode = () => {
                             {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">Batch {selectedBatchNo}</span>}
                         </div>
                         <Link
-                            to="/admin/new-barcode"
+                            to={`/admin/new-barcode/${selectedBatchNo}`}
                             className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
                         >
                             <Plus size={20} />

@@ -11,6 +11,7 @@ import supplierRoutes from './routes/supplierRoutes.js';
 import productTypeRoutes from './routes/productTypeRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
 import batchRoutes from './routes/batchRoutes.js';
+import barcodeRoutes from './routes/barcodeRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { getDir } from './utils/fileDir.js';
 import { allowResourceAccess } from './middleware/corsFileMiddleware.js';
@@ -54,6 +55,7 @@ app.use('/api/suppliers', supplierRoutes);
 app.use('/api/producttypes', productTypeRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/batches', batchRoutes);
+app.use('/api/barcodes', barcodeRoutes);
 
 // fall back when route is not found
 app.use(notFound);
