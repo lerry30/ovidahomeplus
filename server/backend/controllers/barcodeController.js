@@ -23,8 +23,8 @@ const newBarcode = requestHandler(async (req, res, database) => {
     // get items to verify barcode uniqueness
     const [batchData] = await database.execute(batchStmt.getAssociatedToBatch, [batchNo]);
     // console.log(JSON.stringify(batchData, null, 4));
-    const barcodes = batchData?.length > 0 ? batchData[0] : [];
-    
+    const barcodes = batchData?.length > 0 ? batchData[0]?.barcodes?.map(barcode => barcode?.barcode) : [];
+
     // make it multi insert
     let nForMultiInsertStmt = barcodeStmt.newBarcode;
     const dataToInsert = []
