@@ -33,7 +33,7 @@ export const items = `
     INNER JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN disabled_items ON disabled_items.item_id = items.id
     LEFT JOIN barcodes ON barcodes.item_id = items.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_id
+    LEFT JOIN batches ON batches.id = barcodes.batch_no
     WHERE suppliers.status = 'active' 
       AND product_types.status = 'active'
     GROUP BY
