@@ -22,7 +22,7 @@ const Barcode = () => {
             const payload = {batchNo};
             const response = await sendJSON(urls.batchdata, payload);
             if(response) {
-                const data = response?.results;
+                const data = response?.results?.reverse();
                 // console.log(data);
                 setBatchItems(data);
             }
@@ -40,6 +40,19 @@ const Barcode = () => {
             if(response) {
                 const data = response?.results;
                 // console.log(data);
+
+
+                // Todo get delivery date
+
+
+
+
+
+
+
+
+
+
                 setBatches(data);
             }
         } catch(error) {
@@ -71,14 +84,14 @@ const Barcode = () => {
                 <div className="flex gap-2">
                     <Link
                         to={`/admin/update-batch/${selectedBatchNo}`}
-                        className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                        className={`flex gap-2 items-center justify-center leading-none bg-[#ff3e00] text-white font-bold rounded-full p-2 sm:px-4 hover:bg-[#aa3e00] ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
                     >
                         <Pencil size={20} />
                         <span className="hidden sm:flex text-nowrap">Edit Batch</span>
                     </Link>
                     <Link
                         to="/admin/new-batch"
-                        className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
+                        className="flex gap-2 items-center justify-center leading-none bg-[#ff3e00] text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-[#aa3e00]"
                     >
                         <Plus size={20} />
                         <span className="hidden sm:flex text-nowrap">New Batch</span>

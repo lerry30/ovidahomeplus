@@ -205,7 +205,7 @@ const NewItem = () => {
                                         return (
                                             <button
                                                 key={index}
-                                                onClick={() => {
+                                                onClick={(elem) => {
                                                     setData(state => ({...state, productType: item?.name, productTypeId: item?.id}));
                                                 }}
                                                 className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
