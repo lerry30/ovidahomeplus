@@ -169,7 +169,9 @@ const NewBarcode = () => {
             flex flex-col overflow-hidden"
         >
             <section className="w-full h-full flex justify-between items-center gap-4">
-                <div className="w-full h-full flex items-end gap-4 bg-white p-2 pb-6 rounded-lg shadow-sm overflow-hidden">
+                <div className="w-full h-full  bg-white p-2 pb-6 rounded-lg shadow-sm overflow-hidden
+                    flex flex-col md:flex-row md:items-end gap-4
+                ">
                     <div className="flex flex-col">
                         <label htmlFor="quantity" className="font-semibold">
                             Quantity
@@ -189,14 +191,14 @@ const NewBarcode = () => {
                     </div>
                     <button
                         onClick={handleNewBarcode}
-                        className="h-[40px] flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
+                        className="max-w-96 h-[40px] flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
                     >
                         <Plus />
                         <span className="hidden sm:flex text-nowrap">Create Item</span>
                     </button>
                     <Link 
                         to="/admin/barcodes" 
-                        className="h-[40px] flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
+                        className="max-w-96 h-[40px] flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
                     >
                         Cancel
                     </Link>
