@@ -10,14 +10,17 @@ import Select from '@/components/DropDown';
 
 const Barcode = () => {
     const [selectedBatchNo, setSelectedBatchNo] = useState(null);
+    const [selectedBatchDate, setSelectedBatchDate] = useState(null);
+    const [selectedBatchStatus, setSelectedBatchStatus] = useState('No Batch Selected');
     const [batches, setBatches] = useState([]);
     const [batchItems, setBatchItems] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const selectBatch = async (batchNo) => {
+    const selectBatch = async (batchNo, deliveryDate) => {
         try {
             setLoading(true);
             setSelectedBatchNo(batchNo);
+            setSelectedBatchDate(deliveryDate);
 
             const payload = {batchNo};
             const response = await sendJSON(urls.batchdata, payload);
@@ -25,6 +28,7 @@ const Barcode = () => {
                 const data = response?.results?.reverse();
                 // console.log(data);
                 setBatchItems(data);
+                if(data?.length <= 0) setSelectedBatchStatus('Empty Batch Items');
             }
         } catch(error) {
             console.log(error?.message);
@@ -40,19 +44,6 @@ const Barcode = () => {
             if(response) {
                 const data = response?.results;
                 // console.log(data);
-
-
-                // Todo get delivery date
-
-
-
-
-
-
-
-
-
-
                 setBatches(data);
             }
         } catch(error) {
@@ -84,14 +75,14 @@ const Barcode = () => {
                 <div className="flex gap-2">
                     <Link
                         to={`/admin/update-batch/${selectedBatchNo}`}
-                        className={`flex gap-2 items-center justify-center leading-none bg-[#ff3e00] text-white font-bold rounded-full p-2 sm:px-4 hover:bg-[#aa3e00] ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                        className={`flex gap-2 items-center justify-center leading-none bg-[#e37400] text-white font-bold rounded-full p-2 sm:px-4 hover:bg-[#d37506] ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
                     >
                         <Pencil size={20} />
                         <span className="hidden sm:flex text-nowrap">Edit Batch</span>
                     </Link>
                     <Link
                         to="/admin/new-batch"
-                        className="flex gap-2 items-center justify-center leading-none bg-[#ff3e00] text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-[#aa3e00]"
+                        className="flex gap-2 items-center justify-center leading-none bg-[#e37400] text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-[#d37506]"
                     >
                         <Plus size={20} />
                         <span className="hidden sm:flex text-nowrap">New Batch</span>
@@ -111,7 +102,7 @@ const Barcode = () => {
                                         return (
                                             <button
                                                 key={index}
-                                                onClick={() => selectBatch(item?.batchNo)}
+                                                onClick={() => selectBatch(item?.batchNo, item?.deliveryDate)}
                                                 className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
                                             >
                                                 Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
@@ -120,7 +111,9 @@ const Barcode = () => {
                                     })
                                 }
                             </Select>
-                            {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">Batch {selectedBatchNo}</span>}
+                            {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">
+                                Batch {selectedBatchNo}{selectedBatchDate ? ` - ${selectedBatchDate}` : ''}
+                            </span>}
                         </div>
                         <Link
                             to={`/admin/new-barcode/${selectedBatchNo}`}
@@ -130,6 +123,11 @@ const Barcode = () => {
                             <span className="hidden sm:flex text-nowrap">New Item</span>
                         </Link>
                     </div>
+                    {batchItems?.length <= 0 && (
+                        <div className="absolute top-[60px] left-0 right-0 bottom-0 flex justify-center items-center">
+                            <h3>{selectedBatchStatus}</h3>
+                        </div>
+                    )}
                     {/* container with scroll bar */}
                     <ul className="w-full h-full p-2 flex flex-col gap-2 pb-32
                         overflow-y-auto

@@ -84,12 +84,12 @@ const NewBatch = () => {
     return (
         <div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
             <header className="w-full h-[70px] flex items-center mb-2">
-                <Link to="/admin" className="md:hidden flex justify-center items-center text-sm">
+                <Link to="/admin/barcodes" className="md:hidden flex justify-center items-center text-sm">
                     <ChevronLeft />
                     back
                 </Link>
                 <div className="hidden md:flex">
-                    <AppLogo />
+                    <AppLogo segment="/barcodes" />
                 </div>
                 <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Create New Batch</h1>
             </header>

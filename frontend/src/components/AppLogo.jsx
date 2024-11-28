@@ -1,9 +1,9 @@
 import Logo from '@/ovida-logo.jpg';
 import { Link } from 'react-router-dom';
 
-const AppLogo = () => {
+const AppLogo = ({segment=''}) => {
     return (
-        <Link to="/admin">
+        <Link to={`/admin${segment}`}>
             <img  src={Logo} className="m-w-[224px] h-[86px]" />
         </Link>
     );

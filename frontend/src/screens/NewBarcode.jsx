@@ -287,12 +287,12 @@ const NewBarcode = () => {
                                                         </div>
                                                         <div className="w-full flex lg:justify-center 
                                                             row-start-2 lg:row-start-1 lg:col-start-3">
-                                                            <article>
+                                                            {/* <article>
                                                                 <span>Quantity:&nbsp;&nbsp;</span>
                                                                 <span className="font-semibold">
                                                                     {item?.quantity}
                                                                 </span>
-                                                            </article>
+                                                            </article> */}
                                                             {/* <img 
                                                                 src={`${apiUrl}/barcodes/${item?.barcode}.png`}
                                                                 alt="ovida-product-barcode" 

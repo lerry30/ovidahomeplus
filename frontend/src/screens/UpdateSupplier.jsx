@@ -97,7 +97,7 @@ const UpdateSupplier = () => {
         <div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
             <header className="w-full h-[70px] flex items-center mb-2">
                 <div className="hidden md:flex">
-                    <AppLogo />
+                    <AppLogo segment="/suppliers" />
                 </div>
                 <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Update Supplier</h1>
             </header>

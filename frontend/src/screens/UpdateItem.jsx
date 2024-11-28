@@ -245,7 +245,7 @@ const UpdateItem = () => {
                     back
                 </Link>
                 <div className="hidden md:flex">
-                    <AppLogo />
+                    <AppLogo segment="/inventory" />
                 </div>
                 <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Update Item</h1>
             </header>
