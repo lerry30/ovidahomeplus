@@ -28,11 +28,15 @@ const Breadcrumbs = ({tabNames=[], tabLinks=[], localStorageName=''}) => {
                     return (
                         <button
                             key={index}
-                            className={`flex items-center justify-center ${isEnabled?'text-gray-500':''}`}
+                            className={`
+                                flex items-center justify-center
+                                text-[10px] sm:text-[14px] md:text-[16px]
+                                ${isEnabled?'text-gray-500':''}
+                            `}
                             disabled={isEnabled}
                             onClick={() => navigate(tabLinks[index])}
                         >
-                            <span>{name}</span>
+                            <span className="text-nowrap">{name}</span>
                             {index-1!==tabNames.length && (
                                 <ChevronRight color='#808080aa' size={18} />
                             )}

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
 import { getData } from '@/utils/send';
@@ -133,16 +133,17 @@ const Cashier = () => {
             flex flex-col
         ">
             {/* the height has fixed value to properly compute the remaining space available of screen */}
-            <section className="w-full h-[30px] flex justify-between items-center gap-4">
-                <h1 className="text-nowrap font-semibold text-lg">Order Details</h1>
-                <div className="hidden md:flex">
+            <section className="w-full h-[30px] flex items-center gap-4">
+                {/* <h1 className="text-nowrap font-semibold text-lg">Order Details</h1> */}
+                <div className="">
                     <Breadcrumbs
                         tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
                         tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
                         localStorageName={localStorageName}
                     />
                 </div>
-                {/* Proceed */}
+                {/* just a dummy element */}
+                <div className='w-[28px] h-full'></div>
             </section>
             {/* this container has fixed value that depends on the header above. Also the 26px is for padding */}
             <section className="grow w-full h-[calc(100vh-30px-26px)] flex flex-col md:flex-row gap-4
@@ -169,7 +170,7 @@ const Cashier = () => {
                         </Link>
                     </header>
                     <ul className="
-                        w-full h-full flex flex-col gap-2 pb-[40px] pr-1
+                        w-full h-full flex flex-col gap-2 pb-10 pr-1
                         overflow-y-auto
                         [&::-webkit-scrollbar]:w-2
                         [&::-webkit-scrollbar-track]:rounded-full
@@ -332,6 +333,16 @@ const Cashier = () => {
                         <div className="w-full border-t border-neutral-500 border-dashed mx-2 mt-1"></div>
                         <span className="text-nowrap font-semibold text-lg">₱ {formattedNumber(total)}</span>
                     </article>
+                    <div className="w-full flex justify-end py-6">
+                        <Link
+                            to="/admin/customer-info"
+                            className="flex gap-2 items-center justify-center leading-none font-bold rounded-full p-2 sm:px-4 
+                            bg-green-600 text-white hover:bg-green-800"
+                        >
+                            <ShoppingBag />
+                            <span className="hidden sm:flex text-nowrap">Checkout</span>
+                        </Link>
+                    </div>
                 </div>
             </section>
         </main>
