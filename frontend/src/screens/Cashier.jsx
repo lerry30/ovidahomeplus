@@ -55,7 +55,9 @@ const Cashier = () => {
     const increaseItemQuantity = (item) => {
         const selected = zCashierSelectedItem.getState()?.items || [];
         if (selected.hasOwnProperty(item?.id)) {
-            selected[item?.id].quantity++;
+            if(selected[item?.id].quantity < item?.quantity) {
+                selected[item?.id].quantity++;
+            }
         }
         zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
@@ -143,9 +145,19 @@ const Cashier = () => {
                 {/* Proceed */}
             </section>
             {/* this container has fixed value that depends on the header above. Also the 26px is for padding */}
-            <section className="grow w-full h-[calc(100vh-30px-26px)] flex flex-col md:flex-row gap-4">
+            <section className="grow w-full h-[calc(100vh-30px-26px)] flex flex-col md:flex-row gap-4
+                    overflow-x-hidden overflow-y-auto
+                    [&::-webkit-scrollbar]:w-2
+                    [&::-webkit-scrollbar-track]:rounded-full
+                    [&::-webkit-scrollbar-track]:bg-gray-100
+                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb]:bg-gray-300
+                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+            ">
                 <div className="w-full md:w-1/2
-                    min-h-full md:h-full p-2 bg-white shadow-md rounded-lg overflow-hidden">
+                    h-[calc((100vh-30px-26px)/2)] md:h-full p-2 
+                    bg-white shadow-md rounded-lg overflow-hidden">
                     <header className="w-full flex justify-between pb-2">
                         <h2>Items</h2>
                         <Link
@@ -171,7 +183,8 @@ const Cashier = () => {
                             selectedItems?.length > 0 ?
                                 selectedItems.map(item => (
                                     <li key={item?.id}>
-                                        <div className="h-[340px] md:h-[240px] lg:h-[210px] flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
+                                        <div className="h-[340px] sm:h-[270px] md:h-[280px] lg:h-[230px] 
+                                            flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
                                             <img
                                                 src={`${apiUrl}/items/${item?.image}`}
                                                 alt="ovida-product"
@@ -216,8 +229,14 @@ const Cashier = () => {
                                                             ₱ {formattedNumber(item?.maxDiscount)}
                                                         </span>
                                                     </article>
+                                                    <article>
+                                                        <span>Stock:&nbsp;&nbsp;</span>
+                                                        <span className="font-semibold">
+                                                            {formattedNumber(item?.quantity)}
+                                                        </span>
+                                                    </article>
                                                 </div>
-                                                <p className="text-[12px] md:flex">{formattedDateAndTime(new Date(item?.deliveryDate))}</p>
+                                                <p className="text-[12px] md:flex">{formattedDateAndTime(new Date(item?.updatedAt))}</p>
                                                 <div className="flex flex-col lg:flex-row gap-2 pt-1">
                                                     <div className="flex gap-2">
                                                         {/* <button 
@@ -271,11 +290,14 @@ const Cashier = () => {
                     </ul>
                 </div>
                 <div className="w-full md:w-1/2
-                    h-full p-2 bg-white shadow-md rounded-lg overflow-hidden">
+                    h-[calc((100vh-30px-26px)/2)] md:h-full p-2 
+                    bg-white shadow-md rounded-lg overflow-hidden 
+                    pb-20 lg:pb-0">
                     <header className="w-full flex justify-between pb-2">
                         <h2>Summary</h2>
                     </header>
-                    <ul className="w-full flex flex-col
+                    <ul className="w-full max-h-[70%] flex flex-col pb-10
+                        border border-neutral-50 bg-neutral-100 rounded-md
                         overflow-y-auto 
                         [&::-webkit-scrollbar]:w-2
                         [&::-webkit-scrollbar-track]:rounded-full
@@ -287,9 +309,9 @@ const Cashier = () => {
                     ">
                         {
                             selectedItems?.length > 0 &&
-                                selectedItems.map(item => (
+                                selectedItems.map((item, index) => (
                                     <li 
-                                        key={item?.id}
+                                        key={index}
                                         className="w-full flex justify-center items-center px-4 py-1"
                                     >
                                         <h3 className="text-nowrap font-semibold">{item?.productTypeName}</h3>
@@ -305,7 +327,7 @@ const Cashier = () => {
                                 ))
                         }
                     </ul>
-                    <article className="w-full px-4 flex justify-between items-center">
+                    <article className="w-full px-4 pt-4 flex justify-between items-center">
                         <span className="text-nowrap font-semibold text-lg">Total</span>
                         <div className="w-full border-t border-neutral-500 border-dashed mx-2 mt-1"></div>
                         <span className="text-nowrap font-semibold text-lg">₱ {formattedNumber(total)}</span>
