@@ -1,16 +1,41 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 
 const Breadcrumbs = ({tabNames=[], tabLinks=[], localStorageName=''}) => {
     const [tabsStatus, setTabsStatus] = useState([]);
-
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const countCurrentActiveTabs = () => {
+        const currentStatus = JSON.parse(localStorage.getItem(localStorageName) || '[]');
+        let noOfActives = 0;
+        for(const status of currentStatus) {
+            if(status) noOfActives++;
+        }
+        return noOfActives;
+    }
 
     const saveBreadcrumbsStatus = () => {
         const status = Array(tabNames?.length).fill(false);
+        const pathname = location?.pathname;
+        const noOfActives = countCurrentActiveTabs();
+
         if(status.length > 0) {
-            status[0] = true; // first tab default to be true
+            let tabIndex = 0;
+            for(let i = 0; i < tabLinks.length; i++) {
+                const link = tabLinks[i];
+                if(String(link).trim()===String(pathname).trim()) {
+                    tabIndex = i;
+                    break;
+                }
+            }
+
+            if(tabIndex+1 < noOfActives) tabIndex = noOfActives-1;
+            for(let i = 0; i <= tabIndex; i++) {
+                status[i] = true;
+            }
+
             localStorage.setItem(localStorageName, JSON.stringify(status));
             setTabsStatus(status);
         }

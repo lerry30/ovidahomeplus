@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
@@ -9,7 +9,7 @@ import { toNumber, formattedNumber } from '@/utils/number';
 import { breadcrumbsOrder as localStorageName } from '@/constants/localStorageNames';
 
 import Loading from '@/components/Loading';
-import Breadcrumbs from '@/components/BreadCrumbs';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const Cashier = () => {
     const [items, setItems] = useState([]); // from database
@@ -18,6 +18,14 @@ const Cashier = () => {
     const [total, setTotal] = useState(0);
     const [recomputeTotal, setRecomputeTotal] = useState(false); // trigger
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
+
+    const checkout = () => {
+        if(total > 0) {
+            navigate('/admin/customer-info');
+        }
+    }
 
     // to reset the UI
     const setSelectedToDisplay = () => {
@@ -142,8 +150,6 @@ const Cashier = () => {
                         localStorageName={localStorageName}
                     />
                 </div>
-                {/* just a dummy element */}
-                <div className='w-[28px] h-full'></div>
             </section>
             {/* this container has fixed value that depends on the header above. Also the 26px is for padding */}
             <section className="grow w-full h-[calc(100vh-30px-26px)] flex flex-col md:flex-row gap-4
@@ -334,14 +340,14 @@ const Cashier = () => {
                         <span className="text-nowrap font-semibold text-lg">₱ {formattedNumber(total)}</span>
                     </article>
                     <div className="w-full flex justify-end py-6">
-                        <Link
-                            to="/admin/customer-info"
-                            className="flex gap-2 items-center justify-center leading-none font-bold rounded-full p-2 sm:px-4 
-                            bg-green-600 text-white hover:bg-green-800"
+                        <button
+                            onClick={checkout}
+                            className={`flex gap-2 items-center justify-center leading-none font-bold rounded-full p-2 sm:px-4 
+                            bg-green-600 text-white hover:bg-green-800 ${!total ? 'pointer-events-none opacity-50' : ''}`}
                         >
                             <ShoppingBag />
                             <span className="hidden sm:flex text-nowrap">Checkout</span>
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </section>
