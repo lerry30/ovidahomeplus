@@ -16,6 +16,7 @@ import NewBatch from '@/screens/NewBatch';
 import UpdateBatch from '@/screens/UpdateBatch';
 import NewBarcode from '@/screens/NewBarcode';
 import CustomerInfo from '@/screens/CustomerInfo';
+import Checkout from '@/screens/Checkout';
 import NotFound from '@/screens/NotFound';
 import Loading from '@/components/Loading';
 
@@ -66,6 +67,7 @@ const App = () => {
 			<Route path="/admin/select-item" element={<SelectItem />} />
 			<Route path="/admin/new-barcode/:batch" element={<NewBarcode />} />
 			<Route path="/admin/customer-info" element={<CustomerInfo />} />
+			<Route path="/admin/checkout" element={<Checkout />} />
 			<Route path="/admin/*" element={<SidebarRoute />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>

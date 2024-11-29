@@ -1,19 +1,73 @@
+import { Plus } from 'lucide-react';
 import { breadcrumbsOrder as localStorageName, selectedItemsForCashier } from '@/constants/localStorageNames';
 import { useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { contactNumberInput } from '@/utils/contact';
+import { zCustomerInfo } from '@/store/customerInfo';
 
 import SidebarLayout from '@/components/Sidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import ErrorField from '@/components/ErrorField';
 
 const CustomerInfo = () => {
+    const currentFirstname = zCustomerInfo(state => state?.firstname);
+    const currentLastname = zCustomerInfo(state => state?.lastname);
+    const currentAddress = zCustomerInfo(state => state?.address);
+    const currentContacts = zCustomerInfo(state => state?.contacts);
+
+    const [data, setData] = useState({firstname: currentFirstname, lastname: currentLastname, address: currentAddress});
+    const [contacts, setContacts] = useState({first: currentContacts?.first, second: currentContacts?.second});
+    const [errorData, setErrorData] = useState({firstname: '', lastname: '', address: '', contact: '', default: ''});
 
     const navigate = useNavigate();
+
+    const saveCustomerInfo = () => {
+        try {
+            let hasError = false;
+
+            if(!data?.firstname) {
+                setErrorData(state => ({...state, firstname: 'Customer\'s first name is required.'}));
+                hasError = true;
+            }
+
+            if(!data?.lastname) {
+                setErrorData(state => ({...state, lastname: 'Customer\'s last name is required.'}));
+                hasError = true;
+            }
+
+            if(!data?.address) {
+                setErrorData(state => ({...state, address: 'Customer\'s address is required.'}));
+                hasError = true;
+            }
+
+            if(!contacts?.first) {
+                setErrorData(state => ({...state, contact: 'Customer\'s contact number is required.'}));
+                hasError = true;
+            }
+
+            if(hasError) {
+                throw new Error('Ensure all fields above are filled.');
+            }
+
+            zCustomerInfo.getState()?.saveCustomerData(data?.firstname, data?.lastname, data?.address, contacts);
+            navigate('/admin/checkout');
+        } catch(error) {
+            console.log(error?.message);
+            setErrorData(state => ({...state, default: error?.message}));
+        }
+    }
+
+    const handleContactNumberInput = (input, nContact) => {
+        const digits = contactNumberInput(input);
+        setContacts(state => ({...state, [nContact]: digits}));
+    }
     
     useLayoutEffect(() => {
-
         // verify
         const selectedItems = JSON.parse(localStorage.getItem(selectedItemsForCashier) || '{}');
         if(Object.keys(selectedItems).length === 0) navigate('/admin/cashier');
+
+        zCustomerInfo.getState()?.reloadCustomerData();
     }, []);
 
     return (
@@ -37,8 +91,109 @@ const CustomerInfo = () => {
                         />
                     </div>
                 </section>
-                <section className="grow w-full h-full flex flex-col md:flex-row gap-4 bg-white rounded-lg">
-
+                <section className="grow w-full h-full flex flex-col gap-4 py-10 px-20 bg-white rounded-lg">
+                    <div className="w-full flex flex-col md:flex-row">
+                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                            <label htmlFor="firstname" className="font-semibold">
+                                First Name
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input 
+                                id="firstname"
+                                value={data?.firstname}
+                                onChange={elem => {
+                                    const input = elem.target.value;
+                                    setData(state => ({...state, firstname: input}))
+                                }}
+                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                                placeholder="First Name"
+                                required
+                            />
+                            <ErrorField message={errorData?.firstname || ''} />
+                        </div>
+                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                            <label htmlFor="lastname" className="font-semibold">
+                                Last Name
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input 
+                                id="lastname"
+                                value={data?.lastname}
+                                onChange={elem => {
+                                    const input = elem.target.value;
+                                    setData(state => ({...state, lastname: input}));
+                                }}
+                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                                placeholder="Last Name"
+                                required
+                            />
+                            <ErrorField message={errorData?.lastname || ''} />
+                        </div>
+                    </div>
+                    <div className="w-full flex flex-col sm:px-4 gap-2">
+                        <label htmlFor="address" className="font-semibold">
+                            Address
+                            <span className="text-red-500">*</span>
+                        </label>
+                        <input 
+                            id="address"
+                            value={data?.address}
+                            onChange={elem => {
+                                const input = elem.target.value;
+                                setData(state => ({...state, address: input}))
+                            }}
+                            className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            placeholder="Address"
+                            required
+                        />
+                        <ErrorField message={errorData?.address || ''} />
+                    </div>
+                    <div className="w-full flex flex-col md:flex-row">
+                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                            <label htmlFor="first-contact-no" className="font-semibold">
+                                1st Contact Number
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input 
+                                id="first-contact-no"
+                                value={contacts?.first}
+                                onChange={elem => {
+                                    const input = elem.target.value?.trim();
+                                    handleContactNumberInput(input, 'first');
+                                }}
+                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
+                                placeholder="09XX-XXX-XXXX"
+                                required
+                            />
+                            <ErrorField message={errorData?.contact || ''} />
+                        </div>
+                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                            <label htmlFor="second-contact-no" className="font-semibold">
+                                2nd Contact Number
+                            </label>
+                            <input 
+                                id="second-contact-no"
+                                value={contacts?.second}
+                                onChange={elem => {
+                                    const input = elem.target.value?.trim();
+                                    handleContactNumberInput(input, 'second');
+                                }}
+                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
+                                placeholder="09XX-XXX-XXXX (Optional)"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="w-full flex justify-end py-6 sm:px-4">
+                        <button
+                            onClick={saveCustomerInfo}
+                            className="flex items-center justify-center gap-2 leading-none bg-green-600 text-white font-bold rounded-full p-3 hover:bg-green-800"
+                        >
+                            <Plus size={26} />
+                            <span className="hidden sm:flex text-nowrap">Continue to Review</span>
+                        </button>
+                    </div>
+                    <ErrorField message={errorData?.default || ''} />
                 </section>
             </main>
         </div>

@@ -346,7 +346,7 @@ const Cashier = () => {
                             bg-green-600 text-white hover:bg-green-800 ${!total ? 'pointer-events-none opacity-50' : ''}`}
                         >
                             <ShoppingBag />
-                            <span className="hidden sm:flex text-nowrap">Checkout</span>
+                            <span className="hidden sm:flex text-nowrap">Proceed to Checkout</span>
                         </button>
                     </div>
                 </div>

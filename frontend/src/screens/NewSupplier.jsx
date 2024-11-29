@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { sendForm } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
+import { contactNumberInput } from '@/utils/contact';
 import { ChevronLeft } from 'lucide-react';
 
 import AppLogo from '@/components/AppLogo';
@@ -50,26 +51,7 @@ const NewSupplier = () => {
 
     const handleContactNumberInput = (elem) => {
         const input = elem.target.value?.trim();
-        // Remove all non-numeric characters
-        let digits = input.replace(/\D/g, '');
-        // Restrict to a maximum of 11 digits
-        if (digits.length > 11) {
-            digits = digits.substring(0, 11);
-        }
-    
-        // Format only if the digits start with '09' and have at least 4 digits
-        if (digits.length >= 4 && digits.startsWith('09')) {
-            digits = digits.replace(/(\d{4})(\d{3})?(\d{4})?/, (match, p1, p2, p3) => {
-                if (p2 && p3) {
-                    return `${p1}-${p2}-${p3}`;
-                } else if (p2) {
-                    return `${p1}-${p2}`;
-                } else {
-                    return p1;
-                }
-            });
-        }
-        
+        const digits = contactNumberInput(input);
         setData(state => ({...state, contact: digits}))
     }
 

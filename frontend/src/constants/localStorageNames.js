@@ -5,6 +5,7 @@ const item = 'item-data';
 const selectedItemsForCashier = 'selected-items-cashier-data';
 const breadcrumbsOrder = 'breadcrumbs-order-status';
 const selectedItemFormNewBarcode = 'selected-item-new-barcode-data';
+const customerInfo = 'customer-info';
 
 export { 
    user,
@@ -14,4 +15,5 @@ export {
    selectedItemsForCashier,
    breadcrumbsOrder,
    selectedItemFormNewBarcode,
+   customerInfo,
 };
