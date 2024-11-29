@@ -198,7 +198,10 @@ const NewItem = () => {
                             <span className="text-red-500">*</span>
                         </h3>
                         <div className="flex items-center gap-4">
-                            <Select name="Select Product Type" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-30">
+                            <Select 
+                                name={`${data?.productType ? 
+                                        data?.productType : 'Select Product Type'}`}
+                                className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-30">
                                 {
                                     productTypes.map((item, index) => {
                                         if(item?.status !== 'active') return null;
@@ -217,7 +220,14 @@ const NewItem = () => {
                                 }
                             </Select>
                             {/* Dropdown output */}
-                            {data?.productType && <span className="bg-green-400/50 p-2 rounded-md">{data?.productType}</span>}
+                            {data?.productType && (
+                                <span 
+                                    className="hidden sm:flex 
+                                    bg-green-400/50 p-2 rounded-md"
+                                >
+                                    {data?.productType}
+                                </span>
+                            )}
                         </div>
                         <ErrorField message={errorData?.productType || ''} />
                     </div>
@@ -261,7 +271,10 @@ const NewItem = () => {
                                 <span className="text-red-500">*</span>
                             </h3>
                             <div className="flex items-center gap-4">
-                                <Select name="Select Supplier" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20">
+                                <Select 
+                                    name={`${data?.supplier ? data?.supplier : 'Select Supplier'}`}
+                                    className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                >
                                     {
                                         suppliers.map((item, index) => {
                                             if(item?.status !== 'active') return null;
@@ -280,7 +293,14 @@ const NewItem = () => {
                                     }
                                 </Select>
                                 {/* Dropdown output */}
-                                {data?.supplier && <span className="bg-green-400/50 p-2 rounded-md">{data?.supplier}</span>}
+                                {data?.supplier && (
+                                    <span 
+                                        className="hidden sm:flex 
+                                        bg-green-400/50 p-2 rounded-md"
+                                    >
+                                        {data?.supplier}
+                                    </span>
+                                )}
                             </div>
                             <ErrorField message={errorData?.supplier || ''} />
                         </div>
@@ -365,7 +385,10 @@ const NewItem = () => {
                             <span className="text-red-500">*</span>
                         </h3>
                         <div className="flex items-center gap-4">
-                            <Select name="Select Unit" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10">
+                            <Select 
+                                name={`${data?.units ? data?.units : 'Select Unit'}`}
+                                className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10"
+                            >
                                 <button
                                     onClick={() => {
                                         setData(state => ({...state, units: 'pcs'}));
@@ -384,7 +407,11 @@ const NewItem = () => {
                                 </button>
                             </Select>
                             {/* Dropdown output */}
-                            {data?.units && <span className="bg-green-400/50 p-2 rounded-md">{data?.units}</span>}
+                            {data?.units && (
+                                <span className="hidden sm:flex bg-green-400/50 p-2 rounded-md">
+                                    {data?.units}
+                                </span>
+                            )}
                         </div>
                         <ErrorField message={errorData?.units || ''} />
                     </div>

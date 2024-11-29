@@ -96,7 +96,11 @@ const Barcode = () => {
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
                     <div className="h-[60px] border-b p-2 flex justify-between items-center">
                         <div className="flex gap-2">
-                            <Select name="Select Batch Number" className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
+                            <Select 
+                                name={`${selectedBatchNo ? 
+                                        `Batch ${selectedBatchNo}${selectedBatchDate ? ` - ${selectedBatchDate}` : ''}` 
+                                    : 'Select Batch Number'}`} 
+                                className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
                                 {
                                     batches.map((item, index) => {
                                         return (
@@ -111,9 +115,9 @@ const Barcode = () => {
                                     })
                                 }
                             </Select>
-                            {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">
+                            {/* {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">
                                 Batch {selectedBatchNo}{selectedBatchDate ? ` - ${selectedBatchDate}` : ''}
-                            </span>}
+                            </span>} */}
                         </div>
                         <Link
                             to={`/admin/new-barcode/${selectedBatchNo}`}
@@ -139,6 +143,7 @@ const Barcode = () => {
                         dark:[&::-webkit-scrollbar-track]:bg-neutral-700
                         dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
                         {batchItems?.map((item, index) => {
+                            const isActive = !item?.disabledNote;
                             return (
                                 <li 
                                     key={index}
@@ -146,7 +151,8 @@ const Barcode = () => {
                                 >
                                     {item?.barcodes?.map(barcode => (
                                         <div key={barcode?.id}>
-                                            <div className="h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border  rounded-lg">
+                                            <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg
+                                                ${isActive?'border-neutral-300':'border-red-600 bg-gray-200/50'}`}>
                                                 <img 
                                                     src={`${apiUrl}/items/${item?.image}`}
                                                     alt="ovida-product" 
@@ -172,9 +178,11 @@ const Barcode = () => {
                                                         {/* <p className="flex md:hidden text-[12px]">
                                                             {formattedDateAndTime(new Date(item?.deliveryDate))}
                                                         </p> */}
-                                                        <p className="text-red-500 font-semibold italic text-[14px]">
-                                                            {item?.disabledNote}
-                                                        </p>
+                                                        {!isActive && (
+                                                            <p className="text-red-500 font-semibold italic text-[14px]">
+                                                                Inactive item: Note - {item?.disabledNote}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                     <div className="flex flex-col text-sm 
                                                         row-start-3 lg:row-start-1 lg:col-start-2">
