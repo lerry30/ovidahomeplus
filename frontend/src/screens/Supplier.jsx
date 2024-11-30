@@ -226,7 +226,13 @@ const Supplier = () => {
                                                                         {item?.status}
                                                                     </p>
                                                                 </div>
-                                                                <p className="text-[14px] md:text-base">{item?.contact}</p>
+                                                                {item.contact && (
+                                                                    <address className="text-[14px] md:text-base not-italic">
+                                                                        <a href={`tel:+63 ${item.contact?.substring(1)}`}>
+                                                                            +63 {item.contact?.substring(1)}
+                                                                        </a>
+                                                                    </address>
+                                                                )}
                                                                 {/* display only for small screen */}
                                                                 <p className="flex md:hidden text-[14px]">
                                                                     {formattedDateAndTime(new Date(item?.updatedAt))}

@@ -48,7 +48,7 @@ const UpdateSupplier = () => {
             const response = await sendForm(urls?.updatesupplier, form, 'PUT');
             if(response) {
                 console.log(response?.message);
-                navigate('/admin/supplier');
+                navigate('/admin/suppliers');
             }
         } catch(error) {
             console.log(error);

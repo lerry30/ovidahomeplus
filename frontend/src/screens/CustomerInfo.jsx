@@ -8,6 +8,7 @@ import { zCustomerInfo } from '@/store/customerInfo';
 import SidebarLayout from '@/components/Sidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ErrorField from '@/components/ErrorField';
+import TitleFormat from '@/utils/titleFormat';
 
 const CustomerInfo = () => {
     const currentFirstname = zCustomerInfo(state => state?.firstname);
@@ -49,7 +50,14 @@ const CustomerInfo = () => {
                 throw new Error('Ensure all fields above are filled.');
             }
 
-            zCustomerInfo.getState()?.saveCustomerData(data?.firstname, data?.lastname, data?.address, contacts);
+            zCustomerInfo
+                .getState()
+                ?.saveCustomerData(
+                    TitleFormat(data?.firstname), 
+                    TitleFormat(data?.lastname), 
+                    data?.address, 
+                    contacts
+                );
             navigate('/admin/checkout');
         } catch(error) {
             console.log(error?.message);
