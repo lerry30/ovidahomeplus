@@ -1,5 +1,7 @@
-import { breadcrumbsOrder as localStorageName } from '@/constants/localStorageNames';
-import { useState, useLayoutEffect } from 'react';
+// import { Boxes } from 'lucide-react';
+import { Prompt, ErrorModal } from '@/components/Modal';
+import { breadcrumbsOrder as localStorageName, selectedItemsForCashier, customerInfo } from '@/constants/localStorageNames';
+import { useState, useRef, useLayoutEffect } from 'react';
 import { zCustomerInfo } from '@/store/customerInfo';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
 import { useNavigate } from 'react-router-dom';
@@ -21,17 +23,62 @@ const Checkout = () => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [itemDetails, setItemDetails] = useState({});
     const [total, setTotal] = useState(0);
+    const [selectedPayment, setSelectedPayment] = useState(''); // radio button
     const [loading, setLoading] = useState(false);
+    const [placeOrderPrompt, setPlaceOrderPrompt] = useState({header: '', message: ''});
+    const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
+    const sending = useRef(false);
+    
     const navigate = useNavigate();
 
-    // to reset the UI
+    const finilizedOrder = async () => {
+        try {
+            setLoading(true);
+            if(!sending.current) {
+                sending.current = true;
+
+                console.log();
+
+                const response = undefined;
+            }
+        } catch(error) {
+            console.log(error?.message);
+        } finally {
+            setLoading(false);
+            sending.current = false;
+        }
+    }
+
+    const handlePlacingOrder = ({header, message}) => {
+        if(!selectedPayment) {
+            setErrorMessage({
+                header: 'Payment',
+                message: 'Please select the customer\'s payment method first.'
+            });
+            return;
+        }
+
+        setPlaceOrderPrompt({header, message});
+    }
+
+    const handlePaymentChange = (method) => setSelectedPayment(method);
+
+    const computeTotal = () => {
+        const overAllTotal = selectedItems.reduce((t, item) => {
+            const { quantity, isDiscounted } = itemDetails[item?.id];
+            if (isDiscounted) return t + toNumber(item?.maxDiscount) * toNumber(quantity)
+            return t + toNumber(item?.srp) * toNumber(quantity);
+        }, 0);
+        setTotal(overAllTotal);
+    }
+
     const setSelectedToDisplay = () => {
         const selected = zCashierSelectedItem.getState()?.items || {};
         const selectedData = [];
         // I just get the items details in database to avoid setting it all in localstorage
-        for(const item of items) {
-            if(selected.hasOwnProperty(item?.id)) {
+        for (const item of items) {
+            if (selected.hasOwnProperty(item?.id)) {
                 selectedData.push(item);
             }
         }
@@ -42,12 +89,12 @@ const Checkout = () => {
         try {
             setLoading(true);
             const response = await getData(urls?.getitems);
-            if (response) {      
+            if (response) {
                 const data = response?.results;
                 // console.log(data);
                 const fData = [];
-                for(const item of data) {
-                    if(!item?.disabledNote && item?.quantity > 0) {
+                for (const item of data) {
+                    if (!item?.disabledNote && item?.quantity > 0) {
                         fData.push(item);
                     }
                 }
@@ -61,17 +108,72 @@ const Checkout = () => {
     }
 
     useLayoutEffect(() => {
-        setSelectedToDisplay();
-    }, [items]);
+        setTimeout(() => setErrorMessage({header: '', message: ''}), 7000);
+    }, [errorMessage]);
+
+    useLayoutEffect(computeTotal, [selectedItems]);
+    useLayoutEffect(setSelectedToDisplay, [items]);
 
     useLayoutEffect(() => {
+        // verify
+        const selectedItems = JSON.parse(localStorage.getItem(selectedItemsForCashier) || '{}');
+        const savedCustomerInfo = JSON.parse(localStorage.getItem(customerInfo) || '{}');
+        if(Object.keys(selectedItems).length === 0 ||
+            Object.keys(savedCustomerInfo).length === 0) 
+            navigate('/admin/cashier');
+
         zCustomerInfo.getState()?.reloadCustomerData();
         zCashierSelectedItem.getState()?.reloadSelectedItemData();
 
         const selected = zCashierSelectedItem.getState()?.items || [];
-        setItemDetails({...selected});
+        setItemDetails({ ...selected });
         getItems();
     }, []);
+
+    const PaymentOption = ({ name, description, children }) => {
+        const isSelected = selectedPayment===name;
+        return (
+            <div 
+                onClick={() => handlePaymentChange(name)}
+                className={`flex-1 rounded-md p-4 border shadow-md hover:shadow-lg cursor-pointer flex flex-col gap-2
+                    ${isSelected ? 'bg-green-600/10 border-green-500' : 'bg-white border-gray-300'}`}>
+                <div className="flex items-center gap-2">
+                    <input 
+                        type="radio" 
+                        name="payment" 
+                        value={name}
+                        checked={isSelected} 
+                        onChange={() => handlePaymentChange(name)} 
+                        className="w-5 h-5 accent-green-600" 
+                    />
+                    <h3 className="font-semibold text-gray-800">{name}</h3>
+                </div>
+                <p className="text-sm text-gray-500">{description}</p>
+                {children}
+            </div>
+        )
+    }
+
+    if(placeOrderPrompt?.header || placeOrderPrompt?.message) {
+        return (
+            <Prompt 
+                header={placeOrderPrompt?.header}
+                message={placeOrderPrompt?.message} 
+                callback={finilizedOrder} 
+                onClose={() => setPlaceOrderPrompt({header: '', message: ''})} 
+            />
+        )
+    }
+
+    if(errorMessage?.header || errorMessage?.message) {
+        return (
+            <ErrorModal 
+                header={errorMessage?.header}
+                message={errorMessage?.message} 
+                callback={() => setErrorMessage({header: '', message: ''})} 
+            />
+        )
+    }
 
     if (loading) {
         return (
@@ -83,95 +185,100 @@ const Checkout = () => {
         <div className="w-full min-h-screen">
             <SidebarLayout />
             <main className="absolute top-0 
-                left-admin-sidebar-sm lg:left-admin-sidebar-lg 
-                w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
-                h-full md:h-screen bg-neutral-100 p-4
-                flex flex-col
-                overflow-hidden
-            ">
-                {/* the height has fixed value to properly compute the remaining space available of screen */}
+        left-admin-sidebar-sm lg:left-admin-sidebar-lg 
+        w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
+        h-full md:h-screen bg-neutral-100 p-4 flex flex-col overflow-hidden
+    ">
+                {/* Breadcrumbs Section */}
                 <section className="w-full h-[30px] flex items-center gap-4">
-                    {/* <h1 className="text-nowrap font-semibold text-lg">Order Details</h1> */}
-                    <div className="">
-                        <Breadcrumbs
-                            tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
-                            tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
-                            localStorageName={localStorageName}
-                        />
-                    </div>
+                    <Breadcrumbs
+                        tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
+                        tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
+                        localStorageName={localStorageName}
+                    />
                 </section>
-                <section className="grow w-full h-full
-                    flex flex-col lg:flex-row gap-4 pb-[200px]
-                    overflow-x-hidden overflow-y-auto
-                    [&::-webkit-scrollbar]:w-2
-                    [&::-webkit-scrollbar-track]:rounded-full
-                    [&::-webkit-scrollbar-track]:bg-gray-100
-                    [&::-webkit-scrollbar-thumb]:rounded-full
-                    [&::-webkit-scrollbar-thumb]:bg-gray-300
-                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-                    <div className="w-full md:w-1/2 h-fit p-8 pb-12  
-                        bg-white shadow-md rounded-lg overflow-hidden">
-                        <article>
-                            <h1 className="font-semibold">Customer Info</h1>
-                            <article className="pt-2 md:pl-2">
-                                <h2>{currentFirstname} {currentLastname}</h2>
-                                <address>
-                                    <p className="italic text-neutral-600">{currentAddress}</p>
-                                    <a 
-                                        href={`tel:+63 ${currentContacts.first?.substring(1)}`}
-                                        className="not-italic"
-                                    >
-                                        +63 {currentContacts.first?.substring(1)}
+
+                {/* Main Content */}
+                <section className="grow w-full flex flex-col lg:flex-row gap-4 overflow-hidden">
+                    {/* Customer Info */}
+                    <div className="w-full lg:w-1/2 p-8 bg-white shadow-md rounded-lg">
+                        <h1 className="font-semibold text-lg">Customer Info</h1>
+                        <article className="pt-4">
+                            <h2 className="text-lg">{currentFirstname} {currentLastname}</h2>
+                            <address className="text-sm text-neutral-600">
+                                <p className="italic">{currentAddress}</p>
+                                <a href={`tel:+63${currentContacts?.first?.substring(1)}`}>+63 {currentContacts?.first?.substring(1)}</a>
+                                {currentContacts?.second && (
+                                    <a href={`tel:+63${currentContacts?.second?.substring(1)}`} className="ml-4">
+                                        +63 {currentContacts?.second?.substring(1)}
                                     </a>
-                                    {currentContacts?.second && (
-                                        <a 
-                                            href={`tel:+63 ${currentContacts.second?.substring(1)}`}
-                                            className="not-italic"
-                                        >
-                                            +63 {currentContacts.second?.substring(1)}
-                                        </a>
-                                    )}
-                                </address>
-                            </article>
+                                )}
+                            </address>
                         </article>
                     </div>
-                    <div className="w-full md:w-1/2 h-fit p-8   pb-12 
-                        bg-white shadow-md rounded-lg overflow-hidden">
-                        <article>
-                            <h1 className="font-semibold">Customer Info</h1>
-                            <ul>
-                            {
-                                selectedItems?.length > 0 &&
-                                    selectedItems.map((item, index) => (
-                                        <li 
-                                            key={index}
-                                            className="w-full flex justify-center items-center px-4 py-1"
-                                        >
-                                            <h3 className="text-nowrap font-semibold">{item?.productTypeName}</h3>
-                                            <div className="w-full border-t border-neutral-500 border-dashed mx-2 mt-1"></div>
-                                            <h3 className="text-nowrap">
-                                                ₱ {formattedNumber(itemDetails[item?.id]?.isDiscounted ? 
-                                                    toNumber(item?.maxDiscount) * toNumber(itemDetails[item?.id]?.quantity)
-                                                :
-                                                    toNumber(item?.srp) * toNumber(itemDetails[item?.id]?.quantity)
-                                                )}
-                                            </h3>
-                                        </li>
-                                    ))
-                            }
-                            </ul>
-                        </article>
+
+                    {/* Order Summary */}
+                    <div className="w-full lg:w-1/2 p-8 bg-white shadow-md rounded-lg">
+                        <h1 className="font-semibold text-lg">Order Summary</h1>
+                        <ul className="max-h-[50%] mt-4
+                            overflow-x-hidden overflow-y-auto
+                            [&::-webkit-scrollbar]:w-2
+                            [&::-webkit-scrollbar-track]:rounded-full
+                            [&::-webkit-scrollbar-track]:bg-gray-100
+                            [&::-webkit-scrollbar-thumb]:rounded-full
+                            [&::-webkit-scrollbar-thumb]:bg-gray-300
+                            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+                            ">
+                            {selectedItems?.map((item, index) => (
+                                <li key={index} className="flex justify-between items-center py-2">
+                                    <span className="font-medium">{item.productTypeName}</span>
+                                    <span className="text-right">
+                                        ₱ {formattedNumber(
+                                            itemDetails[item.id]?.isDiscounted
+                                                ? toNumber(item.maxDiscount) * toNumber(itemDetails[item.id]?.quantity)
+                                                : toNumber(item.srp) * toNumber(itemDetails[item.id]?.quantity)
+                                        )}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="mt-4 flex justify-between items-center border-t pt-4">
+                            <span className="font-semibold text-lg">Total</span>
+                            <span className="font-semibold text-lg">
+                                ₱ {formattedNumber(total)}
+                            </span>
+                        </div>
                     </div>
                 </section>
-                <section className="w-full min-h-[200px] p-12
-                    fixed bottom-0 right-0
-                    left-admin-sidebar-sm lg:left-admin-sidebar-lg 
-                    bg-white overflow-hidden">
-                    <div></div>
+
+                {/* Footer Section */}
+                <section
+                    className="fixed bottom-0 left-admin-sidebar-sm lg:left-admin-sidebar-lg 
+            w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
+            bg-gray-100 shadow-md border-t p-6"
+                >
+                    <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+                        {/* Payment Methods */}
+                        <div className="flex flex-wrap gap-4 justify-center lg:justify-start w-full lg:w-auto">
+                            <PaymentOption name="Bank Transfer" description="Customer paid via bank transfer." />
+                            <PaymentOption name="Credit/Debit Card" description="Customer used a card to pay." />
+                            <PaymentOption name="E-Wallet" description="Paid via e-wallet (GCash, Paymaya, Paypal)." />
+                            <PaymentOption name="Cash Payment" description="Customer paid in cash." />
+                        </div>
+
+                        {/* Place Order Button */}
+                        <button
+                            onClick={() => handlePlacingOrder({header: 'Place Order', message: 'Are you sure you want to place this order?'})}
+                            className="h-fit px-2 py-3 rounded-full bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition w-full lg:w-[19%]"
+                        >
+                            Place Order
+                        </button>
+                    </div>
                 </section>
             </main>
         </div>
+
     )
 }
 
