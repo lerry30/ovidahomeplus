@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Minus, ShoppingBag } from 'lucide-react';
+import { PromptTextBox } from '@/components/Modal';
 import { useLayoutEffect, useState } from 'react';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
 import { getData } from '@/utils/send';
@@ -17,6 +18,7 @@ const Cashier = () => {
     const [itemDetails, setItemDetails] = useState({});
     const [total, setTotal] = useState(0);
     const [recomputeTotal, setRecomputeTotal] = useState(false); // trigger
+    const [barcodePrompt, setBarcodePrompt] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -126,6 +128,17 @@ const Cashier = () => {
         setItemDetails({...selected});
         getItems();
     }, []);
+
+    // if(barcodePrompt) {
+    //     return (
+    //         <PromptTextBox 
+    //             header="Barcode" 
+    //             message="Enter barcode." 
+    //             callback={async (value) => {}} 
+    //             onClose={() => setDisablePrompt(false)} 
+    //         />
+    //     )
+    // }
 
     if (loading) {
         return (

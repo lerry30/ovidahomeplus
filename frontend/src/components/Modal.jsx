@@ -90,7 +90,7 @@ export const Prompt = ({ header, message, callback, onClose }) => {
 export const PromptTextBox = ({ header, message, callback, onClose }) => {
     const textBoxRef = useRef(null);
     const modalRef = useRef(null);
-    const [ textBoxError, setTextBoxError ] = useState('');
+    const [textBoxError, setTextBoxError] = useState('');
 
     const send = async (ev) => {
         try {
@@ -128,11 +128,153 @@ export const PromptTextBox = ({ header, message, callback, onClose }) => {
                     name="textbox" 
                     className="input w-full min-h-[120px] outline-none border-[1px] border-neutral-400 font-paragraphs p-2"
                 ></textarea>
-                <ErrorField message={ textBoxError } />
+                <ErrorField message={textBoxError} />
 
                 <div className="w-full justify-end flex gap-2 mt-2">
                     <button onClick={closeModal} className="font-headings bg-neutral-500/45 p-2 leading-none rounded-full text-[16px]">Cancel</button>
                     <button onClick={send} className="font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-full text-[16px]">Submit</button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export const PromptInput = ({ header, message, callback, onClose }) => {
+    const [textInput, setTextInput] = useState('');
+    const [inputError, setInputError] = useState('');
+    const modalRef = useRef(null);
+
+    const send = async (ev) => {
+        try {
+            ev.preventDefault();
+            if(!textInput) {
+                setInputError(`Please fill in the input field with the ${ header?.trim()?.toLowerCase() }.`);
+                return;
+            }
+
+            if(textInput?.length > 200) {
+                setInputError('Max 200 characters, please be concise.');
+                return;
+            }
+
+            await callback(textInput);
+        } catch(error) {
+            setInputError(error?.message || 'There\'s something wrong.');
+        }
+    }
+
+    const closeModal = () => {
+        modalRef.current.style.display = 'none';
+        onClose();
+    }
+
+    return (
+        <div ref={ modalRef } className="w-screen h-screen fixed top-0 left-0 bg-neutral-800/90 z-50 flex justify-center items-center backdrop-blur-sm">
+            <div className="card p-10 bg-zinc-100 rounded-md shadow-lg shadow-black border border-emerald-500 flex flex-col">
+                <article className="w-full relative">
+                    <div onClick={ closeModal } className="group absolute top-[-20px] right-[-20px]">
+                        <X
+                            onClick={ closeModal }
+                            className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
+                        />
+                    </div>
+                </article>
+                
+                <h1 className="font-headings font-bold text-2xl pt-2 max-w-80">{header}</h1>
+                <p className="font-paragraphs w-80 py-4 text-neutral-800">{message}</p>
+
+                <input
+                    value={textInput}
+                    onChange={elem => {
+                        const input = elem.target.value.trim();
+                        setTextInput(input);
+                    }}
+                    className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                    placeholder="Item Code"
+                    required
+                />
+                <ErrorField message={inputError || ''} />
+
+                <div className="w-full justify-end flex gap-2 mt-2">
+                    <button onClick={closeModal} className="font-headings bg-neutral-500/45 p-2 leading-none rounded-full text-[16px]">Cancel</button>
+                    <button onClick={send} className="font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-full text-[16px]">Done</button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[] }) => {
+    const [checkedBoxes, setCheckedBoxes] = useState([]);
+    const modalRef = useRef(null);
+
+    const send = async (ev) => {
+        try {
+            ev.preventDefault();
+            await callback(checkedBoxes);
+        } catch(error) {
+            setInputError(error?.message || 'There\'s something wrong.');
+        }
+    }
+
+    const check = (checkedItem) => {
+        if(checkedBoxes?.includes(checkedItem)) {
+            setCheckedBoxes(state => state?.filter(item => item!==checkedItem));
+            return;
+        }
+        setCheckedBoxes([...checkedBoxes, checkedItem]);
+    }
+
+    const closeModal = () => {
+        modalRef.current.style.display = 'none';
+        onClose();
+    }
+
+    return (
+        <div ref={ modalRef } className="w-screen h-screen fixed top-0 left-0 bg-neutral-800/90 z-50 flex justify-center items-center backdrop-blur-sm">
+            <div className="card p-10 bg-zinc-100 rounded-md shadow-lg shadow-black border border-emerald-500 flex flex-col">
+                <article className="w-full relative">
+                    <div onClick={ closeModal } className="group absolute top-[-20px] right-[-20px]">
+                        <X
+                            onClick={ closeModal }
+                            className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
+                        />
+                    </div>
+                </article>
+                
+                <h1 className="font-headings font-bold text-2xl pt-2 max-w-80">{header}</h1>
+                <p className="font-paragraphs w-80 py-4 text-neutral-800">{message}</p>
+
+                {list?.length > 0 && (
+                    list.map((item, index) => {
+                        return (
+                            <article key={index} className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    className="size-5"
+                                    // checked={isSelected}
+                                    onChange={() => check(item)}
+                                />
+                                <span>{item}</span>
+                            </article>
+                        )   
+                    }
+                ))}
+
+                <div className="w-full justify-end flex gap-2 mt-4">
+                    <button 
+                        onClick={closeModal} 
+                        className="font-headings bg-neutral-500/45 p-2 leading-none rounded-full text-[16px]"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={send} 
+                        className={`font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-full text-[16px] 
+                            ${checkedBoxes?.length===0 ? 'pointer-events-none opacity-80' : ''}`}
+                    >
+                        Done
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react';
+import { ErrorModal, PromptCheckBoxes } from '@/components/Modal';
 import { useNavigate } from 'react-router-dom';
-import { ErrorModal } from '@/components/Modal';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
@@ -15,6 +15,8 @@ const SelectItem = () => {
     const [items, setItems] = useState([]);
     const [displayItems, setDisplayItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState({});
+    const [barcodes, setBarcodes] = useState({}); // contains item's barcodes
+    const [barcodePrompt, setBarcodePrompt] = useState({isOpen: false, data: []});
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
@@ -36,17 +38,21 @@ const SelectItem = () => {
     }
 
     const checkBox = (index, itemId) => {
-        const isChecked = checkBoxes.current[index].checked;
-        checkBoxes.current[index].checked = !isChecked;
-
-        setSelectedItems(state => {
-            if(state.hasOwnProperty(itemId)) {
-                delete state[itemId];
-                return {...state};
-            } else {
-                return {...state, [itemId]: {quantity: 1, isDiscounted: false}};
-            }
-        });
+        const checkedBoxElem = checkBoxes.current[index];
+        const isChecked = checkedBoxElem.checked;
+        console.log(isChecked);
+        
+        const nSelected = {...selectedItems};
+        if(nSelected.hasOwnProperty(itemId)) {
+            checkedBoxElem.checked = !isChecked;
+            delete nSelected[itemId];
+        } else {
+            nSelected[itemId] = {quantity: 1, isDiscounted: false};
+            const listOfBarcodes = barcodes[itemId];
+            console.log({listOfBarcodes});
+            setBarcodePrompt({isOpen: true, data: listOfBarcodes, itemId, checkedBoxElem});
+        }
+        setSelectedItems(nSelected);
     }
 
     const search = (ev) => {
@@ -87,7 +93,6 @@ const SelectItem = () => {
                     }
                 }
             }
-
             setDisplayItems(searched);
         } catch(error) {
             console.log(error);
@@ -104,14 +109,16 @@ const SelectItem = () => {
                 // filter data if it has 
                 const data = response?.results;
                 const fData = [];
+                const fDataObj = {};
                 for(const item of data) {
                     if(!item?.disabledNote && item?.quantity > 0) {
                         fData.push(item);
+                        fDataObj[item?.id] = item?.barcodes?.map(barcode => barcode?.barcode);
                     }
                 }
-
                 setItems(fData);
                 setDisplayItems(fData);
+                setBarcodes(fDataObj);
             }
         } catch(error) {
             console.log(error?.message);
@@ -127,6 +134,22 @@ const SelectItem = () => {
         const currentSelectedItems = zCashierSelectedItem.getState()?.items || [];
         setSelectedItems(currentSelectedItems);
     }, []);
+
+    if(barcodePrompt?.isOpen) {
+        return (
+            <PromptCheckBoxes
+                header="Barcode"
+                message="Insert the item barcode"
+                callback={(selectedItems) => {}}
+                onClose={() => {
+                    const {itemId, checkedBoxElem} = barcodePrompt;
+                    setBarcodePrompt(false);
+                    checkedBoxElem.checked = false;
+                }}
+                list={barcodePrompt?.data}
+            />
+        )
+    }
 
     if(errorMessage?.header || errorMessage?.message) {
         return (
