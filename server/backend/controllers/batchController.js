@@ -1,6 +1,7 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
 import { isValidDate } from '../utils/datetime.js';
+import { parseOneDeep } from '../utils/jsonParse.js';
 import * as batchStmt from '../mysql/batch.js';
 
 /*
@@ -86,7 +87,8 @@ const updateBatch = requestHandler(async (req, res, database) => {
 const getBatchWithData = requestHandler(async (req, res, database) => {
     const batchNo = toNumber(req.body?.batchNo);
     const [results] = await database.execute(batchStmt.getAssociatedToBatch, [batchNo]);
-    res.status(200).json({results});
+    const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
+    res.status(200).json({results: items});
 });
 
 export {

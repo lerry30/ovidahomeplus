@@ -1,4 +1,4 @@
-export const apiUrl = 'http://192.168.1.15:4000';
+export const apiUrl = 'http://192.168.0.104:4000';
 
 export const urls = {
     signup: `${apiUrl}/api/users/`,

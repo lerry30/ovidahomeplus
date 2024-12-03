@@ -39,7 +39,7 @@ const NewSupplier = () => {
             const response = await sendForm(urls?.newsupplier, form);
             if(response) {
                 console.log(response?.message);
-                navigate('/admin/supplier');
+                navigate('/admin/suppliers');
             }
         } catch(error) {
             console.log(error);

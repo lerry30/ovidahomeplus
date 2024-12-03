@@ -2,6 +2,7 @@ import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
 import { setBarcodeSequence } from '../helper/barcode.js';
 import { generateBarcode } from '../utils/generateBarcode.js';
+import { parseOneDeep } from '../utils/jsonParse.js';
 import * as barcodeStmt from '../mysql/barcode.js';
 import * as batchStmt from '../mysql/batch.js';
 
@@ -24,7 +25,9 @@ const newBarcode = requestHandler(async (req, res, database) => {
     const [itemData] = await database.execute(batchStmt.getAssociatedToBatch, [batchNo]);
     // console.log(JSON.stringify(itemData, null, 4));
     // console.log(JSON.stringify({no: itemData?.length, one: itemData[0], two: itemData[1]}, null, 4));
-    const barcodes = itemData?.length > 0 ? itemData?.map(item => item.barcodes?.map(barcode => barcode?.barcode))?.flat(1) : [];
+    const barcodes = itemData?.length > 0 ? 
+        parseOneDeep(itemData, ['barcodes'])?.map(item => item.barcodes.map(barcode => barcode?.barcode))?.flat(1) 
+        : [];
 
     // make it multi insert
     let nForMultiInsertStmt = barcodeStmt.newBarcode;

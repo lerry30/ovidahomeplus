@@ -1,5 +1,6 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber, roundToTwo } from '../utils/number.js';
+import { parseOneDeep } from '../utils/jsonParse.js';
 // import { generateBarcode } from '../utils/generateBarcode.js';
 // import { setBarcodeSequence } from '../helper/item.js';
 // import { unlink } from 'fs/promises';
@@ -57,7 +58,8 @@ const newItem = requestHandler(async (req, res, database) => {
 */
 const getItems = requestHandler(async (req, res, database) => {
     const [results] = await database.query(itemStmt.items, []);
-    res.status(200).json({results});
+    const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
+    res.status(200).json({results: items});
 });
 
 /*
