@@ -1,6 +1,6 @@
 // import { Boxes } from 'lucide-react';
 import { Prompt, ErrorModal } from '@/components/Modal';
-import { breadcrumbsOrder as localStorageName, selectedItemsForCashier, customerInfo } from '@/constants/localStorageNames';
+import { breadcrumbsOrder, selectedItemsForCashier, customerInfo } from '@/constants/localStorageNames';
 import { useState, useRef, useLayoutEffect } from 'react';
 import { zCustomerInfo } from '@/store/customerInfo';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
@@ -20,8 +20,8 @@ const Checkout = () => {
     const currentContacts = zCustomerInfo(state => state?.contacts);
 
     const [items, setItems] = useState([]); // from database
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [itemDetails, setItemDetails] = useState({});
+    const [selectedItems, setSelectedItems] = useState([]); // from local storage which is the customer order details or it is just info of the order
+    const [itemDetails, setItemDetails] = useState({}); // defines the barcodes and if they are discounted
     const [total, setTotal] = useState(0);
     const [selectedPayment, setSelectedPayment] = useState(''); // radio button
     const [loading, setLoading] = useState(false);
@@ -29,24 +29,73 @@ const Checkout = () => {
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
     const sending = useRef(false);
-    
     const navigate = useNavigate();
 
     const finilizedOrder = async () => {
         try {
             setLoading(true);
+            // to avoid multi submission
             if(!sending.current) {
                 sending.current = true;
 
-                console.log();
+                if(!currentFirstname || !currentLastname || !currentAddress || !currentContacts?.first) {
+                    setErrorMessage({
+                        header: 'Customer Info',
+                        message: 'Please provide the complete info of the customer.'
+                    });
+                    setTimeout(() => {
+                        localStorage.setItem(breadcrumbsOrder, JSON.stringify([true, true, false]));
+                        localStorage.removeItem(customerInfo);
+                        navigate('/admin/customer-info');
+                    }, 4000);
+                    throw new Error('Please provide the complete info of the customer.');
+                }
 
-                const response = undefined;
+                if(Object.keys(itemDetails).length > 0) {
+                    let error = false;
+                    for(const key in itemDetails) {
+                        const order = itemDetails[key];
+                        error = order?.barcodes?.length===0;
+                    }
+
+                    if(error) {
+                        setErrorMessage({
+                            header: 'Error',
+                            message: 'There\'s something wrong.'
+                        });
+                        setTimeout(() => {
+                            localStorage.setItem(breadcrumbsOrder, JSON.stringify([true, false, false]));
+                            localStorage.removeItem(selectedItemsForCashier);
+                            localStorage.removeItem(customerInfo);
+                            navigate('/admin/cashier');
+                        }, 4000);
+                        throw new Error('There\'s something wrong.');
+                    }
+                }
+
+                const payload = {
+                    customerInfo: {
+                        firstname: currentFirstname,
+                        lastname: currentLastname,
+                        address: currentAddress,
+                        contacts: currentContacts
+                    },
+                    orders: itemDetails,
+                    paymentMethod: selectedPayment
+                }
+                const response = await sendJSON(urls.neworder, payload);
+                if(response) {
+                    localStorage.removeItem(selectedItemsForCashier);
+                    localStorage.removeItem(customerInfo);
+                    navigate(0);
+                }
             }
         } catch(error) {
             console.log(error?.message);
         } finally {
             setLoading(false);
             sending.current = false;
+            setPlaceOrderPrompt({header: '', message: ''});
         }
     }
 
@@ -66,7 +115,8 @@ const Checkout = () => {
 
     const computeTotal = () => {
         const overAllTotal = selectedItems.reduce((t, item) => {
-            const { quantity, isDiscounted } = itemDetails[item?.id];
+            const quantity = itemDetails[item?.id]?.barcodes?.length; 
+            const isDiscounted = itemDetails[item?.id]?.isDiscounted;
             if (isDiscounted) return t + toNumber(item?.maxDiscount) * toNumber(quantity)
             return t + toNumber(item?.srp) * toNumber(quantity);
         }, 0);
@@ -125,8 +175,8 @@ const Checkout = () => {
         zCustomerInfo.getState()?.reloadCustomerData();
         zCashierSelectedItem.getState()?.reloadSelectedItemData();
 
-        const selected = zCashierSelectedItem.getState()?.items || [];
-        setItemDetails({ ...selected });
+        const selected = zCashierSelectedItem.getState()?.items;
+        if(selected) setItemDetails({ ...selected });
         getItems();
     }, []);
 
@@ -194,7 +244,7 @@ const Checkout = () => {
                     <Breadcrumbs
                         tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
                         tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
-                        localStorageName={localStorageName}
+                        localStorageName={breadcrumbsOrder}
                     />
                 </section>
 
@@ -205,11 +255,15 @@ const Checkout = () => {
                         <h1 className="font-semibold text-lg">Customer Info</h1>
                         <article className="pt-4">
                             <h2 className="text-lg">{currentFirstname} {currentLastname}</h2>
-                            <address className="text-sm text-neutral-600">
+                            <address className="text-sm text-neutral-600 flex flex-col gap-1">
                                 <p className="italic">{currentAddress}</p>
-                                <a href={`tel:+63${currentContacts?.first?.substring(1)}`}>+63 {currentContacts?.first?.substring(1)}</a>
+                                {currentContacts?.first && (
+                                    <a href={`tel:+63${currentContacts?.first?.substring(1)}`}>
+                                        +63 {currentContacts?.first?.substring(1)}
+                                    </a>
+                                )}
                                 {currentContacts?.second && (
-                                    <a href={`tel:+63${currentContacts?.second?.substring(1)}`} className="ml-4">
+                                    <a href={`tel:+63${currentContacts?.second?.substring(1)}`}>
                                         +63 {currentContacts?.second?.substring(1)}
                                     </a>
                                 )}
@@ -236,8 +290,8 @@ const Checkout = () => {
                                     <span className="text-right">
                                         ₱ {formattedNumber(
                                             itemDetails[item.id]?.isDiscounted
-                                                ? toNumber(item.maxDiscount) * toNumber(itemDetails[item.id]?.quantity)
-                                                : toNumber(item.srp) * toNumber(itemDetails[item.id]?.quantity)
+                                                ? toNumber(item.maxDiscount) * toNumber(itemDetails[item.id]?.barcodes?.length)
+                                                : toNumber(item.srp) * toNumber(itemDetails[item.id]?.barcodes?.length)
                                         )}
                                     </span>
                                 </li>

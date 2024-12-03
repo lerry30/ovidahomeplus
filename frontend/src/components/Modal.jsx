@@ -204,17 +204,13 @@ export const PromptInput = ({ header, message, callback, onClose }) => {
     );
 }
 
-export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[] }) => {
-    const [checkedBoxes, setCheckedBoxes] = useState([]);
+export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[], checked=[] }) => {
+    const [checkedBoxes, setCheckedBoxes] = useState(checked);
     const modalRef = useRef(null);
 
-    const send = async (ev) => {
-        try {
-            ev.preventDefault();
-            await callback(checkedBoxes);
-        } catch(error) {
-            setInputError(error?.message || 'There\'s something wrong.');
-        }
+    const done = () => {
+        if(checkedBoxes?.length === 0) return;
+        callback(checkedBoxes);
     }
 
     const check = (checkedItem) => {
@@ -247,12 +243,13 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[] }
 
                 {list?.length > 0 && (
                     list.map((item, index) => {
+                        const isChecked = checkedBoxes.includes(item);
                         return (
                             <article key={index} className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
                                     className="size-5"
-                                    // checked={isSelected}
+                                    checked={isChecked}
                                     onChange={() => check(item)}
                                 />
                                 <span>{item}</span>
@@ -269,7 +266,7 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[] }
                         Cancel
                     </button>
                     <button 
-                        onClick={send} 
+                        onClick={done} 
                         className={`font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-full text-[16px] 
                             ${checkedBoxes?.length===0 ? 'pointer-events-none opacity-80' : ''}`}
                     >

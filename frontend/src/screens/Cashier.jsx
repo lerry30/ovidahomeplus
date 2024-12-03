@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Minus, ShoppingBag } from 'lucide-react';
-import { PromptTextBox } from '@/components/Modal';
+import { Plus, Minus, ShoppingBag, CircleX } from 'lucide-react';
+import { PromptCheckBoxes } from '@/components/Modal';
 import { useLayoutEffect, useState } from 'react';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
 import { getData } from '@/utils/send';
@@ -18,7 +18,8 @@ const Cashier = () => {
     const [itemDetails, setItemDetails] = useState({});
     const [total, setTotal] = useState(0);
     const [recomputeTotal, setRecomputeTotal] = useState(false); // trigger
-    const [barcodePrompt, setBarcodePrompt] = useState(false);
+    const [barcodes, setBarcodes] = useState({}); // contains item's barcodes
+    const [barcodePrompt, setBarcodePrompt] = useState({isOpen: false, data: [], itemId: 0});
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -45,51 +46,62 @@ const Cashier = () => {
 
     const computeTotal = () => {
         const overAllTotal = selectedItems.reduce((t, item) => {
-            const {quantity, isDiscounted} = itemDetails[item?.id];
+            const quantity = itemDetails[item?.id]?.barcodes?.length;
+            const isDiscounted = itemDetails[item?.id]?.isDiscounted;
             if(isDiscounted) return t + toNumber(item?.maxDiscount) * toNumber(quantity)
             return t + toNumber(item?.srp) * toNumber(quantity);
         }, 0);
         setTotal(overAllTotal);
     }
 
-    const enableDiscount = (item) => {
-        const selected = zCashierSelectedItem.getState()?.items || [];
-        if (selected.hasOwnProperty(item?.id) && selected[item?.id].hasOwnProperty('isDiscounted')) {
-            selected[item?.id].isDiscounted = !selected[item?.id].isDiscounted;
+    const enableDiscount = (itemId) => {
+        const selected = zCashierSelectedItem.getState()?.items;
+        if (selected.hasOwnProperty(itemId) && selected[itemId].hasOwnProperty('isDiscounted')) {
+            selected[itemId].isDiscounted = !selected[itemId].isDiscounted;
         }
         zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
         setItemDetails({...selected});
         setRecomputeTotal(!recomputeTotal);
     }
 
-    const increaseItemQuantity = (item) => {
-        const selected = zCashierSelectedItem.getState()?.items || [];
-        if (selected.hasOwnProperty(item?.id)) {
-            if(selected[item?.id].quantity < item?.quantity) {
-                selected[item?.id].quantity++;
-            }
+    const removeItem = (itemId) => {
+        // remove
+        const selected = zCashierSelectedItem.getState()?.items;
+        if (selected.hasOwnProperty(itemId)) {
+            delete selected[itemId];
         }
-        zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
-        setItemDetails({...selected});
-        setRecomputeTotal(!recomputeTotal);
+        zCashierSelectedItem.getState()?.saveSelectedItemData({...selected});
+        setSelectedToDisplay();
     }
 
-    const decreaseItemQuantity = (item) => {
-        const selected = zCashierSelectedItem.getState()?.items || [];
-        // console.log(sItem, item?.id);
-        if (selected.hasOwnProperty(item?.id)) {
-            if(selected[item?.id]?.quantity <= 1) {
-                delete selected[item?.id] 
-                setSelectedItems(state => state?.filter(sItem => sItem?.id!==item?.id));
-            } else {
-                selected[item?.id].quantity--;
-            }
-        }
+    // const increaseItemQuantity = (item) => {
+    //     const selected = zCashierSelectedItem.getState()?.items || [];
+    //     if (selected.hasOwnProperty(item?.id)) {
+    //         if(selected[item?.id].quantity < item?.quantity) {
+    //             selected[item?.id].quantity++;
+    //         }
+    //     }
+    //     zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
+    //     setItemDetails({...selected});
+    //     setRecomputeTotal(!recomputeTotal);
+    // }
 
-        zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
-        setItemDetails({...selected});
-        setRecomputeTotal(!recomputeTotal);
-    }
+    // const decreaseItemQuantity = (itemId) => {
+    //     const selected = zCashierSelectedItem.getState()?.items;
+    //     console.log(selected, itemId);
+    //     if (selected[itemId]) {
+    //         if(selected[itemId]?.quantity <= 1) {
+    //             delete selected[itemId] 
+    //             setSelectedItems(state => state?.filter(sItem => sItem?.id!==itemId));
+    //         } else {
+    //             selected[itemId].quantity--;
+    //         }
+    //     }
+
+    //     zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
+    //     setItemDetails({...selected});
+    //     setRecomputeTotal(!recomputeTotal);
+    // }
 
     const getItems = async () => {
         try {
@@ -99,13 +111,16 @@ const Cashier = () => {
                 const data = response?.results;
                 // console.log(data);
                 const fData = [];
+                const fDataObj = {};
                 for(const item of data) {
                     if(!item?.disabledNote && item?.quantity > 0) {
                         fData.push(item);
+                        fDataObj[item?.id] = item?.barcodes?.map(barcode => barcode?.barcode);
                     }
                 }
 
                 setItems(fData);
+                setBarcodes(fDataObj);
             }
         } catch (error) {
             console.log(error?.message);
@@ -124,21 +139,40 @@ const Cashier = () => {
 
     useLayoutEffect(() => {
         zCashierSelectedItem.getState()?.reloadSelectedItemData();
-        const selected = zCashierSelectedItem.getState()?.items || [];
-        setItemDetails({...selected});
+        const selected = zCashierSelectedItem.getState()?.items;
+        if(selected) setItemDetails({...selected});
         getItems();
     }, []);
 
-    // if(barcodePrompt) {
-    //     return (
-    //         <PromptTextBox 
-    //             header="Barcode" 
-    //             message="Enter barcode." 
-    //             callback={async (value) => {}} 
-    //             onClose={() => setDisablePrompt(false)} 
-    //         />
-    //     )
-    // }
+    if(barcodePrompt?.isOpen) {
+        return (
+            <PromptCheckBoxes
+                header="Barcode"
+                message="Insert the item barcode"
+                callback={(selectedBarcodes) => {
+                    if(selectedBarcodes.length === 0) return;
+                    const {item} = barcodePrompt;
+
+                    const selected = zCashierSelectedItem.getState()?.items;
+                    if (selected.hasOwnProperty(item?.id)) {
+                        if(selected[item?.id].barcodes.length < item?.quantity) {
+                            selected[item?.id].barcodes = selectedBarcodes;
+                        }
+                    }
+                    zCashierSelectedItem.getState()?.saveSelectedItemData(selected);
+                    setItemDetails({...selected});
+                    setRecomputeTotal(!recomputeTotal);
+
+                    setBarcodePrompt(false);
+                }}
+                onClose={() => {
+                    setBarcodePrompt(false);
+                }}
+                list={barcodePrompt?.data}
+                checked={itemDetails[barcodePrompt?.item.id]?.barcodes}
+            />
+        )
+    }
 
     if (loading) {
         return (
@@ -225,9 +259,6 @@ const Cashier = () => {
                                                     </div>
                                                     <p className="text-[12px]">{item?.description}</p>
                                                     <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
-                                                    <p className="text-red-500 font-semibold italic text-[14px]">
-                                                        {item?.disabledNote}
-                                                    </p>
                                                 </div>
                                                 <div className="flex flex-col text-sm 
                                                     row-start-3 lg:row-start-1 lg:col-start-2">
@@ -259,22 +290,14 @@ const Cashier = () => {
                                                 <p className="text-[12px] md:flex">{formattedDateAndTime(new Date(item?.updatedAt))}</p>
                                                 <div className="flex flex-col lg:flex-row gap-2 pt-1">
                                                     <div className="flex gap-2">
-                                                        {/* <button 
-                                                            onClick={() => {
-                                                                // remove
-                                                                const selected = zCashierSelectedItem.getState()?.items || [];
-                                                                const newSelected = selected.filter(itemId => itemId!==item?.id)
-                                                                zCashierSelectedItem.getState()?.saveSelectedItemData(newSelected);
-                                                                setSelectedToDisplay();
-                                                            }}
-                                                            className="flex gap-2 items-center justify-center leading-none bg-red-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-red-800 text-[12px]
-                                                            sm:pr-4"
+                                                        <button 
+                                                            onClick={() => removeItem(item?.id)}
+                                                            className="flex gap-2 items-center justify-center leading-none font-bold text-[12px]"
                                                         >
-                                                            <CircleX />
-                                                            Remove
-                                                        </button> */}
+                                                            <CircleX className="fill-red-600/25 stroke-red-600" />
+                                                        </button>
                                                         <button
-                                                            onClick={() => enableDiscount(item)}
+                                                            onClick={() => enableDiscount(item?.id)}
                                                             className="flex gap-2 items-center justify-center leading-none bg-purple-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-purple-800 text-[12px]
                                                             sm:pr-4"
                                                         >
@@ -283,15 +306,19 @@ const Cashier = () => {
                                                         </button>
                                                     </div>
                                                     <div className="w-full flex justify-end items-center gap-2">
-                                                        <button
-                                                            onClick={() => decreaseItemQuantity(item)}
+                                                        {/* <button
+                                                            onClick={() => decreaseItemQuantity(item?.id)}
                                                             className="bg-neutral-500 rounded-lg text-white"
                                                         >
                                                             <Minus />
-                                                        </button>
-                                                        <span className="text-nowrap">{`${itemDetails[item?.id]?.quantity} ${item.unit}`}</span>
+                                                        </button> */}
+                                                        <span className="text-nowrap">{`${itemDetails[item?.id]?.barcodes.length} ${item.unit}`}</span>
                                                         <button 
-                                                            onClick={() => increaseItemQuantity(item)}
+                                                            onClick={() => {
+                                                                const listOfBarcodes = barcodes[item.id];
+                                                                setBarcodePrompt({isOpen: true, data: listOfBarcodes, item});
+                                                                // increaseItemQuantity(item)
+                                                            }}
                                                             className="bg-neutral-500 rounded-lg text-white"
                                                         >
                                                             <Plus />
@@ -338,9 +365,9 @@ const Cashier = () => {
                                         <div className="w-full border-t border-neutral-500 border-dashed mx-2 mt-1"></div>
                                         <h3 className="text-nowrap">
                                             ₱ {formattedNumber(itemDetails[item?.id]?.isDiscounted ? 
-                                                toNumber(item?.maxDiscount) * toNumber(itemDetails[item?.id]?.quantity)
+                                                toNumber(item?.maxDiscount) * toNumber(itemDetails[item?.id]?.barcodes?.length)
                                             :
-                                                toNumber(item?.srp) * toNumber(itemDetails[item?.id]?.quantity)
+                                                toNumber(item?.srp) * toNumber(itemDetails[item?.id]?.barcodes?.length)
                                             )}
                                         </h3>
                                     </li>

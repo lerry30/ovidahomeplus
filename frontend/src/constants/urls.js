@@ -23,4 +23,5 @@ export const urls = {
     updatebatch: `${apiUrl}/api/batches/update`,
     batchdata: `${apiUrl}/api/batches/batch-data`,
     newbarcode: `${apiUrl}/api/barcodes/new`,
+    neworder: `${apiUrl}/api/orders/new`,
 };

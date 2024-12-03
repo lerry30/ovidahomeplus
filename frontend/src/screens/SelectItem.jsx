@@ -16,7 +16,7 @@ const SelectItem = () => {
     const [displayItems, setDisplayItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState({});
     const [barcodes, setBarcodes] = useState({}); // contains item's barcodes
-    const [barcodePrompt, setBarcodePrompt] = useState({isOpen: false, data: []});
+    const [barcodePrompt, setBarcodePrompt] = useState({isOpen: false, data: [], itemId: 0});
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
@@ -40,19 +40,15 @@ const SelectItem = () => {
     const checkBox = (index, itemId) => {
         const checkedBoxElem = checkBoxes.current[index];
         const isChecked = checkedBoxElem.checked;
-        console.log(isChecked);
         
-        const nSelected = {...selectedItems};
-        if(nSelected.hasOwnProperty(itemId)) {
+        if(selectedItems[itemId]) {
             checkedBoxElem.checked = !isChecked;
-            delete nSelected[itemId];
+            delete selectedItems[itemId];
+            setSelectedItems({...selectedItems});
         } else {
-            nSelected[itemId] = {quantity: 1, isDiscounted: false};
             const listOfBarcodes = barcodes[itemId];
-            console.log({listOfBarcodes});
-            setBarcodePrompt({isOpen: true, data: listOfBarcodes, itemId, checkedBoxElem});
+            setBarcodePrompt({isOpen: true, data: listOfBarcodes, itemId});
         }
-        setSelectedItems(nSelected);
     }
 
     const search = (ev) => {
@@ -105,7 +101,7 @@ const SelectItem = () => {
 
             const response = await getData(urls?.getitems);
             if(response) {
-                console.log(response?.results);
+                // console.log(response?.results);
                 // filter data if it has 
                 const data = response?.results;
                 const fData = [];
@@ -131,8 +127,8 @@ const SelectItem = () => {
         getItems();
 
         zCashierSelectedItem.getState()?.reloadSelectedItemData();
-        const currentSelectedItems = zCashierSelectedItem.getState()?.items || [];
-        setSelectedItems(currentSelectedItems);
+        const currentSelectedItems = zCashierSelectedItem.getState()?.items;
+        if(currentSelectedItems) setSelectedItems(currentSelectedItems);
     }, []);
 
     if(barcodePrompt?.isOpen) {
@@ -140,11 +136,17 @@ const SelectItem = () => {
             <PromptCheckBoxes
                 header="Barcode"
                 message="Insert the item barcode"
-                callback={(selectedItems) => {}}
+                callback={(selectedBarcodes) => {
+                    const {itemId} = barcodePrompt;
+                    selectedItems[itemId] = {isDiscounted: false, barcodes: selectedBarcodes};
+                    setSelectedItems({...selectedItems});
+                    setBarcodePrompt(false);    
+                }}
                 onClose={() => {
-                    const {itemId, checkedBoxElem} = barcodePrompt;
+                    const {itemId} = barcodePrompt;
+                    delete selectedItems[itemId];
+                    setSelectedItems({...selectedItems});
                     setBarcodePrompt(false);
-                    checkedBoxElem.checked = false;
                 }}
                 list={barcodePrompt?.data}
             />
@@ -204,7 +206,7 @@ const SelectItem = () => {
                                 displayItems.map((item, index) => {
                                     const isActive = !item?.disabledNote;
                                     const status = isActive ? 'active' : 'inactive';
-                                    const isSelected = selectedItems.hasOwnProperty(item?.id);
+                                    const isSelected = !!selectedItems[item?.id];
                                     return (
                                         <li 
                                             key={index}

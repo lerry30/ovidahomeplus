@@ -1,0 +1,2 @@
+// this statement will be use for multi insert of barcodes so controller will be in charge of setting it
+export const newOrder = 'INSERT INTO sold_items(barcode, is_discounted, customer_id, payment_method) VALUES';
