@@ -25,4 +25,5 @@ export const urls = {
     batchdata: `${apiUrl}/api/batches/batch-data`,
     newbarcode: `${apiUrl}/api/barcodes/new`,
     neworder: `${apiUrl}/api/orders/new`,
+    solditemstoday: `${apiUrl}/api/solditems/today`,
 };
