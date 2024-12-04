@@ -99,21 +99,17 @@ const SelectItem = () => {
         try {
             setLoading(true);
 
-            const response = await getData(urls?.getitems);
+            const response = await getData(urls.getexclude); // exclude sold items
             if(response) {
                 // console.log(response?.results);
                 // filter data if it has 
                 const data = response?.results;
-                const fData = [];
                 const fDataObj = {};
                 for(const item of data) {
-                    if(!item?.disabledNote && item?.quantity > 0) {
-                        fData.push(item);
-                        fDataObj[item?.id] = item?.barcodes?.map(barcode => barcode?.barcode);
-                    }
+                    fDataObj[item?.id] = item?.barcodes?.map(barcode => barcode?.barcode);
                 }
-                setItems(fData);
-                setDisplayItems(fData);
+                setItems(data);
+                setDisplayItems(data);
                 setBarcodes(fDataObj);
             }
         } catch(error) {
@@ -199,8 +195,6 @@ const SelectItem = () => {
                                 [&::-webkit-scrollbar-track]:bg-gray-100
                                 [&::-webkit-scrollbar-thumb]:rounded-full
                                 [&::-webkit-scrollbar-thumb]:bg-gray-300
-                                dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                                dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
                             ">
                             {
                                 displayItems.map((item, index) => {

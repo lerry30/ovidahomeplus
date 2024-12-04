@@ -241,22 +241,30 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[], 
                 <h1 className="font-headings font-bold text-2xl pt-2 max-w-80">{header}</h1>
                 <p className="font-paragraphs w-80 py-4 text-neutral-800">{message}</p>
 
-                {list?.length > 0 && (
-                    list.map((item, index) => {
-                        const isChecked = checkedBoxes.includes(item);
-                        return (
-                            <article key={index} className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    className="size-5"
-                                    checked={isChecked}
-                                    onChange={() => check(item)}
-                                />
-                                <span>{item}</span>
-                            </article>
-                        )   
-                    }
-                ))}
+                <div className="w-[70vw] max-h-[60vh] flex flex-wrap gap-2
+                    overflow-x-hidden overflow-y-auto
+                    [&::-webkit-scrollbar]:w-2
+                    [&::-webkit-scrollbar-track]:rounded-full
+                    [&::-webkit-scrollbar-track]:bg-gray-300
+                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb]:bg-gray-400">
+                    {list?.length > 0 && (
+                        list.map((item, index) => {
+                            const isChecked = checkedBoxes.includes(item);
+                            return (
+                                <article key={index} className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        className="size-5"
+                                        checked={isChecked}
+                                        onChange={() => check(item)}
+                                    />
+                                    <span>{item}</span>
+                                </article>
+                            )   
+                        }
+                    ))}
+                </div>
 
                 <div className="w-full justify-end flex gap-2 mt-4">
                     <button 

@@ -117,6 +117,9 @@ const NewBarcode = () => {
         try {
             setLoading(true);
 
+            // I don't want to get the items with excluded sold items since
+            // since the page needs to add quantity and generate new barcode
+            // so it means it needs to display items even they have zero quantity.
             const response = await getData(urls?.getitems);
             if(response) {
                 // console.log(response?.results);
@@ -221,8 +224,6 @@ const NewBarcode = () => {
                                     [&::-webkit-scrollbar-track]:bg-gray-100
                                     [&::-webkit-scrollbar-thumb]:rounded-full
                                     [&::-webkit-scrollbar-thumb]:bg-gray-300
-                                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
                                 ">
                                 {
                                     displayItems.map((item, index) => {

@@ -1,12 +1,14 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber, roundToTwo } from '../utils/number.js';
 import { parseOneDeep } from '../utils/jsonParse.js';
+import { checkDescription } from '../helper/items.js';
 // import { generateBarcode } from '../utils/generateBarcode.js';
 // import { setBarcodeSequence } from '../helper/item.js';
 // import { unlink } from 'fs/promises';
 // import { getDir } from '../utils/fileDir.js';
 import * as itemStmt from '../mysql/item.js';
 import * as disabledItemStmt from '../mysql/disabledItem.js';
+import * as soldItemStmt from '../mysql/soldItems.js';
 
 /*
    desc     New Item
@@ -35,10 +37,9 @@ const newItem = requestHandler(async (req, res, database) => {
 
     const maxDiscount = srp - srp * 0.05;
 
-    // create barcode
-    // get items to verify barcode uniqueness
-    // const [getItems] = await database.query(itemStmt.items, []);
-    // const itemBarcode = setBarcodeSequence(productTypeId, getItems);
+    // to make sure that product description is unique
+    const [descriptions] = await database.query(itemStmt.getItemDescription, [supplierId, productTypeId]);
+    checkDescription(description, descriptions); // will verify the description uniqueness
 
     const [itemInserted] = await database.execute(itemStmt.newItem,
         [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, image]);
@@ -57,7 +58,38 @@ const newItem = requestHandler(async (req, res, database) => {
    access   public
 */
 const getItems = requestHandler(async (req, res, database) => {
-    const [results] = await database.query(itemStmt.items, []);
+    const [resultSoldItems] = await database.query(soldItemStmt.soldItems, []);
+    const soldBarcodesObject = resultSoldItems?.reduce((codes, details) => ({...codes, [details?.barcode]: true}), {});
+
+    const [resultItems] = await database.query(itemStmt.items, []);
+    const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
+
+    // just to get rid of sold items
+    const nItems = [];
+    for(const item of items) {
+        const itemContents = {...item, quantity: 0, barcodes: []};
+        const barcodes = item?.barcodes ?? [];
+        for(const barcode of barcodes) {
+            const code = barcode?.barcode;
+            if(!code) continue;
+            if(!soldBarcodesObject[code]) {
+                itemContents.barcodes.push(barcode);
+                itemContents.quantity++;
+            }
+        }
+        nItems.push(itemContents);
+    }
+    
+    res.status(200).json({results: nItems});
+});
+
+/*
+   desc     Get items
+   route    GET /api/items/excluded
+   access   public
+*/
+const getExcludedSoldItems = requestHandler(async (req, res, database) => {
+    const [results] = await database.query(itemStmt.excludedSoldItems, []);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});
 });
@@ -90,29 +122,20 @@ const updateItem = requestHandler(async (req, res, database) => {
 
     const maxDiscount = srp - srp * 0.05;
 
-    // get items to verify barcode uniqueness
-    const [getItems] = await database.query(itemStmt.items, []);
-
-    // let deliveryId = undefined;
-    // let itemBarcode = undefined;
-    // let isBarcodeChange = false;
-    // let prevBarcode = '';
-    for(let i = 0; i < getItems.length; i++) {
-        const item = getItems[i];
-        if(item?.id === itemId) {
-            // itemBarcode = item?.barcode;
-            // deliveryId = item?.deliveryId;
-            // prevBarcode = item?.barcode;
-
-            if(!image) image = item?.image;
-            // if(item?.productTypeId !== productTypeId) {
-                // itemBarcode = setBarcodeSequence(productTypeId, getItems);
-                // isBarcodeChange = true;
-            //}
-
-            break;
+    if(!image) {
+        const [getItems] = await database.query(itemStmt.items, []);
+        for(let i = 0; i < getItems.length; i++) {
+            const item = getItems[i];
+            if(item?.id === itemId) {
+                image = item?.image;
+                break;
+            }
         }
     }
+
+    // to make sure that product description is unique
+    const [descriptions] = await database.query(itemStmt.getItemDescription, [supplierId, productTypeId]);
+    checkDescription(description, descriptions); // will verify the description uniqueness
 
     const [itemUpdated] = await database.execute(itemStmt.updateItem, 
         [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, image, itemId]);
@@ -168,6 +191,7 @@ const enableItem = requestHandler(async (req, res, database) => {
 export {
     newItem,
     getItems,
+    getExcludedSoldItems,
     updateItem,
     disableItem,
     enableItem,

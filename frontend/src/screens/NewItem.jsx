@@ -156,6 +156,11 @@ const NewItem = () => {
         }
     }
 
+    const focusOnInput = (ev) => {
+        const input = ev?.target?.querySelector('input');
+        if(input && input?.nodeName=='INPUT') input.focus();
+    }
+
     useLayoutEffect(() => {
         const profitMargin = toNumber(data?.deliveryPrice) * PROFIT_MARGIN + toNumber(data?.deliveryPrice);
         setData(state => ({...state, srp: profitMargin}));
@@ -237,7 +242,10 @@ const NewItem = () => {
                             {/* <span className="text-red-500">*</span> */}
                         </h3>
                         <small>Add up to a maximum of 4 description categories.</small>
-                        <article className="w-full min-h-[50px] flex flex-wrap gap-2 border rounded-lg p-2">
+                        <article 
+                            onClick={focusOnInput}
+                            className="w-full min-h-[50px] flex flex-wrap gap-2 border rounded-lg p-2"
+                        >
                             {data.description.map((item, index) => {
                                 return (
                                     <div key={index} className="flex items-center gap-2 border rounded-lg p-2">

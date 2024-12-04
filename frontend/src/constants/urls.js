@@ -1,4 +1,4 @@
-export const apiUrl = 'http://192.168.0.104:4000';
+export const apiUrl = 'http://192.168.1.15:4000';
 
 export const urls = {
     signup: `${apiUrl}/api/users/`,
@@ -14,6 +14,7 @@ export const urls = {
     updateproducttype: `${apiUrl}/api/producttypes/update`,
     newitem: `${apiUrl}/api/items/new`,
     getitems: `${apiUrl}/api/items/get`,
+    getexclude: `${apiUrl}/api/items/exclude`,
     updateitem: `${apiUrl}/api/items/update`,
     disableitem: `${apiUrl}/api/items/status/disable`,
     enableitem: `${apiUrl}/api/items/status/enable`,

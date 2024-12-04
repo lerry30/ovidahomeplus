@@ -106,20 +106,15 @@ const Cashier = () => {
     const getItems = async () => {
         try {
             setLoading(true);
-            const response = await getData(urls?.getitems);
+            const response = await getData(urls.getexclude); // exclude sold items
             if (response) {      
                 const data = response?.results;
                 // console.log(data);
-                const fData = [];
                 const fDataObj = {};
                 for(const item of data) {
-                    if(!item?.disabledNote && item?.quantity > 0) {
-                        fData.push(item);
-                        fDataObj[item?.id] = item?.barcodes?.map(barcode => barcode?.barcode);
-                    }
+                    fDataObj[item?.id] = item?.barcodes?.map(barcode => barcode?.barcode);
                 }
-
-                setItems(fData);
+                setItems(data);
                 setBarcodes(fDataObj);
             }
         } catch (error) {
@@ -163,10 +158,10 @@ const Cashier = () => {
                     setItemDetails({...selected});
                     setRecomputeTotal(!recomputeTotal);
 
-                    setBarcodePrompt(false);
+                    setBarcodePrompt({isOpen: false, data: [], item: {}});
                 }}
                 onClose={() => {
-                    setBarcodePrompt(false);
+                    setBarcodePrompt({isOpen: false, data: [], item: {}});
                 }}
                 list={barcodePrompt?.data}
                 checked={itemDetails[barcodePrompt?.item.id]?.barcodes}
@@ -206,8 +201,6 @@ const Cashier = () => {
                     [&::-webkit-scrollbar-track]:bg-gray-100
                     [&::-webkit-scrollbar-thumb]:rounded-full
                     [&::-webkit-scrollbar-thumb]:bg-gray-300
-                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
             ">
                 <div className="w-full md:w-1/2
                     h-[calc((100vh-30px-26px)/2)] md:h-full p-2 
@@ -230,8 +223,6 @@ const Cashier = () => {
                         [&::-webkit-scrollbar-track]:bg-gray-100
                         [&::-webkit-scrollbar-thumb]:rounded-full
                         [&::-webkit-scrollbar-thumb]:bg-gray-300
-                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
                     ">
                         {
                             selectedItems?.length > 0 ?
@@ -351,8 +342,6 @@ const Cashier = () => {
                         [&::-webkit-scrollbar-track]:bg-gray-100
                         [&::-webkit-scrollbar-thumb]:rounded-full
                         [&::-webkit-scrollbar-thumb]:bg-gray-300
-                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
                     ">
                         {
                             selectedItems?.length > 0 &&

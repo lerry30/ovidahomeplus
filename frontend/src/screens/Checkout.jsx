@@ -138,17 +138,11 @@ const Checkout = () => {
     const getItems = async () => {
         try {
             setLoading(true);
-            const response = await getData(urls?.getitems);
+            const response = await getData(urls.getexclude); // exclude sold items
             if (response) {
                 const data = response?.results;
                 // console.log(data);
-                const fData = [];
-                for (const item of data) {
-                    if (!item?.disabledNote && item?.quantity > 0) {
-                        fData.push(item);
-                    }
-                }
-                setItems(fData);
+                setItems(data);
             }
         } catch (error) {
             console.log(error?.message);
@@ -281,8 +275,6 @@ const Checkout = () => {
                             [&::-webkit-scrollbar-track]:bg-gray-100
                             [&::-webkit-scrollbar-thumb]:rounded-full
                             [&::-webkit-scrollbar-thumb]:bg-gray-300
-                            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
                             ">
                             {selectedItems?.map((item, index) => (
                                 <li key={index} className="flex justify-between items-center py-2">
