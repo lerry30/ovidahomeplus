@@ -293,7 +293,7 @@ const SoldItems = () => {
                             onClick={() => calendarInputRef.current?.showPicker()}
                             className="flex items-center justify-center bg-gray-100 cursor-pointer"
                         >
-                            <label className="relative block">
+                            <label className="relative block min-w-10">
                                 <input
                                     type="date"
                                     ref={calendarInputRef}
@@ -303,7 +303,7 @@ const SoldItems = () => {
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                                     <CalendarSearch className="w-5 h-5 text-gray-400" />
                                 </span>
-                                <span className="block pl-10 pr-1 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm">
+                                <span className="hidden sm:block pl-10 pr-1 py-2 text-gray-700 border border-gray-300 rounded-lg shadow-sm">
                                     Choose a date
                                 </span>
                             </label>

@@ -171,7 +171,7 @@ const Supplier = () => {
                 <Searchbar ref={searchBar} search={search} />
                 <Link
                     to="/admin/new-supplier"
-                    className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
+                    className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:pr-4 hover:bg-green-800"
                 >
                     <Plus />
                     <span className="hidden sm:flex text-nowrap">New Supplier</span>
