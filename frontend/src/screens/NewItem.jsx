@@ -26,6 +26,7 @@ const NewItem = () => {
     });
     const [errorData, setErrorData] = useState({
         productType: '',
+        description: '',
         supplier: '',
         deliveryPrice: '',
         itemCode: '',
@@ -71,6 +72,11 @@ const NewItem = () => {
             let hasError = false;
             if(!productType || !productTypeId) {
                 setErrorData(state => ({...state, productType: 'Please select a product type from the dropdown menu.'}));
+                hasError = true;
+            }
+
+            if(!description) {
+                setErrorData(state => ({...state, description: 'Please include the product description to highlight its unique features..'}));
                 hasError = true;
             }
 
@@ -239,7 +245,7 @@ const NewItem = () => {
                     <div className="w-full sm:px-4">
                         <h3 className="font-semibold">
                             Description
-                            {/* <span className="text-red-500">*</span> */}
+                            <span className="text-red-500">*</span>
                         </h3>
                         <small>Add up to a maximum of 4 description categories.</small>
                         <article 
@@ -268,6 +274,7 @@ const NewItem = () => {
                                 className="min-w-[100px] outline-none" 
                             />
                         </article>
+                        <ErrorField message={errorData?.description || ''} />
                     </div>
 
                     {/* Supplier */}

@@ -7,7 +7,7 @@ export const zCustomerInfo = create(set => ({
     address: '',
     contacts: {
         first: '',
-        last: ''
+        second: ''
     },
 
     saveCustomerData: (firstname, lastname, address, contacts) => {

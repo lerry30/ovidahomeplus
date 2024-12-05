@@ -11,10 +11,10 @@ import ErrorField from '@/components/ErrorField';
 import TitleFormat from '@/utils/titleFormat';
 
 const CustomerInfo = () => {
-    const currentFirstname = zCustomerInfo(state => state?.firstname);
-    const currentLastname = zCustomerInfo(state => state?.lastname);
-    const currentAddress = zCustomerInfo(state => state?.address);
-    const currentContacts = zCustomerInfo(state => state?.contacts);
+    const currentFirstname = zCustomerInfo(state => state?.firstname ?? '');
+    const currentLastname = zCustomerInfo(state => state?.lastname ?? '');
+    const currentAddress = zCustomerInfo(state => state?.address ?? '');
+    const currentContacts = zCustomerInfo(state => state?.contacts ?? '');
 
     const [data, setData] = useState({firstname: currentFirstname, lastname: currentLastname, address: currentAddress});
     const [contacts, setContacts] = useState({first: currentContacts?.first, second: currentContacts?.second});
@@ -55,7 +55,7 @@ const CustomerInfo = () => {
                 ?.saveCustomerData(
                     TitleFormat(data?.firstname), 
                     TitleFormat(data?.lastname), 
-                    data?.address, 
+                    TitleFormat(data?.address), 
                     contacts
                 );
             navigate('/admin/checkout');

@@ -25,7 +25,7 @@ const Barcode = () => {
             const payload = {batchNo};
             const response = await sendJSON(urls.batchdata, payload);
             if(response) {
-                const data = response?.results?.reverse();
+                const data = response?.results;
                 // console.log(data);
                 setBatchItems(data);
                 if(data?.length <= 0) setSelectedBatchStatus('Empty Batch Items');
@@ -42,7 +42,7 @@ const Barcode = () => {
             setLoading(true);
             const response = await getData(urls.getbatches);
             if(response) {
-                const data = response?.results;
+                const data = response?.results?.reverse();
                 // console.log(data);
                 setBatches(data);
             }

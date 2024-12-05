@@ -78,7 +78,10 @@ const Checkout = () => {
                         firstname: currentFirstname,
                         lastname: currentLastname,
                         address: currentAddress,
-                        contacts: currentContacts
+                        contacts: {
+                            first: String(currentContacts?.first).trim(),
+                            second: String(currentContacts?.second).trim()
+                        }
                     },
                     orders: itemDetails,
                     paymentMethod: selectedPayment
@@ -269,7 +272,7 @@ const Checkout = () => {
                     <div className="w-full lg:w-1/2 p-8 bg-white shadow-md rounded-lg">
                         <h1 className="font-semibold text-lg">Order Summary</h1>
                         <ul className="max-h-[50%] mt-4
-                            overflow-x-hidden overflow-y-auto
+                            overflow-x-hidden overflow-y-auto pr-1
                             [&::-webkit-scrollbar]:w-2
                             [&::-webkit-scrollbar-track]:rounded-full
                             [&::-webkit-scrollbar-track]:bg-gray-100

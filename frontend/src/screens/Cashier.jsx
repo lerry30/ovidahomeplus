@@ -195,7 +195,7 @@ const Cashier = () => {
             </section>
             {/* this container has fixed value that depends on the header above. Also the 26px is for padding */}
             <section className="grow w-full h-[calc(100vh-30px-26px)] flex flex-col md:flex-row gap-4
-                    overflow-x-hidden overflow-y-auto
+                    overflow-x-hidden overflow-y-auto pr-1
                     [&::-webkit-scrollbar]:w-2
                     [&::-webkit-scrollbar-track]:rounded-full
                     [&::-webkit-scrollbar-track]:bg-gray-100
@@ -216,8 +216,8 @@ const Cashier = () => {
                         </Link>
                     </header>
                     <ul className="
-                        w-full h-full flex flex-col gap-2 pb-10 pr-1
-                        overflow-y-auto
+                        w-full h-full flex flex-col gap-2 pb-10
+                        overflow-y-auto pr-1
                         [&::-webkit-scrollbar]:w-2
                         [&::-webkit-scrollbar-track]:rounded-full
                         [&::-webkit-scrollbar-track]:bg-gray-100
@@ -336,7 +336,7 @@ const Cashier = () => {
                     </header>
                     <ul className="w-full max-h-[70%] flex flex-col pb-10
                         border border-neutral-50 bg-neutral-100 rounded-md
-                        overflow-y-auto 
+                        overflow-y-auto pr-1
                         [&::-webkit-scrollbar]:w-2
                         [&::-webkit-scrollbar-track]:rounded-full
                         [&::-webkit-scrollbar-track]:bg-gray-100

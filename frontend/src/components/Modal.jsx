@@ -230,9 +230,9 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[], 
         <div ref={ modalRef } className="w-screen h-screen fixed top-0 left-0 bg-neutral-800/90 z-50 flex justify-center items-center backdrop-blur-sm">
             <div className="card p-10 bg-zinc-100 rounded-md shadow-lg shadow-black border border-emerald-500 flex flex-col">
                 <article className="w-full relative">
-                    <div onClick={ closeModal } className="group absolute top-[-20px] right-[-20px]">
+                    <div onClick={closeModal} className="group absolute top-[-20px] right-[-20px]">
                         <X
-                            onClick={ closeModal }
+                            onClick={closeModal}
                             className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
                         />
                     </div>
@@ -243,7 +243,7 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[], 
 
                 <div className="w-[70vw] max-h-[60vh] flex flex-wrap gap-2
                     overflow-x-hidden overflow-y-auto
-                    [&::-webkit-scrollbar]:w-2
+                    [&::-webkit-scrollbar]:w-2 pr-1
                     [&::-webkit-scrollbar-track]:rounded-full
                     [&::-webkit-scrollbar-track]:bg-gray-300
                     [&::-webkit-scrollbar-thumb]:rounded-full

@@ -36,6 +36,7 @@ const UpdateItem = () => {
     });
     const [errorData, setErrorData] = useState({
         productType: '',
+        description: '',
         supplier: '',
         deliveryPrice: '',
         itemCode: '',
@@ -88,6 +89,11 @@ const UpdateItem = () => {
             let hasError = false;
             if(!productType || !productTypeId) {
                 setErrorData(state => ({...state, productType: 'Please select a product type from the dropdown menu.'}));
+                hasError = true;
+            }
+            
+            if(!description) {
+                setErrorData(state => ({...state, description: 'Please include the product description to highlight its unique features..'}));
                 hasError = true;
             }
 
@@ -329,6 +335,7 @@ const UpdateItem = () => {
                                 className="min-w-[100px] outline-none" 
                             />
                         </article>
+                        <ErrorField message={errorData?.description || ''} />
                     </div>
 
                     {/* Supplier */}

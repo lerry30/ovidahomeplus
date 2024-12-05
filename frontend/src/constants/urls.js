@@ -26,4 +26,5 @@ export const urls = {
     newbarcode: `${apiUrl}/api/barcodes/new`,
     neworder: `${apiUrl}/api/orders/new`,
     solditemstoday: `${apiUrl}/api/solditems/today`,
+    dateofsolditems: `${apiUrl}/api/solditems/date`,
 };

@@ -29,6 +29,7 @@ const newItem = requestHandler(async (req, res, database) => {
     const image = req?.file?.filename || '';
 
     if(!productTypeId) throw {status: 400, message: 'Please select a product type from the dropdown menu.'};
+    if(!description) throw {status: 400, message: 'Please include the product description to highlight its unique features.'};
     if(!supplierId) throw {status: 400, message: 'Please select a supplier from the dropdown menu.'};
     if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
     if(!itemCode) throw {status: 400, message: 'Please provide an item code.'};
@@ -114,6 +115,7 @@ const updateItem = requestHandler(async (req, res, database) => {
     let image = req?.file?.filename || '';
 
     if(!productTypeId) throw {status: 400, message: 'Please select a product type from the dropdown menu.'};
+    if(!description) throw {status: 400, message: 'Please include the product description to highlight its unique features.'};
     if(!supplierId) throw {status: 400, message: 'Please select a supplier from the dropdown menu.'};
     if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
     if(!itemCode) throw {status: 400, message: 'Please provide an item code.'};

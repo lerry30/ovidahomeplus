@@ -247,7 +247,7 @@ const Inventory = () => {
                         items?.length > 0 ? (
                             <>{displayItems?.length > 0 ? (
                                 <ul className="w-full h-full flex flex-col gap-2 p-2 pb-20
-                                    overflow-y-auto
+                                    overflow-x-hidden overflow-y-auto
                                     [&::-webkit-scrollbar]:w-2
                                     [&::-webkit-scrollbar-track]:rounded-full
                                     [&::-webkit-scrollbar-track]:bg-gray-100
@@ -260,7 +260,7 @@ const Inventory = () => {
                                         const status = isActive ? 'active' : 'inactive';
                                         return (
                                             <li key={item?.id}>
-                                                <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border  rounded-lg ${isActive?'border-neutral-300':'border-red-600 bg-gray-200/50'}`}>
+                                                <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg ${isActive?'border-neutral-300':'border-red-600 bg-gray-200/50'}`}>
                                                     <img 
                                                         src={`${apiUrl}/items/${item?.image}`}
                                                         alt="ovida-product" 
