@@ -215,9 +215,10 @@ const Cashier = () => {
                             <span className="hidden sm:flex text-nowrap">Select Item</span>
                         </Link>
                     </header>
+                    <hr />
                     <ul className="
                         w-full h-full flex flex-col gap-2 pb-10
-                        overflow-y-auto pr-1
+                        overflow-y-auto pt-2 pr-1
                         [&::-webkit-scrollbar]:w-2
                         [&::-webkit-scrollbar-track]:rounded-full
                         [&::-webkit-scrollbar-track]:bg-gray-100

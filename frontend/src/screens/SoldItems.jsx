@@ -26,7 +26,6 @@ const SoldItems = () => {
             if (response) {
                 const data = response?.results;
                 setSoldItemsToShow(data);
-                console.log(data);
             }
         } catch (error) {
             console.log(error?.message);
