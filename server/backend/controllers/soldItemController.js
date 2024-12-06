@@ -15,7 +15,7 @@ const getSoldItemsToday = requestHandler(async (req, res, database) => {
 /*
    desc     Get sold items by date
    route    POST /api/solditems/date
-   access   public
+   access   private
 */
 const getSoldItemsByDate = requestHandler(async (req, res, database) => {
     const date = String(req.body?.date).trim();

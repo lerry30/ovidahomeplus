@@ -1,5 +1,5 @@
 import express from 'express';
-// import { protect } from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 import {
     getSoldItemsToday,
@@ -9,6 +9,6 @@ import {
 const router = express.Router();
 
 router.get('/today', getSoldItemsToday);
-router.post('/date', getSoldItemsByDate);
+router.post('/date', protect, getSoldItemsByDate);
 
 export default router;

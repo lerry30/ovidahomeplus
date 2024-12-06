@@ -327,7 +327,7 @@ const SoldItems = () => {
                 ">
                     {soldItemsToShow?.length<=0 && (
                         <div className="absolute top-[60px] left-0 right-0 bottom-0 flex justify-center items-center">
-                            <h3>No sold items found for the selected date. Please adjust your search or try a different date.</h3>
+                            <h3>No sold items found for the selected date. Please try a different date.</h3>
                         </div>
                     )}
                     {soldItemsToShow?.map((item, index) => (

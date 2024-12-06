@@ -344,13 +344,13 @@ const Inventory = () => {
                                                                 >
                                                                     <Ellipsis />
                                                                 </button>
-                                                                <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border p-1 ${itemActions[index]?'block':'hidden'}`}>
+                                                                <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border shadow-lg p-1 ${itemActions[index]?'block':'hidden'}`}>
                                                                     <button
                                                                         onClick={() => {
                                                                             actionId.current = item?.id;
                                                                             setEnablePrompt(true)} 
                                                                         }
-                                                                        className={`w-full hover:bg-gray-100 p-1 rounded-lg ${isActive?'opacity-50':'opacity-100'}`}
+                                                                        className={`w-full text-start hover:bg-gray-100 p-1 rounded-lg ${isActive?'opacity-50':'opacity-100'}`}
                                                                         disabled={isActive}
                                                                     >
                                                                         Enable
@@ -360,7 +360,7 @@ const Inventory = () => {
                                                                             actionId.current = item?.id;
                                                                             setDisablePrompt(true)} 
                                                                         }
-                                                                        className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
+                                                                        className={`w-full text-start hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
                                                                         disabled={!isActive}
                                                                     >
                                                                         Disable
@@ -372,7 +372,7 @@ const Inventory = () => {
                                                                                 navigate('/admin/update-item');
                                                                             }
                                                                         }}
-                                                                        className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
+                                                                        className={`w-full text-start hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
                                                                         disabled={!isActive}
                                                                     >
                                                                             Update

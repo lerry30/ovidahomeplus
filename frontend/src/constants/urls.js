@@ -28,4 +28,8 @@ export const urls = {
     solditemstoday: `${apiUrl}/api/solditems/today`,
     dateofsolditems: `${apiUrl}/api/solditems/date`,
     newexpense: `${apiUrl}/api/expenses/new`,
+    getexpensestoday: `${apiUrl}/api/expenses/today`,
+    updateexpense: `${apiUrl}/api/expenses/update`,
+    deleteexpense: `${apiUrl}/api/expenses/delete`,
+    dateofexpenses: `${apiUrl}/api/expenses/date`,
 };

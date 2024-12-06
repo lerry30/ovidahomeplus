@@ -1,17 +1,22 @@
 import { Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { toNumber } from '@/utils/number';
 import { sendJSON } from '@/utils/send'; 
 import { urls } from '@/constants/urls';
+import { zExpense } from '@/store/expense';
 
 import SidebarLayout from '@/components/Sidebar';
 import ErrorField from '@/components/ErrorField';
 import Loading from '@/components/Loading';
 import TitleFormat from '@/utils/titleFormat';
  
-const NewExpense = () => {
-    const [data, setData] = useState({expenseType: '', expenseAmount: 0});
+const UpdateExpense = () => {
+    const currentId = zExpense(state => state?.id);
+    const currentType = zExpense(state => state?.type);
+    const currentAmount = zExpense(state => state?.amount);
+
+    const [data, setData] = useState({expenseType: currentType, expenseAmount: currentAmount});
     const [errorData, setErrorData] = useState({expenseType: '', expenseAmount: '', default: ''});
     const [loading, setLoading] = useState(false);
 
@@ -22,6 +27,7 @@ const NewExpense = () => {
             setLoading(true);
             setErrorData(({expenseType: '', expenseAmount: '', default: ''}));
 
+            const id = toNumber(currentId) ?? 0;
             const expenseType = TitleFormat(String(data?.expenseType).trim());
             const expenseAmount = toNumber(data?.expenseAmount) ?? 0;
 
@@ -38,8 +44,8 @@ const NewExpense = () => {
 
             if(hasError) throw new Error('Please provide the correct input for the expense.');
 
-            const payload = {expenseType, expenseAmount};
-            const response = await sendJSON(urls.newexpense, payload);
+            const payload = {id, expenseType, expenseAmount};
+            const response = await sendJSON(urls.updateexpense, payload, 'PUT');
             if(response) {
                 navigate('/admin/expenses');
             }
@@ -50,6 +56,10 @@ const NewExpense = () => {
             setLoading(false);
         }
     }
+
+    useLayoutEffect(() => {
+        zExpense.getState()?.reloadExpenseData();
+    }, []);
 
     if (loading) {
         return (
@@ -131,4 +141,4 @@ const NewExpense = () => {
     )
 }
 
-export default NewExpense;
+export default UpdateExpense;

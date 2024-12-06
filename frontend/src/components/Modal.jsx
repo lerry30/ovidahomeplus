@@ -79,7 +79,7 @@ export const Prompt = ({ header, message, callback, onClose }) => {
                 <h1 className="font-headings font-bold text-2xl pt-2 max-w-80 text-center">{ header }</h1>
                 <p className="font-paragraphs w-80 py-4 text-center text-neutral-800">{ message }</p>
                 <div className="w-full justify-end flex gap-2 mt-2">
-                    <button onClick={ callback } className="font-headings bg-neutral-500/45 px-4 py-1 leading-none rounded-lg text-[16px]">Yes</button>
+                    <button onClick={ callback } className="font-headings bg-[#080] text-white px-4 py-1 leading-none rounded-lg text-[16px]">Yes</button>
                     <button onClick={ closeModal } className="font-headings bg-neutral-500/45 p-2 leading-none rounded-lg text-[16px]">Cancel</button>
                 </div>
             </div>
@@ -132,7 +132,7 @@ export const PromptTextBox = ({ header, message, callback, onClose }) => {
 
                 <div className="w-full justify-end flex gap-2 mt-2">
                     <button onClick={closeModal} className="font-headings bg-neutral-500/45 p-2 leading-none rounded-lg text-[16px]">Cancel</button>
-                    <button onClick={send} className="font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-lg text-[16px]">Submit</button>
+                    <button onClick={send} className="font-headings bg-[#080] text-white px-4 py-1 leading-none rounded-lg text-[16px]">Submit</button>
                 </div>
             </div>
         </div>

@@ -241,13 +241,13 @@ const ProductTypes = () => {
                                                                     >
                                                                         <Ellipsis />
                                                                     </button>
-                                                                    <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border p-1 ${productTypeActions[index]?'block':'hidden'}`}>
+                                                                    <article className={`absolute right-0 z-10 text-sm bg-white rounded-lg border shadow-lg p-1 ${productTypeActions[index]?'block':'hidden'}`}>
                                                                         <button
                                                                             onClick={() => {
                                                                                 actionId.current = item?.id;
                                                                                 setEnablePrompt(true)} 
                                                                             }
-                                                                            className={`w-full hover:bg-gray-100 p-1 rounded-lg ${isActive?'opacity-50':'opacity-100'}`}
+                                                                            className={`w-full text-start hover:bg-gray-100 p-1 rounded-lg ${isActive?'opacity-50':'opacity-100'}`}
                                                                             disabled={isActive}
                                                                         >
                                                                             Enable
@@ -257,7 +257,7 @@ const ProductTypes = () => {
                                                                                 actionId.current = item?.id;
                                                                                 setDisablePrompt(true)} 
                                                                             }
-                                                                            className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
+                                                                            className={`w-full text-start hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
                                                                             disabled={!isActive}
                                                                         >
                                                                             Disable
@@ -270,7 +270,7 @@ const ProductTypes = () => {
                                                                                     navigate('/admin/update-product-type');
                                                                                 }
                                                                             }}
-                                                                            className={`w-full hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
+                                                                            className={`w-full text-start hover:bg-gray-100 p-1 rounded-lg ${!isActive?'opacity-50':'opacity-100'}`}
                                                                             disabled={!isActive}
                                                                         >
                                                                                 Update
