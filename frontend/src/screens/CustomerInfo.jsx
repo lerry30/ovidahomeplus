@@ -113,7 +113,7 @@ const CustomerInfo = () => {
                                     const input = elem.target.value;
                                     setData(state => ({...state, firstname: input}))
                                 }}
-                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                                className="w-full outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                                 placeholder="First Name"
                                 required
                             />
@@ -131,7 +131,7 @@ const CustomerInfo = () => {
                                     const input = elem.target.value;
                                     setData(state => ({...state, lastname: input}));
                                 }}
-                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                                className="w-full outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                                 placeholder="Last Name"
                                 required
                             />
@@ -150,7 +150,7 @@ const CustomerInfo = () => {
                                 const input = elem.target.value;
                                 setData(state => ({...state, address: input}))
                             }}
-                            className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="w-full outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                             placeholder="Address"
                             required
                         />
@@ -169,7 +169,7 @@ const CustomerInfo = () => {
                                     const input = elem.target.value?.trim();
                                     handleContactNumberInput(input, 'first');
                                 }}
-                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
+                                className="w-full outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
                                 placeholder="09XX-XXX-XXXX"
                                 required
                             />
@@ -186,7 +186,7 @@ const CustomerInfo = () => {
                                     const input = elem.target.value?.trim();
                                     handleContactNumberInput(input, 'second');
                                 }}
-                                className="w-full outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
+                                className="w-full outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
                                 placeholder="09XX-XXX-XXXX (Optional)"
                                 required
                             />
@@ -195,7 +195,7 @@ const CustomerInfo = () => {
                     <div className="w-full flex justify-end py-6 sm:px-4">
                         <button
                             onClick={saveCustomerInfo}
-                            className="flex items-center justify-center gap-2 leading-none bg-green-600 text-white font-bold rounded-full p-3 hover:bg-green-800"
+                            className="flex items-center justify-center gap-2 leading-none bg-green-600 text-white font-bold rounded-lg p-3 hover:bg-green-800"
                         >
                             <Plus size={26} />
                             <span className="hidden sm:flex text-nowrap">Continue to Review</span>

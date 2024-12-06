@@ -175,7 +175,7 @@ const SelectItem = () => {
                 <Searchbar ref={searchBar} search={search} />
                 <button
                     onClick={handleSelectedItems}
-                    className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
+                    className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:pr-4 hover:bg-green-800"
                 >
                     <Plus />
                     <span className="hidden sm:flex text-nowrap">Select Item(s)</span>
@@ -191,9 +191,9 @@ const SelectItem = () => {
                             <ul className="w-full h-full flex flex-col gap-2 p-2
                                 overflow-y-auto
                                 [&::-webkit-scrollbar]:w-2
-                                [&::-webkit-scrollbar-track]:rounded-full
+                                [&::-webkit-scrollbar-track]:rounded-lg
                                 [&::-webkit-scrollbar-track]:bg-gray-100
-                                [&::-webkit-scrollbar-thumb]:rounded-full
+                                [&::-webkit-scrollbar-thumb]:rounded-lg
                                 [&::-webkit-scrollbar-thumb]:bg-gray-300
                             ">
                             {
@@ -233,7 +233,7 @@ const SelectItem = () => {
                                                         col-start-1">
                                                         <div className="flex flex-col md:flex-row md:items-center md:gap-2">
                                                             <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
-                                                            <p className={`w-fit h-6 text-white text-sm px-2 rounded-full ${isActive?'bg-green-500':'bg-red-500'}`}>
+                                                            <p className={`w-fit h-6 text-white text-sm px-2 rounded-lg ${isActive?'bg-green-500':'bg-red-500'}`}>
                                                                 {status}
                                                             </p>
                                                         </div>

@@ -1,0 +1,1 @@
+export const newExpense = 'INSERT INTO expenses(type, amount) VALUES(?, ?);';

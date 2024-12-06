@@ -152,9 +152,9 @@ const Dashboard = () => {
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
             h-full bg-neutral-100 p-4 pb-[30px] overflow-y-auto
             [&::-webkit-scrollbar]:w-2
-            [&::-webkit-scrollbar-track]:rounded-full
+            [&::-webkit-scrollbar-track]:rounded-lg
             [&::-webkit-scrollbar-track]:bg-gray-100
-            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:rounded-lg
             [&::-webkit-scrollbar-thumb]:bg-gray-300"
         >
             <section className="bg-neutral-100 min-h-screen">

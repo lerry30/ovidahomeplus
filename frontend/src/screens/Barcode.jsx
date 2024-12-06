@@ -75,14 +75,14 @@ const Barcode = () => {
                 <div className="flex gap-2">
                     <Link
                         to={`/admin/update-batch/${selectedBatchNo}`}
-                        className={`flex gap-2 items-center justify-center leading-none bg-[#e37400] text-white font-bold rounded-full p-2 sm:px-4 hover:bg-[#d37506] ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                        className={`flex gap-2 items-center justify-center leading-none bg-[#e37400] text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-[#d37506] ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
                     >
                         <Pencil size={20} />
                         <span className="hidden sm:flex text-nowrap">Edit Batch</span>
                     </Link>
                     <Link
                         to="/admin/new-batch"
-                        className="flex gap-2 items-center justify-center leading-none bg-[#e37400] text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-[#d37506]"
+                        className="flex gap-2 items-center justify-center leading-none bg-[#e37400] text-white font-bold rounded-lg p-2 sm:pr-4 hover:bg-[#d37506]"
                     >
                         <Plus size={20} />
                         <span className="hidden sm:flex text-nowrap">New Batch</span>
@@ -121,7 +121,7 @@ const Barcode = () => {
                         </div>
                         <Link
                             to={`/admin/new-barcode/${selectedBatchNo}`}
-                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
                         >
                             <Plus size={20} />
                             <span className="hidden sm:flex text-nowrap">New Item</span>
@@ -136,9 +136,9 @@ const Barcode = () => {
                     <ul className="w-full h-full p-2 flex flex-col gap-2 pb-32
                         overflow-y-auto
                         [&::-webkit-scrollbar]:w-2
-                        [&::-webkit-scrollbar-track]:rounded-full
+                        [&::-webkit-scrollbar-track]:rounded-lg
                         [&::-webkit-scrollbar-track]:bg-gray-100
-                        [&::-webkit-scrollbar-thumb]:rounded-full
+                        [&::-webkit-scrollbar-thumb]:rounded-lg
                         [&::-webkit-scrollbar-thumb]:bg-gray-300">
                         {batchItems?.map((item, index) => {
                             const isActive = !item?.disabledNote;
@@ -218,7 +218,7 @@ const Barcode = () => {
                                                     <div className="flex flex-col items-end md:justify-start
                                                         row-start-1 col-start-2 lg:col-start-4">
                                                         <button
-                                                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
                                                         >
                                                             <Printer />
                                                             <span className="hidden sm:flex text-nowrap">Print Barcode</span>

@@ -1,4 +1,4 @@
-export const apiUrl = 'http://192.168.0.104:4000';
+export const apiUrl = 'http://192.168.1.15:4000';
 
 export const urls = {
     signup: `${apiUrl}/api/users/`,
@@ -27,4 +27,5 @@ export const urls = {
     neworder: `${apiUrl}/api/orders/new`,
     solditemstoday: `${apiUrl}/api/solditems/today`,
     dateofsolditems: `${apiUrl}/api/solditems/date`,
+    newexpense: `${apiUrl}/api/expenses/new`,
 };

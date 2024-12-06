@@ -17,7 +17,7 @@ export const SuccessModal = ({ message, callback }) => {
                     <div onClick={ closeModal } className="group absolute top-[-20px] right-[-20px]">
                         <X
                             onClick={ closeModal }
-                            className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
+                            className="cursor-pointer rounded-lg group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
                         />
                     </div>
                 </article>
@@ -44,7 +44,7 @@ export const ErrorModal = ({ header, message, callback }) => {
                     <div onClick={ closeModal } className="group absolute top-[-20px] right-[-20px]">
                         <X
                             onClick={ closeModal }
-                            className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
+                            className="cursor-pointer rounded-lg group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
                         />
                     </div>
                 </article>
@@ -71,7 +71,7 @@ export const Prompt = ({ header, message, callback, onClose }) => {
                     <div onClick={ closeModal } className="group absolute top-[-20px] right-[-20px]">
                         <X
                             onClick={ closeModal }
-                            className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
+                            className="cursor-pointer rounded-lg group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
                         />
                     </div>
                 </article>
@@ -79,8 +79,8 @@ export const Prompt = ({ header, message, callback, onClose }) => {
                 <h1 className="font-headings font-bold text-2xl pt-2 max-w-80 text-center">{ header }</h1>
                 <p className="font-paragraphs w-80 py-4 text-center text-neutral-800">{ message }</p>
                 <div className="w-full justify-end flex gap-2 mt-2">
-                    <button onClick={ callback } className="font-headings bg-neutral-500/45 px-4 py-1 leading-none rounded-full text-[16px]">Yes</button>
-                    <button onClick={ closeModal } className="font-headings bg-neutral-500/45 p-2 leading-none rounded-full text-[16px]">Cancel</button>
+                    <button onClick={ callback } className="font-headings bg-neutral-500/45 px-4 py-1 leading-none rounded-lg text-[16px]">Yes</button>
+                    <button onClick={ closeModal } className="font-headings bg-neutral-500/45 p-2 leading-none rounded-lg text-[16px]">Cancel</button>
                 </div>
             </div>
         </div>
@@ -131,8 +131,8 @@ export const PromptTextBox = ({ header, message, callback, onClose }) => {
                 <ErrorField message={textBoxError} />
 
                 <div className="w-full justify-end flex gap-2 mt-2">
-                    <button onClick={closeModal} className="font-headings bg-neutral-500/45 p-2 leading-none rounded-full text-[16px]">Cancel</button>
-                    <button onClick={send} className="font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-full text-[16px]">Submit</button>
+                    <button onClick={closeModal} className="font-headings bg-neutral-500/45 p-2 leading-none rounded-lg text-[16px]">Cancel</button>
+                    <button onClick={send} className="font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-lg text-[16px]">Submit</button>
                 </div>
             </div>
         </div>
@@ -175,7 +175,7 @@ export const PromptInput = ({ header, message, callback, onClose }) => {
                     <div onClick={ closeModal } className="group absolute top-[-20px] right-[-20px]">
                         <X
                             onClick={ closeModal }
-                            className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
+                            className="cursor-pointer rounded-lg group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
                         />
                     </div>
                 </article>
@@ -189,15 +189,15 @@ export const PromptInput = ({ header, message, callback, onClose }) => {
                         const input = elem.target.value.trim();
                         setTextInput(input);
                     }}
-                    className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                    className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                     placeholder="Item Code"
                     required
                 />
                 <ErrorField message={inputError || ''} />
 
                 <div className="w-full justify-end flex gap-2 mt-2">
-                    <button onClick={closeModal} className="font-headings bg-neutral-500/45 p-2 leading-none rounded-full text-[16px]">Cancel</button>
-                    <button onClick={send} className="font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-full text-[16px]">Done</button>
+                    <button onClick={closeModal} className="font-headings bg-neutral-500/45 p-2 leading-none rounded-lg text-[16px]">Cancel</button>
+                    <button onClick={send} className="font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-lg text-[16px]">Done</button>
                 </div>
             </div>
         </div>
@@ -233,7 +233,7 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[], 
                     <div onClick={closeModal} className="group absolute top-[-20px] right-[-20px]">
                         <X
                             onClick={closeModal}
-                            className="cursor-pointer rounded-full group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
+                            className="cursor-pointer rounded-lg group-hover:bg-neutral-800/50 group-hover:stroke-neutral-200 stroke-neutral-500/75" 
                         />
                     </div>
                 </article>
@@ -244,9 +244,9 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[], 
                 <div className="w-[70vw] max-h-[60vh] flex flex-wrap gap-2
                     overflow-x-hidden overflow-y-auto
                     [&::-webkit-scrollbar]:w-2 pr-1
-                    [&::-webkit-scrollbar-track]:rounded-full
+                    [&::-webkit-scrollbar-track]:rounded-lg
                     [&::-webkit-scrollbar-track]:bg-gray-300
-                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb]:rounded-lg
                     [&::-webkit-scrollbar-thumb]:bg-gray-400">
                     {list?.length > 0 && (
                         list.map((item, index) => {
@@ -269,13 +269,13 @@ export const PromptCheckBoxes = ({ header, message, callback, onClose, list=[], 
                 <div className="w-full justify-end flex gap-2 mt-4">
                     <button 
                         onClick={closeModal} 
-                        className="font-headings bg-neutral-500/45 p-2 leading-none rounded-full text-[16px]"
+                        className="font-headings bg-neutral-500/45 p-2 leading-none rounded-lg text-[16px]"
                     >
                         Cancel
                     </button>
                     <button 
                         onClick={done} 
-                        className={`font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-full text-[16px] 
+                        className={`font-headings bg-green-600 text-white px-4 py-1 leading-none rounded-lg text-[16px] 
                             ${checkedBoxes?.length===0 ? 'pointer-events-none opacity-80' : ''}`}
                     >
                         Done

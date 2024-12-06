@@ -197,9 +197,9 @@ const Cashier = () => {
             <section className="grow w-full h-[calc(100vh-30px-26px)] flex flex-col md:flex-row gap-4
                     overflow-x-hidden overflow-y-auto pr-1
                     [&::-webkit-scrollbar]:w-2
-                    [&::-webkit-scrollbar-track]:rounded-full
+                    [&::-webkit-scrollbar-track]:rounded-lg
                     [&::-webkit-scrollbar-track]:bg-gray-100
-                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb]:rounded-lg
                     [&::-webkit-scrollbar-thumb]:bg-gray-300
             ">
                 <div className="w-full md:w-1/2
@@ -209,7 +209,7 @@ const Cashier = () => {
                         <h2>Items</h2>
                         <Link
                             to="/admin/select-item"
-                            className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-1 sm:pr-4 hover:bg-green-800"
+                            className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-1 sm:pr-4 hover:bg-green-800"
                         >
                             <Plus />
                             <span className="hidden sm:flex text-nowrap">Select Item</span>
@@ -220,9 +220,9 @@ const Cashier = () => {
                         w-full h-full flex flex-col gap-2 pb-10
                         overflow-y-auto pt-2 pr-1
                         [&::-webkit-scrollbar]:w-2
-                        [&::-webkit-scrollbar-track]:rounded-full
+                        [&::-webkit-scrollbar-track]:rounded-lg
                         [&::-webkit-scrollbar-track]:bg-gray-100
-                        [&::-webkit-scrollbar-thumb]:rounded-full
+                        [&::-webkit-scrollbar-thumb]:rounded-lg
                         [&::-webkit-scrollbar-thumb]:bg-gray-300
                     ">
                         {
@@ -290,7 +290,7 @@ const Cashier = () => {
                                                         </button>
                                                         <button
                                                             onClick={() => enableDiscount(item?.id)}
-                                                            className="flex gap-2 items-center justify-center leading-none bg-purple-600 text-white font-bold rounded-full p-1 pr-2 hover:bg-purple-800 text-[12px]
+                                                            className="flex gap-2 items-center justify-center leading-none bg-purple-600 text-white font-bold rounded-lg p-1 pr-2 hover:bg-purple-800 text-[12px]
                                                             sm:pr-4"
                                                         >
                                                             <Minus />
@@ -339,9 +339,9 @@ const Cashier = () => {
                         border border-neutral-50 bg-neutral-100 rounded-md
                         overflow-y-auto pr-1
                         [&::-webkit-scrollbar]:w-2
-                        [&::-webkit-scrollbar-track]:rounded-full
+                        [&::-webkit-scrollbar-track]:rounded-lg
                         [&::-webkit-scrollbar-track]:bg-gray-100
-                        [&::-webkit-scrollbar-thumb]:rounded-full
+                        [&::-webkit-scrollbar-thumb]:rounded-lg
                         [&::-webkit-scrollbar-thumb]:bg-gray-300
                     ">
                         {
@@ -372,8 +372,8 @@ const Cashier = () => {
                     <div className="w-full flex justify-end py-6">
                         <button
                             onClick={checkout}
-                            className={`flex gap-2 items-center justify-center leading-none font-bold rounded-full p-2 sm:px-4 
-                            bg-green-600 text-white hover:bg-green-800 ${!total ? 'pointer-events-none opacity-50' : ''}`}
+                            className={`flex gap-2 items-center justify-center leading-none font-bold rounded-lg p-2 sm:px-4 
+                            bg-green-600 text-white hover:bg-green-800 ${!total ? 'pointer-events-none opacity-70' : ''}`}
                         >
                             <ShoppingBag />
                             <span className="hidden sm:flex text-nowrap">Proceed to Checkout</span>

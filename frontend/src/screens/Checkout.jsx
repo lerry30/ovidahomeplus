@@ -274,9 +274,9 @@ const Checkout = () => {
                         <ul className="max-h-[50%] mt-4
                             overflow-x-hidden overflow-y-auto pr-1
                             [&::-webkit-scrollbar]:w-2
-                            [&::-webkit-scrollbar-track]:rounded-full
+                            [&::-webkit-scrollbar-track]:rounded-lg
                             [&::-webkit-scrollbar-track]:bg-gray-100
-                            [&::-webkit-scrollbar-thumb]:rounded-full
+                            [&::-webkit-scrollbar-thumb]:rounded-lg
                             [&::-webkit-scrollbar-thumb]:bg-gray-300
                             ">
                             {selectedItems?.map((item, index) => (
@@ -319,7 +319,7 @@ const Checkout = () => {
                         {/* Place Order Button */}
                         <button
                             onClick={() => handlePlacingOrder({header: 'Place Order', message: 'Are you sure you want to place this order?'})}
-                            className="h-fit px-2 py-3 rounded-full bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition w-full lg:w-[19%]"
+                            className="h-fit px-2 py-3 rounded-lg bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition w-full lg:w-[19%]"
                         >
                             Place Order
                         </button>

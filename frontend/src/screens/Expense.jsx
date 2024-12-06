@@ -1,4 +1,5 @@
 import { CalendarSearch, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
 const Expense = () => {
@@ -28,6 +29,12 @@ const Expense = () => {
         }
     }
 
+    const openCalendar = () => {
+        try {
+            calendarInputRef.current?.showPicker();
+        } catch(error) {}
+    }
+
     return (
         <main className="absolute top-0 
             left-admin-sidebar-sm lg:left-admin-sidebar-lg 
@@ -44,29 +51,9 @@ const Expense = () => {
             </section>
             <section className="grow w-full h-full relative flex flex-col overflow-hidden">
                 <div className="flex justify-between items-center py-1 px-2 rounded-lg bg-white mb-2 mr-1">
-                    <button 
-                        onClick={() => {}}
-                        className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
-                    >
-                        <Plus />
-                        <span className="hidden md:flex">Log New Expense</span>
-                    </button>
                     <div className="flex items-center space-x-4 cursor-pointer">
-                        <span className="font-semibold text-md">
-                            {selectedDate ?
-                                areDatesEqual(today, new Date(selectedDate)) ?
-                                    'Today'
-                                    :
-                                    areDatesEqual(new Date(today.getTime() - 1000 * 60 * 60 * 24), new Date(selectedDate)) ?
-                                        'Yesterday'
-                                        :
-                                        formattedDate(new Date(selectedDate))
-                                :
-                                'Today'
-                            }
-                        </span>
                         <div
-                            onClick={() => calendarInputRef.current?.showPicker()}
+                            onClick={openCalendar}
                             className="flex items-center justify-center bg-gray-100 cursor-pointer"
                         >
                             <label className="relative block min-w-10">
@@ -84,15 +71,35 @@ const Expense = () => {
                                 </span>
                             </label>
                         </div>
+                        <span className="font-semibold text-md">
+                            {selectedDate ?
+                                areDatesEqual(today, new Date(selectedDate)) ?
+                                    'Today'
+                                    :
+                                    areDatesEqual(new Date(today.getTime() - 1000 * 60 * 60 * 24), new Date(selectedDate)) ?
+                                        'Yesterday'
+                                        :
+                                        formattedDate(new Date(selectedDate))
+                                :
+                                'Today'
+                            }
+                        </span>
                     </div>
+                    <Link 
+                        to="/admin/new-expense"
+                        className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
+                    >
+                        <Plus />
+                        <span className="hidden md:flex">Log New Expense</span>
+                    </Link>
                 </div>
                 <div className="
                     w-full h-full flex flex-col gap-2 pr-1
                     overflow-x-hidden overflow-y-auto
                     [&::-webkit-scrollbar]:w-2
-                    [&::-webkit-scrollbar-track]:rounded-full
+                    [&::-webkit-scrollbar-track]:rounded-lg
                     [&::-webkit-scrollbar-track]:bg-gray-400/70
-                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb]:rounded-lg
                     [&::-webkit-scrollbar-thumb]:bg-gray-300
                 ">
 

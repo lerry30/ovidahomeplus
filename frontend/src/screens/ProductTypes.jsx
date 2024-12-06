@@ -171,7 +171,7 @@ const ProductTypes = () => {
                 <Searchbar ref={searchBar} search={search} />
                 <Link
                     to="/admin/new-product-type"
-                    className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-2 sm:pr-4 hover:bg-green-800"
+                    className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:pr-4 hover:bg-green-800"
                 >
                     <Plus />
                     <span className="hidden sm:flex text-nowrap">New Product Type</span>
@@ -194,9 +194,9 @@ const ProductTypes = () => {
                                 <ul className="w-full h-full flex flex-col gap-2 p-2 pb-20
                                     overflow-x-hidden overflow-y-auto
                                     [&::-webkit-scrollbar]:w-2
-                                    [&::-webkit-scrollbar-track]:rounded-full
+                                    [&::-webkit-scrollbar-track]:rounded-lg
                                     [&::-webkit-scrollbar-track]:bg-gray-100
-                                    [&::-webkit-scrollbar-thumb]:rounded-full
+                                    [&::-webkit-scrollbar-thumb]:rounded-lg
                                     [&::-webkit-scrollbar-thumb]:bg-gray-300
                                 ">
                                     {
@@ -220,7 +220,7 @@ const ProductTypes = () => {
                                                             <div className="w-full flex flex-col md:w-fit">
                                                                 <div className="flex flex-col">
                                                                     <h3 className="font-semibold text-lg">{item?.name}</h3>
-                                                                    <p className={`w-fit h-6 text-white text-sm px-2 rounded-full ${isActive?'bg-green-500':'bg-red-500'}`}>
+                                                                    <p className={`w-fit h-6 text-white text-sm px-2 rounded-lg ${isActive?'bg-green-500':'bg-red-500'}`}>
                                                                         {item?.status}
                                                                     </p>
                                                                 </div>
@@ -231,7 +231,7 @@ const ProductTypes = () => {
                                                                 </p>
                                                             </div>
                                                             <div className="flex flex-col md:items-end md:justify-start">
-                                                                <div className="relative size-[26px] rounded-full hover:cursor-pointer hover:bg-gray-200">
+                                                                <div className="relative size-[26px] rounded-lg hover:cursor-pointer hover:bg-gray-200">
                                                                     <button 
                                                                         onClick={(ev) => {
                                                                             ev.stopPropagation();

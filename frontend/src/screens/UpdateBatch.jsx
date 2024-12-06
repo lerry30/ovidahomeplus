@@ -111,7 +111,7 @@ const UpdateBatch = () => {
                             id="batch-number"
                             value={data?.batchNo}
                             onChange={elem => setData(state => ({...state, batchNo: elem.target.value}))}
-                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4 pointer-events-none" 
+                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4 pointer-events-none" 
                             placeholder="Batch Number"
                             required
                         />
@@ -128,7 +128,7 @@ const UpdateBatch = () => {
                                 const nInput = input.replace(/[^0-9]+/g, '');
                                 setData(state => ({...state, deliveryRecieptNo: nInput}));
                             }}
-                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                             placeholder="Delivery Reciept Number"
                         />
                     </div>
@@ -144,7 +144,7 @@ const UpdateBatch = () => {
                                 const input = elem.target.value;
                                 setData(state => ({...state, deliveryDate: input}))
                             }}
-                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
+                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
                             required
                         />
                         <ErrorField message={errorData?.deliveryDate || ''} />
@@ -152,13 +152,13 @@ const UpdateBatch = () => {
                     <div className="sm:px-4 sm:py-2 flex gap-2">
                         <Link 
                             to="/admin/barcodes" 
-                            className="flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
+                            className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
                         >
                             Cancel
                         </Link>
                         <button 
                             onClick={batch} 
-                            className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800"
+                            className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800"
                         >
                             Edit Batch
                         </button>

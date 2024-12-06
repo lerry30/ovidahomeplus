@@ -76,7 +76,7 @@ const SignUp = () => {
                             onChange={elem => 
                                 setData(state => ({...state, firstname: elem.target.value}))}
                             autoFocus={true} 
-                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                             placeholder="Username"
                             required
                         />
@@ -92,7 +92,7 @@ const SignUp = () => {
                             value={data?.lastname}
                             onChange={elem => 
                                 setData(state => ({...state, lastname: elem.target.value}))}
-                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                             placeholder="Password"
                             required
                         />
@@ -109,7 +109,7 @@ const SignUp = () => {
                             onChange={elem => 
                                 setData(state => ({...state, username: elem.target.value}))} 
                             autoFocus={true} 
-                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                             placeholder="Username"
                             required
                         />
@@ -126,14 +126,14 @@ const SignUp = () => {
                             value={data?.password}
                             onChange={elem => 
                                 setData(state => ({...state, password: elem.target.value}))}
-                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                            className="w-[300px] outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                             placeholder="Password"
                             required
                         />
                         <ErrorField message={errorData?.password || ''} />
                     </div>
                     <div className="px-4 py-2">
-                        <button type="submit" className="w-[300px] flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">Sign In</button>
+                        <button type="submit" className="w-[300px] flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">Sign In</button>
                     </div>
                     <ErrorField message={errorData?.default || ''} />
                     <small>

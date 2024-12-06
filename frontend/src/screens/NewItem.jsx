@@ -331,7 +331,7 @@ const NewItem = () => {
                                     const input = Math.max(0, toNumber(elem.target.value));
                                     setData(state => ({...state, deliveryPrice: input}))
                                 }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
                                 required
                             />
                             <ErrorField message={errorData?.deliveryPrice || ''} />
@@ -349,7 +349,7 @@ const NewItem = () => {
                                     const input = elem.target.value;
                                     setData(state => ({...state, deliveryDate: input}))
                                 }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4"
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
                                 required
                             />
                             <ErrorField message={errorData?.deliveryDate || ''} />
@@ -370,7 +370,7 @@ const NewItem = () => {
                                     const input = elem.target.value;
                                     setData(state => ({...state, itemCode: input}))
                                 }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                                 placeholder="Item Code"
                                 required
                             />
@@ -388,7 +388,7 @@ const NewItem = () => {
                                     const input = Math.max(0, toNumber(elem.target.value));
                                     setData(state => ({...state, srp: input}));
                                 }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-full py-2 px-4" 
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                                 required
                             />
                             <ErrorField message={errorData?.srp || ''} />
@@ -434,11 +434,11 @@ const NewItem = () => {
                     <div className="w-full flex justify-end gap-2 sm:px-4 sm:py-2">
                         <Link 
                             to="/admin/inventory" 
-                            className="flex items-center justify-center leading-none font-bold rounded-full p-4 text-white bg-gray-500 hover:bg-gray-600"
+                            className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
                         >
                             Cancel
                         </Link>
-                        <button onClick={item} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-full p-4 hover:bg-green-800">
+                        <button onClick={item} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">
                             Add New Item
                         </button>
                     </div>
