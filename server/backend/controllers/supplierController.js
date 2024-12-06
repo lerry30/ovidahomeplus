@@ -1,5 +1,7 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
+import { fileExists, getDir } from '../utils/fileDir.js';
+import { unlink } from 'fs/promises';
 import * as supplierStmt from '../mysql/supplier.js';
 
 /*
@@ -68,9 +70,15 @@ const updateSupplier = requestHandler(async (req, res, database) => {
 
     const [result] = await database.query(supplierStmt.supplier, [id]);
     const currentImage = result?.length > 0 ? result[0]?.image : '';
-    const newImage = image ? image : currentImage;
+    let newImage = currentImage;
+    if(image) {
+        newImage = image;
+        const filePath = `uploads/suppliers/${currentImage}`;
+        const isFileExists = await fileExists(filePath);
+        if(isFileExists) await unlink(getDir(filePath));
+    }
     const [update] = await database.execute(supplierStmt.updateSupplier, [name, contact, newImage, id]);
-    if(update?.changedRows > 0) {
+    if(update?.affectedRows > 0) {
         res.status(200).json({message: 'Supplier successfully updated.'});
     } else {
         throw {status: 400, message: 'Updating supplier failed.'}

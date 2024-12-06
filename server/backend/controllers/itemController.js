@@ -4,8 +4,8 @@ import { parseOneDeep } from '../utils/jsonParse.js';
 import { checkDescription } from '../helper/items.js';
 // import { generateBarcode } from '../utils/generateBarcode.js';
 // import { setBarcodeSequence } from '../helper/item.js';
-// import { unlink } from 'fs/promises';
-// import { getDir } from '../utils/fileDir.js';
+import { getDir, fileExists } from '../utils/fileDir.js';
+import { unlink } from 'fs/promises';
 import * as itemStmt from '../mysql/item.js';
 import * as disabledItemStmt from '../mysql/disabledItem.js';
 import * as soldItemStmt from '../mysql/soldItems.js';
@@ -112,7 +112,7 @@ const updateItem = requestHandler(async (req, res, database) => {
     const srp = roundToTwo(toNumber(req.body?.srp));
     const unit = req.body?.unit?.trim();
 
-    let image = req?.file?.filename || '';
+    const image = req?.file?.filename || '';
 
     if(!productTypeId) throw {status: 400, message: 'Please select a product type from the dropdown menu.'};
     if(!description) throw {status: 400, message: 'Please include the product description to highlight its unique features.'};
@@ -124,23 +124,25 @@ const updateItem = requestHandler(async (req, res, database) => {
 
     const maxDiscount = srp - srp * 0.05;
 
-    if(!image) {
-        const [getItems] = await database.query(itemStmt.items, []);
-        for(let i = 0; i < getItems.length; i++) {
-            const item = getItems[i];
-            if(item?.id === itemId) {
-                image = item?.image;
-                break;
-            }
-        }
+    const [itemResult] = await database.query(itemStmt.item, [itemId]);
+    const currentItem = itemResult?.length > 0 ? itemResult[0] : {};
+    const currentImage = currentItem?.image ?? '';
+    const currentDescription = currentItem?.description ?? '';
+
+    let newImage = currentImage;
+    if(image) {
+        newImage = image;
+        const filePath = `uploads/items/${currentImage}`;
+        const isFileExists = await fileExists(filePath);
+        if(isFileExists) await unlink(getDir(filePath));
     }
 
     // to make sure that product description is unique
     const [descriptions] = await database.query(itemStmt.getItemDescription, [supplierId, productTypeId]);
-    checkDescription(description, descriptions); // will verify the description uniqueness
+    if(currentDescription !== description) checkDescription(description, descriptions); // will verify the description uniqueness
 
     const [itemUpdated] = await database.execute(itemStmt.updateItem, 
-        [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, image, itemId]);
+        [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, newImage, itemId]);
     if(itemUpdated?.affectedRows > 0) {
         // if(isBarcodeChange) {
         //     await unlink(getDir(`uploads/barcodes/${prevBarcode}.png`));

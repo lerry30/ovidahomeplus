@@ -20,3 +20,12 @@ export const isDirExists = async (dirPath) => {
         return false;
     }
 }
+
+export const fileExists = async (filePath) => {
+    try {
+        await fs.promises.access(getDir(filePath));
+        return true; // File exists
+    } catch (error) {
+        return false; // File does not exist
+    }
+}

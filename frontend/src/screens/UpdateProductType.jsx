@@ -70,7 +70,7 @@ const UpdateProductType = () => {
                 <div className="hidden md:flex">
                     <AppLogo segment="/product-types" />
                 </div>
-                <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Create New Product Type</h1>
+                <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Update Product Type</h1>
             </header>
             <main className="grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 p-4">    
                 <section className="bg-white rounded-md p-4">
@@ -109,7 +109,7 @@ const UpdateProductType = () => {
                             onClick={productType} 
                             className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800"
                         >
-                            Add Product Type
+                            Update Product Type
                         </button>
                     </div>
                     <ErrorField message={errorData?.default || ''} />

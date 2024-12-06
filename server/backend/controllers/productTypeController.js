@@ -1,5 +1,7 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
+import { getDir, fileExists } from '../utils/fileDir.js';
+import { unlink } from 'fs/promises';
 import * as productTypeStmt from '../mysql/productType.js';
 
 /*
@@ -61,16 +63,20 @@ const updateProductType = requestHandler(async (req, res, database) => {
     const name = String(req.body?.name)?.trim();
     const image = req?.file?.filename;
 
-    console.log(id, name, image);
-
     if(!id || id===0) throw new Error('There\'s something wrong.');
     if(!name) throw {status: 400, message: 'Product type name is required to update product type.'};
 
     const [result] = await database.query(productTypeStmt.productType, [id]);
     const currentImage = result?.length > 0 ? result[0]?.image : '';
-    const newImage = image ? image : currentImage;
+    let newImage = currentImage;
+    if(image) {
+        newImage = image;
+        const filePath = `uploads/producttypes/${currentImage}`;
+        const isFileExists = await fileExists(filePath);
+        if(isFileExists) await unlink(getDir(filePath));
+    }
     const [update] = await database.execute(productTypeStmt.updateProductType, [name, newImage, id]);
-    if(update?.changedRows > 0) {
+    if(update?.affectedRows > 0) {
         res.status(200).json({message: 'Product type successfully updated.'});
     } else {
         throw {status: 400, message: 'Updating product type failed.'}
