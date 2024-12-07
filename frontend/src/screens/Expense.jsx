@@ -5,13 +5,15 @@ import { useLayoutEffect, useState, useRef } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { zExpense } from '@/store/expense';
-import { toNumber } from '@/utils/number';
+import { toNumber, formattedNumber } from '@/utils/number';
 import { areDatesEqual, formattedDate } from '@/utils/datetime';
 
+import CalendarPicker from '@/components/CalendarPicker';
 import Loading from '@/components/Loading';
 
 const Expense = () => {
     const [expensesToShow, setExpensesToShow] = useState([]);
+    const [total, setTotal] = useState(0);
     const [selectedDate, setSelectedDate] = useState(new Date().getTime());
     const [expenseActions, setExpenseActions] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -23,13 +25,10 @@ const Expense = () => {
     const navigate = useNavigate();
     const today = new Date();
 
-    const selectDate = async (ev) => {
+    const selectDate = async (value) => {
         try {
-            const input = ev.target.value;
-            setSelectedDate(input);
-
             setLoading(true);
-            const payload = { date: input };
+            const payload = { date: value };
             const response = await sendJSON(urls.dateofexpenses, payload);
             if (response) {
                 const data = response?.results;
@@ -40,6 +39,7 @@ const Expense = () => {
             console.log(error?.message);
         } finally {
             setLoading(false);
+            setSelectedDate(value);
         }
     }
 
@@ -101,6 +101,12 @@ const Expense = () => {
 
     useLayoutEffect(() => {
         setExpenseActions(Array(expensesToShow?.length).fill(false));
+        let nTotal = 0;
+        for(const expense of expensesToShow) {
+            const amount = toNumber(expense?.amount);
+            nTotal = nTotal + amount;
+        }
+        setTotal(nTotal);
     }, [expensesToShow]);
 
     useLayoutEffect(() => {
@@ -137,58 +143,29 @@ const Expense = () => {
             h-screen bg-neutral-100 sm:p-2 md:p-4 lg:px-6
             flex flex-col"
         >
-            <section className="flex items-center gap-4">
+            <section className="flex justify-between items-center pr-2 pb-2">
                 <h1 className="hidden sm:flex font-semibold text-lg">Expenses</h1>
                 {/* <Searchbar ref={searchBar} search={() => {}} /> */}
+                {areDatesEqual(today, new Date(selectedDate)) && (
+                    <Link 
+                        to="/admin/new-expense"
+                        className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
+                    >
+                        <Plus />
+                        <span className="hidden md:flex">Log New Expense</span>
+                    </Link>
+                )}
             </section>
             <section>
                 <h1 className="flex sm:hidden font-semibold text-lg">Expenses</h1>
             </section>
             <section className="grow w-full h-full relative flex flex-col overflow-hidden">
                 <div className="flex justify-between items-center py-1 px-2 rounded-lg bg-white mb-2 mr-1">
-                    <div className="flex items-center space-x-4 cursor-pointer">
-                        <div
-                            onClick={openCalendar}
-                            className="flex items-center justify-center bg-gray-100 cursor-pointer"
-                        >
-                            <label className="relative block min-w-10">
-                                <input
-                                    type="date"
-                                    ref={calendarInputRef}
-                                    onChange={selectDate}
-                                    className="absolute opacity-0 w-0 h-0"
-                                />
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <CalendarSearch className="w-5 h-5 text-gray-400" />
-                                </span>
-                                <span className="hidden sm:block pl-10 pr-1 py-2 text-gray-700 border border-gray-300 rounded-lg shadow-sm">
-                                    Choose a date
-                                </span>
-                            </label>
-                        </div>
-                        <span className="font-semibold text-md">
-                            {selectedDate ?
-                                areDatesEqual(today, new Date(selectedDate)) ?
-                                    'Today'
-                                    :
-                                    areDatesEqual(new Date(today.getTime() - 1000 * 60 * 60 * 24), new Date(selectedDate)) ?
-                                        'Yesterday'
-                                        :
-                                        formattedDate(new Date(selectedDate))
-                                :
-                                'Today'
-                            }
-                        </span>
-                    </div>
-                    {areDatesEqual(today, new Date(selectedDate)) && (
-                        <Link 
-                            to="/admin/new-expense"
-                            className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
-                        >
-                            <Plus />
-                            <span className="hidden md:flex">Log New Expense</span>
-                        </Link>
-                    )}
+                    <CalendarPicker callback={selectDate} selectedDate={selectedDate}/>
+                    <article>
+                        <span>Total: </span>
+                        <span className="font-semibold">{formattedNumber(total)}</span>
+                    </article>
                 </div>
                 {expensesToShow?.length<=0 && (
                     <div className="absolute top-[60px] left-0 right-0 bottom-0 flex justify-center items-center">

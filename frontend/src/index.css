@@ -11,6 +11,12 @@
 	--admin-sidebar-width-lg: 240px;
 }
 
+/* *:focus {
+	outline: none !important;
+    border: 2px solid green;
+	box-shadow: 0 0 10px #3333;
+} */
+
 body {
 	width: 100%;
 	min-height: 100vh;

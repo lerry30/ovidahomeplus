@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, ListChecks, Truck, Package, UserRoundPen, Barcode, PackageCheck, HandCoins  } from 'lucide-react';
+import { LayoutDashboard, ListChecks, Truck, Package, UserRoundPen, Barcode, PackageCheck, HandCoins, FileChartColumn } from 'lucide-react';
 import AppLogo from '@/components/AppLogo';
 
 const SidebarLayout = () => {
@@ -12,6 +12,11 @@ const SidebarLayout = () => {
                 className="flex items-center gap-4 rounded-lg px-4 py-2 leading-none mt-2">
                     <LayoutDashboard />
                     <span className="hidden lg:flex">Dashboard</span>
+            </NavLink>
+            <NavLink to="/admin/reports" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}}
+                className="flex items-center gap-4 rounded-lg px-4 py-2 leading-none">
+                    <FileChartColumn />
+                    <span className="hidden lg:flex">Reports</span>
             </NavLink>
             <NavLink to="/admin/cashier" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}}
                 className="flex items-center gap-4 rounded-lg px-4 py-2 leading-none">

@@ -2,26 +2,23 @@ import { Users, Phone, Calendar, Barcode, Package, DollarSign, CreditCard, MapPi
 import { useLayoutEffect, useState, useRef } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
-import { formattedDateAndTime, areDatesEqual, formattedDate } from '@/utils/datetime';
+import { formattedDateAndTime } from '@/utils/datetime';
 
+import CalendarPicker from '@/components/CalendarPicker';
 import Loading from '@/components/Loading';
 
 const SoldItems = () => {
     const [isCompactView, setIsCompactView] = useState(window.innerWidth <= 768);
     const [soldItemsToShow, setSoldItemsToShow] = useState([]);
-    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedDate, setSelectedDate] = useState(new Date().getTime());
     const [loading, setLoading] = useState(false);
 
     const calendarInputRef = useRef(null);
-    const today = new Date();
 
-    const selectDate = async (ev) => {
+    const selectDate = async (value) => {
         try {
-            const input = ev.target.value;
-            setSelectedDate(input);
-
             setLoading(true);
-            const payload = { date: input };
+            const payload = { date: value };
             const response = await sendJSON(urls.dateofsolditems, payload);
             if (response) {
                 const data = response?.results;
@@ -31,6 +28,7 @@ const SoldItems = () => {
             console.log(error?.message);
         } finally {
             setLoading(false);
+            setSelectedDate(value);
         }
     }
 
@@ -278,40 +276,7 @@ const SoldItems = () => {
             </section>
             <section className="grow w-full h-full relative flex flex-col overflow-hidden">
                 <div className="flex justify-between items-center py-1 px-2 rounded-lg bg-white mb-2 mr-1">
-                    <div className="flex items-center space-x-4 cursor-pointer">
-                        <div
-                            onClick={openCalendar}
-                            className="flex items-center justify-center bg-gray-100 cursor-pointer"
-                        >
-                            <label className="relative block min-w-10">
-                                <input
-                                    type="date"
-                                    ref={calendarInputRef}
-                                    onChange={selectDate}
-                                    className="absolute opacity-0 w-0 h-0"
-                                />
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <CalendarSearch className="w-5 h-5 text-gray-400" />
-                                </span>
-                                <span className="hidden sm:block pl-10 pr-1 py-2 text-gray-700 border border-gray-300 rounded-lg shadow-sm">
-                                    Choose a date
-                                </span>
-                            </label>
-                        </div>
-                        <span className="font-semibold text-md">
-                            {selectedDate ?
-                                areDatesEqual(today, new Date(selectedDate)) ?
-                                    'Today'
-                                    :
-                                    areDatesEqual(new Date(today.getTime() - 1000 * 60 * 60 * 24), new Date(selectedDate)) ?
-                                        'Yesterday'
-                                        :
-                                        formattedDate(new Date(selectedDate))
-                                :
-                                'Today'
-                            }
-                        </span>
-                    </div>
+                    <CalendarPicker callback={selectDate} selectedDate={selectedDate} />
                     <span className="text-md">
                         Total Sold Items: <span className="font-semibold text-md">{soldItemsToShow?.length ?? 0}</span>
                     </span>
