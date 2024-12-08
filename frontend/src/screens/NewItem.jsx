@@ -1,5 +1,5 @@
 import { ChevronLeft, CircleX } from 'lucide-react';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, useRef } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
@@ -40,6 +40,7 @@ const NewItem = () => {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const descriptionInputRef = useRef(null);
 
     const PROFIT_MARGIN = 0.4576;
 
@@ -48,6 +49,7 @@ const NewItem = () => {
         if(input === 'Enter') {
             if(data?.description?.length >= 4) return;
             const inputValue = ev.target.value;
+            if(!inputValue) return;
             setData(state => ({...state, description: [...state?.description, inputValue]}));
             ev.target.value = '';
         }
@@ -57,9 +59,14 @@ const NewItem = () => {
         try {
             setLoading(true);
 
+            // just to insert description which exists in input field yet
+            const nDescription = descriptionInputRef.current?.value ?? '';
+            const allDescription = data?.description;
+            if(nDescription) allDescription.push(nDescription);
+
             const productType = data?.productType?.trim();
             const productTypeId = toNumber(data?.productTypeId);
-            const description = data?.description?.join(',');
+            const description = allDescription?.join(',');
 
             const supplier = data?.supplier?.trim();
             const supplierId = toNumber(data?.supplierId);
@@ -163,6 +170,7 @@ const NewItem = () => {
     }
 
     const focusOnInput = (ev) => {
+        ev.stopPropagation();
         const input = ev?.target?.querySelector('input');
         if(input && input?.nodeName=='INPUT') input.focus();
     }
@@ -175,6 +183,19 @@ const NewItem = () => {
     useLayoutEffect(() => {
         getSuppliers();
         getProductTypes();
+
+        const onPageClick = () => {
+            const nDescription = descriptionInputRef.current?.value ?? '';
+            if(nDescription) {
+                setData(state => ({...state, description: [...state?.description, nDescription]}));
+                descriptionInputRef.current.value = '';
+            }
+        }
+
+        addEventListener('click', onPageClick);
+        return () => {
+            removeEventListener('click', onPageClick);
+        }
     }, []);
 
     if(loading) {
@@ -270,6 +291,7 @@ const NewItem = () => {
                                 )
                             })}
                             <input 
+                                ref={descriptionInputRef}
                                 onKeyDown={enterNewDescription} 
                                 className="min-w-[100px] outline-none" 
                             />

@@ -1,5 +1,5 @@
 import { ChevronLeft, CircleX } from 'lucide-react';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, useRef } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
@@ -50,21 +50,18 @@ const UpdateItem = () => {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const descriptionInputRef = useRef(null);
 
     const PROFIT_MARGIN = 0.4576;
-
-    const newDescription = (ev) => {
-        if(data?.description?.length >= 4) return;
-        const inputValue = ev.target.value.trim();
-        if(!inputValue) return;
-        setData(state => ({...state, description: [...state?.description, inputValue]}));
-        ev.target.value = '';
-    }
 
     const enterNewDescription = (ev) => {
         const input = ev.key;
         if(input === 'Enter') {
-            newDescription(ev);
+            if(data?.description?.length >= 4) return;
+            const inputValue = ev.target.value;
+            if(!inputValue) return;
+            setData(state => ({...state, description: [...state?.description, inputValue]}));
+            ev.target.value = '';
         }
     }
 
@@ -72,9 +69,14 @@ const UpdateItem = () => {
         try {
             setLoading(true);
 
+            // just to insert description which exists in input field yet
+            const nDescription = descriptionInputRef.current?.value ?? '';
+            const allDescription = data?.description;
+            if(nDescription) allDescription.push(nDescription);
+
             const productType = data?.productType?.trim();
             const productTypeId = toNumber(data?.productTypeId);
-            const description = data?.description?.join(',')?.trim();
+            const description = allDescription?.join(',')?.trim();
 
             const supplier = data?.supplier?.trim();
             const supplierId = toNumber(data?.supplierId);
@@ -240,6 +242,16 @@ const UpdateItem = () => {
         getProductTypes();
 
         zItem.getState()?.reloadItemData();
+
+        const onPageClick = () => {
+            const nDescription = descriptionInputRef.current?.value ?? '';
+            if(nDescription) {
+                setData(state => ({...state, description: [...state?.description, nDescription]}));
+                descriptionInputRef.current.value = '';
+            }
+        }
+        addEventListener('click', onPageClick);
+        return () => removeEventListener('click', onPageClick);
     }, []);
 
     if(loading) {
@@ -330,8 +342,8 @@ const UpdateItem = () => {
                                 )
                             })}
                             <input 
+                                ref={descriptionInputRef}
                                 onKeyDown={enterNewDescription}
-                                onBlur={newDescription}
                                 className="min-w-[100px] outline-none" 
                             />
                         </article>
@@ -483,7 +495,9 @@ const UpdateItem = () => {
                         >
                             Cancel
                         </Link>
-                        <button onClick={item} className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">
+                        <button 
+                            onClick={item} 
+                            className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">
                             Update Item
                         </button>
                     </div>
