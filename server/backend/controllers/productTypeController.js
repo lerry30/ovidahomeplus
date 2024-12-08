@@ -6,7 +6,7 @@ import * as productTypeStmt from '../mysql/productType.js';
 
 /*
    desc     New Product Type
-   route    POST /api/producttype/new
+   route    POST /api/producttypes/new
    access   private
 */
 const newProductType = requestHandler(async (req, res, database) => {
@@ -14,6 +14,9 @@ const newProductType = requestHandler(async (req, res, database) => {
     const image = req?.file?.filename || '';
 
     if(!name) throw {status: 400, message: 'Product type name is required to add new.'}
+
+    const [result] = await database.execute(productTypeStmt.getProductTypeByName, [name]);
+    if(result?.length > 0) throw {status: 400, message: 'Product type already exists.'};
 
     const [insert] = await database.execute(productTypeStmt.newProductType, [name, image]);
     if(insert?.insertId > 0) {
@@ -25,7 +28,7 @@ const newProductType = requestHandler(async (req, res, database) => {
 
 /*
    desc     Get Product Types
-   route    GET /api/producttype/get
+   route    GET /api/producttypes/get
    access   public
 */
 const getProductTypes = requestHandler(async (req, res, database) => {
@@ -35,7 +38,7 @@ const getProductTypes = requestHandler(async (req, res, database) => {
 
 /*
    desc     Update Status of Product Type
-   route    PATCH /api/producttype/status
+   route    PATCH /api/producttypes/status
    access   private
 */
 const changeProductTypeStatus = requestHandler(async (req, res, database) => {
@@ -55,7 +58,7 @@ const changeProductTypeStatus = requestHandler(async (req, res, database) => {
 
 /*
    desc     Update Product Type
-   route    PUT /api/producttype/update
+   route    PUT /api/producttypes/update
    access   private
 */
 const updateProductType = requestHandler(async (req, res, database) => {
