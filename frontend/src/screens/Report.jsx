@@ -1,8 +1,10 @@
 import { Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState, useRef } from 'react';
-import { sendJSON } from '@/utils/send';
+import { useLayoutEffect, useState, useRef } from 'react';
+import { sendJSON, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
+import { formattedDate } from '@/utils/datetime';
+import { toNumber, formattedNumber } from '@/utils/number';
 
 import Select from '@/components/DropDown';
 import CalendarPicker from '@/components/CalendarPicker';
@@ -11,6 +13,11 @@ import Loading from '@/components/Loading';
 const Report = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('Daily');
     const [selectedDate, setSelectedDate] = useState(new Date().getTime());
+    const [soldItemsToShow, setSoldItemsToShow] = useState([]);
+    const [expensesToShow, setExpensesToShow] = useState([]);
+    const [totalCollection, setTotalCollection] = useState(0);
+    const [totalExpenses, setTotalExpenses] = useState(0);
+    const [netCash, setNetCash] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const selectDate = async (value) => {
@@ -23,6 +30,85 @@ const Report = () => {
             setSelectedDate(value);
         }
     }
+
+    const mergeResemblance = (items) => {
+        const itemKeys = {};
+        for(const item of items) {
+            const supplierNameKey = String(item?.supplierName).trim().toLowerCase();
+            const projectTypeKey = String(item?.productTypeName).trim().toLowerCase();
+            const descriptionKey = String(item?.itemDescription).trim().toLowerCase();
+            const paymentMethodKey = String(item?.paymentMethod).trim().toLowerCase();
+            const nKey = `${supplierNameKey}-${projectTypeKey}-${descriptionKey}-${paymentMethodKey}`; 
+
+            const nAmount = !item?.isDiscounted ? item?.srp : item?.maxDiscount;
+            const itemObject = {
+                ...item, quantity: 1,
+                totalAmount: toNumber(nAmount)
+            };
+            if(itemKeys[nKey]) {
+                itemObject.quantity++;
+                itemObject.totalAmount = itemObject.totalAmount + itemKeys[nKey].totalAmount;
+            }
+            itemKeys[nKey] = itemObject;
+        }
+        return Object.values(itemKeys);
+    }
+
+    const getSoldItemsToday = async () => {
+        try {
+            setLoading(true);
+            const response = await getData(urls.solditemstoday);
+            if (response) {
+                const data = response?.results;
+                console.log(data);
+                const nData = mergeResemblance(data);     
+                let total = 0;
+                for(const soldItem of nData) {
+                    total = total + soldItem?.totalAmount;
+                }
+                setSoldItemsToShow(nData);
+                setTotalCollection(total);
+            }
+        } catch (error) {
+            console.log(error?.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const getExpensesToday = async () => {
+        try {
+            setLoading(true);
+            const response = await getData(urls.getexpensestoday);
+            if(response) {
+                // console.log(response);
+                const data = response?.results;
+                let total = 0;
+                for(const expense of data) {
+                    total = total + toNumber(expense?.amount);
+                }
+
+                setExpensesToShow(data);
+                setTotalExpenses(total);
+            }
+        } catch(error) {
+            console.log(error?.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useLayoutEffect(() => {
+        if(totalExpenses && totalCollection) {
+            const net = totalCollection-totalExpenses;
+            if(net > 0) setNetCash(net);
+        }
+    }, [totalExpenses, totalCollection]);
+
+    useLayoutEffect(() => {
+        getSoldItemsToday();
+        getExpensesToday();
+    }, []);
     
     if (loading) {
         return (
@@ -111,14 +197,16 @@ const Report = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td className="border px-4 py-2">LEELAND</td>
-                                        <td className="border px-4 py-2">OFFICE TABLE 1.2M BG-298</td>
-                                        <td className="border px-4 py-2">1</td>
-                                        <td className="border px-4 py-2">11/29/2024</td>
-                                        <td className="border px-4 py-2">₱10,000</td>
-                                        <td className="border px-4 py-2">CASH</td>
-                                    </tr>
+                                    {soldItemsToShow?.map((item, index) => (
+                                        <tr key={index}>
+                                            <td className="border px-4 py-2">{item?.supplierName}</td>
+                                            <td className="border px-4 py-2">{item?.productTypeName} {item?.itemDescription}</td>
+                                            <td className="border px-4 py-2">{toNumber(item?.quantity)}</td>
+                                            <td className="border pxpy-2">{formattedDate(new Date(item?.soldAt))}</td>
+                                            <td className="border px-4 py-2">₱ {formattedNumber(item?.totalAmount)}</td>
+                                            <td className="border px-4 py-2">{item?.paymentMethod}</td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -127,19 +215,20 @@ const Report = () => {
                         <div className="bg-white p-4 shadow-md rounded-lg mb-2">
                             <h2 className="text-lg font-semibold mb-4">Expense Summary</h2>
                             <ul className="list-disc list-inside">
-                                <li>Notarize Ovida Document: ₱400</li>
-                                <li>Ribbon Red-Bundle Promo: ₱166</li>
-                                <li>Diesel Deliver Sir Fernan: ₱500</li>
-                                {/* Add items dynamically */}
+                                {expensesToShow?.map((item, index) => (
+                                    <li key={index}>
+                                        {item?.type}:&nbsp;&nbsp;&nbsp;₱ {formattedNumber(item?.amount)}
+                                    </li>
+                                ))}
                             </ul>
                         </div>
 
                         {/* Net Summary */}
                         <div className="bg-white p-4 shadow-md rounded-lg">
                             <h2 className="text-lg font-semibold">Net Summary</h2>
-                            <p>Total Collection: ₱79,830</p>
-                            <p>Total Expenses: ₱8,466</p>
-                            <p className="font-bold">Net Cash Available: ₱71,364</p>
+                            <p>Total Collection: ₱ {formattedNumber(totalCollection)}</p>
+                            <p>Total Expenses: ₱ {formattedNumber(totalExpenses)}</p>
+                            <p className="font-bold">Net Cash Available: ₱ {formattedNumber(netCash)}</p>
                         </div>
                     </div>
                 </div>
