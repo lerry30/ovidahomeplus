@@ -12,6 +12,7 @@ import Loading from '@/components/Loading';
 
 const Report = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('Daily');
+    const [selectedMonth, setSelectedMonth] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date().getTime());
     const [soldItemsToShow, setSoldItemsToShow] = useState([]);
     const [expensesToShow, setExpensesToShow] = useState([]);
@@ -20,6 +21,13 @@ const Report = () => {
     const [netCash, setNetCash] = useState(0);
     const [loading, setLoading] = useState(false);
 
+    const months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'December'];
+
+    const selectMonth = (month) => {
+           
+    }
+
+    // daily
     const selectDate = async (value) => {
         try {
             setLoading(true);
@@ -60,7 +68,6 @@ const Report = () => {
             const response = await getData(urls.solditemstoday);
             if (response) {
                 const data = response?.results;
-                console.log(data);
                 const nData = mergeResemblance(data);     
                 let total = 0;
                 for(const soldItem of nData) {
@@ -106,6 +113,14 @@ const Report = () => {
     }, [totalExpenses, totalCollection]);
 
     useLayoutEffect(() => {
+        if(selectedPeriod) {
+            if(selectedPeriod.toLowerCase()==='monthly') {
+                
+            }
+        }
+    }, [selectedPeriod]);
+
+    useLayoutEffect(() => {
         getSoldItemsToday();
         getExpensesToday();
     }, []);
@@ -149,7 +164,26 @@ const Report = () => {
                                 Yearly
                             </button>
                         </Select>
-                        <CalendarPicker callback={selectDate} selectedDate={selectedDate}/>
+                        {selectedPeriod==='Daily' ?
+                            <CalendarPicker callback={selectDate} selectedDate={selectedDate}/>
+                        :
+                            selectedPeriod==='Monthly' ?
+                                <Select
+                                    name="Select Month"
+                                    className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                >
+                                    {months?.map((month, index) => (
+                                        <button 
+                                            key={index}
+                                            onClick={() => selectMonth(month)}
+                                            className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center">
+                                            {month}
+                                        </button>
+                                    ))}  
+                                </Select>
+                            :
+                                <></>
+                        }
                     </div>
                     <div className="w-full h-full
                         overflow-x-hidden pb-32 pr-1
