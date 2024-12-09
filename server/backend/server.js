@@ -15,6 +15,7 @@ import barcodeRoutes from './routes/barcodeRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import soldItemRoutes from './routes/soldItemRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { getDir } from './utils/fileDir.js';
 import { allowResourceAccess } from './middleware/corsFileMiddleware.js';
@@ -62,6 +63,7 @@ app.use('/api/barcodes', barcodeRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/solditems', soldItemRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/reports', reportRoutes);
 
 // fall back when route is not found
 app.use(notFound);

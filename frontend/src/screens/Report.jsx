@@ -23,22 +23,6 @@ const Report = () => {
 
     const months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'December'];
 
-    const selectMonth = (month) => {
-           
-    }
-
-    // daily
-    const selectDate = async (value) => {
-        try {
-            setLoading(true);
-        } catch(error) {
-            console.log(error?.message);
-        } finally {
-            setLoading(false);
-            setSelectedDate(value);
-        }
-    }
-
     const mergeResemblance = (items) => {
         const itemKeys = {};
         for(const item of items) {
@@ -60,6 +44,51 @@ const Report = () => {
             itemKeys[nKey] = itemObject;
         }
         return Object.values(itemKeys);
+    }
+
+    const selectMonth = (month) => {
+        try {
+            setLoading(true);
+            setSelectedMonth(month);
+        } catch(error) {
+            console.log(error?.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // daily
+    const selectDate = async (value) => {
+        try {
+            setLoading(true);
+            const payload = { date: value };
+            const response = await sendJSON(urls.dateofreport, payload);
+            if (response) {
+                // console.log(response?.results);
+                const {expenses, soldItems} = response?.results;
+
+                let totalExp = 0;
+                for(const expense of expenses) {
+                    totalExp = totalExp + toNumber(expense?.amount);
+                }
+
+                const nSoldItems = mergeResemblance(soldItems);     
+                let totalColl = 0;
+                for(const soldItem of nSoldItems) {
+                    totalColl = totalColl + soldItem?.totalAmount;
+                }
+
+                setExpensesToShow(expenses);
+                setSoldItemsToShow(nSoldItems);
+                setTotalExpenses(totalExp);
+                setTotalCollection(totalColl);
+            }
+        } catch(error) {
+            console.log(error?.message);
+        } finally {
+            setLoading(false);
+            setSelectedDate(value);
+        }
     }
 
     const getSoldItemsToday = async () => {
@@ -169,7 +198,7 @@ const Report = () => {
                         :
                             selectedPeriod==='Monthly' ?
                                 <Select
-                                    name="Select Month"
+                                    name={`${selectedMonth || 'Select Month'}`}
                                     className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
                                 >
                                     {months?.map((month, index) => (
