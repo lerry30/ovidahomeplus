@@ -164,7 +164,7 @@ const Expense = () => {
                     <CalendarPicker callback={selectDate} selectedDate={selectedDate}/>
                     <article>
                         <span>Total: </span>
-                        <span className="font-semibold">{formattedNumber(total)}</span>
+                        <span className="font-semibold">₱{formattedNumber(total)}</span>
                     </article>
                 </div>
                 {expensesToShow?.length<=0 && (
@@ -188,7 +188,7 @@ const Expense = () => {
                         >
                             <article className="w-full flex justify-between p-3">
                                 <span>{item?.type}</span>
-                                <span>{formattedNumber(String(item?.amount).split('.')[0])}</span>
+                                <span>₱{formattedNumber(String(item?.amount).split('.')[0])}</span>
                             </article>
                             <div className="flex justify-center items-center px-4">
                                 <div className="relative size-[26px] rounded-lg hover:cursor-pointer hover:bg-gray-200">

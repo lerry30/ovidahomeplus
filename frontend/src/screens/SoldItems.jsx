@@ -1,4 +1,4 @@
-import { Users, Phone, Calendar, Barcode, Package, DollarSign, CreditCard, MapPinHouse, Hash, CalendarSearch } from 'lucide-react';
+import { Users, Phone, Calendar, Barcode, Package, PhilippinePeso, CreditCard, MapPinHouse, Hash } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
@@ -128,7 +128,7 @@ const SoldItems = () => {
 
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+                        <PhilippinePeso className="w-5 h-5 text-green-600" />
                         <span>SRP</span>
                     </div>
                     <span className="font-bold text-green-600">{item?.srp}</span>
@@ -136,7 +136,7 @@ const SoldItems = () => {
 
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+                        <PhilippinePeso className="w-5 h-5 text-green-600" />
                         <span>Total</span>
                     </div>
                     <span className="font-bold text-green-600">{
@@ -221,7 +221,7 @@ const SoldItems = () => {
 
                     <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-2">
-                            <DollarSign className="w-5 h-5 text-green-600" />
+                            <PhilippinePeso className="w-5 h-5 text-green-600" />
                             <span>SRP</span>
                         </div>
                         <span className="font-bold text-green-600">{item?.srp}</span>
@@ -229,7 +229,7 @@ const SoldItems = () => {
 
                     <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-2">
-                            <DollarSign className="w-5 h-5 text-green-600" />
+                            <PhilippinePeso className="w-5 h-5 text-green-600" />
                             <span>Total</span>
                         </div>
                         <span className="font-bold text-green-600">

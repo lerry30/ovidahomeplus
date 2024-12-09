@@ -33,4 +33,6 @@ export const urls = {
     deleteexpense: `${apiUrl}/api/expenses/delete`,
     dateofexpenses: `${apiUrl}/api/expenses/date`,
     dateofreport: `${apiUrl}/api/reports/date`,
+    monthlyreport: `${apiUrl}/api/reports/monthly`,
+    yearlyreport: `${apiUrl}/api/reports/yearly`,
 };

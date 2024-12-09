@@ -1,10 +1,8 @@
-import { Plus } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useLayoutEffect, useState, useRef } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { sendJSON, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { formattedDate } from '@/utils/datetime';
-import { toNumber, formattedNumber } from '@/utils/number';
+import { toNumber, formattedCurrency } from '@/utils/number';
 
 import Select from '@/components/DropDown';
 import CalendarPicker from '@/components/CalendarPicker';
@@ -12,16 +10,26 @@ import Loading from '@/components/Loading';
 
 const Report = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('Daily');
+
+    const [selectedYear, setSelectedYear] = useState(''); // I also used it for selecting months for monthly report
+    const [selectedYearData, setSelectedYearData] = useState([]);
+
     const [selectedMonth, setSelectedMonth] = useState('');
-    const [selectedDate, setSelectedDate] = useState(new Date().getTime());
+    const [selectedMonthData, setSelectedMonthData] = useState([]);
+
+    const [selectedDate, setSelectedDate] = useState(new Date().getTime()); // ui
     const [soldItemsToShow, setSoldItemsToShow] = useState([]);
     const [expensesToShow, setExpensesToShow] = useState([]);
+
     const [totalCollection, setTotalCollection] = useState(0);
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [netCash, setNetCash] = useState(0);
+
     const [loading, setLoading] = useState(false);
 
-    const months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'December'];
+    const today = new Date();
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const YEAR_STARTED = 2024;
 
     const mergeResemblance = (items) => {
         const itemKeys = {};
@@ -46,10 +54,57 @@ const Report = () => {
         return Object.values(itemKeys);
     }
 
-    const selectMonth = (month) => {
+    const selectYear = async (year) => {
+        try {
+            setLoading(true);
+            setSelectedYear(year);
+
+            const payload = {year};
+            const response = await sendJSON(urls.yearlyreport, payload);
+            if(response) {
+                const data = response?.results;
+                // console.log(data);
+                setSelectedYearData(data);
+
+                let totalCol = 0;
+                let totalExp = 0;
+                // the total of net income will be computed in useLayoutEffect
+                for(const details of data) {
+                    totalCol = toNumber(totalCol + details?.totalCollection);
+                    totalExp = toNumber(totalExp + details?.totalExpenses);
+                }
+                setTotalCollection(totalCol);
+                setTotalExpenses(totalExp);
+            }
+        } catch(error) {
+            console.log(error?.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const selectMonth = async (month, index) => {
         try {
             setLoading(true);
             setSelectedMonth(month);
+
+            const payload = {year: selectedYear, month: index};
+            const response = await sendJSON(urls.monthlyreport, payload);
+            if(response) {
+                const data = response?.results;
+                // console.log(data);
+                setSelectedMonthData(data);
+
+                let totalCol = 0;
+                let totalExp = 0;
+                // the total of net income will be computed in useLayoutEffect
+                for(const details of data) {
+                    totalCol = toNumber(totalCol + details?.totalCollection);
+                    totalExp = toNumber(totalExp + details?.totalExpenses);
+                }
+                setTotalCollection(totalCol);
+                setTotalExpenses(totalExp);
+            }
         } catch(error) {
             console.log(error?.message);
         } finally {
@@ -135,17 +190,14 @@ const Report = () => {
     }
 
     useLayoutEffect(() => {
-        if(totalExpenses && totalCollection) {
-            const net = totalCollection-totalExpenses;
-            if(net > 0) setNetCash(net);
-        }
+        const net = toNumber(totalCollection)-toNumber(totalExpenses);
+        setNetCash(net);
     }, [totalExpenses, totalCollection]);
 
     useLayoutEffect(() => {
         if(selectedPeriod) {
-            if(selectedPeriod.toLowerCase()==='monthly') {
-                
-            }
+            setTotalCollection(0);
+            setTotalExpenses(0);
         }
     }, [selectedPeriod]);
 
@@ -197,21 +249,60 @@ const Report = () => {
                             <CalendarPicker callback={selectDate} selectedDate={selectedDate}/>
                         :
                             selectedPeriod==='Monthly' ?
-                                <Select
-                                    name={`${selectedMonth || 'Select Month'}`}
-                                    className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
-                                >
-                                    {months?.map((month, index) => (
-                                        <button 
-                                            key={index}
-                                            onClick={() => selectMonth(month)}
-                                            className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center">
-                                            {month}
-                                        </button>
-                                    ))}  
-                                </Select>
+                                <>
+                                    <Select
+                                        name={`${selectedYear || 'Select Year'}`}
+                                        className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                    >
+                                        {Array(today.getFullYear()-YEAR_STARTED+1).fill(0)?.map((_, index) => {
+                                            const nYear = YEAR_STARTED+index;
+                                            return (
+                                                <button 
+                                                    key={index}
+                                                    onClick={() => setSelectedYear(nYear)}
+                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                                >
+                                                    {nYear}
+                                                </button>
+                                            )
+                                        })}  
+                                    </Select>
+                                    <Select
+                                        name={`${selectedMonth || 'Select Month'}`}
+                                        className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                    >
+                                        {months?.map((month, index) => (
+                                            <button 
+                                                key={index}
+                                                onClick={() => selectMonth(month, index)}
+                                                className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                            >
+                                                {month}
+                                            </button>
+                                        ))}  
+                                    </Select>
+                                </>
                             :
-                                <></>
+                                selectedPeriod==='Yearly' ?
+                                    <Select
+                                        name={`${selectedYear || 'Select Year'}`}
+                                        className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                    >
+                                        {Array(today.getFullYear()-YEAR_STARTED+1).fill(0)?.map((_, index) => {
+                                            const nYear = YEAR_STARTED+index;
+                                            return (
+                                                <button 
+                                                    key={index}
+                                                    onClick={() => selectYear(nYear)}
+                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                                >
+                                                    {nYear}
+                                                </button>
+                                            )
+                                        })}  
+                                    </Select>
+                                :
+                                    <></>
                         }
                     </div>
                     <div className="w-full h-full
@@ -223,75 +314,136 @@ const Report = () => {
                         [&::-webkit-scrollbar-thumb]:rounded-lg
                         [&::-webkit-scrollbar-thumb]:bg-gray-300
                     ">
-                        {/* Cash Breakdown */}
-                        <div className="bg-white p-4 shadow-md rounded-lg mb-2">
-                            <h2 className="text-lg font-semibold mb-4">Cash Breakdown</h2>
-                            <table className="w-full border-collapse border border-gray-200">
-                                <thead>
-                                    <tr className="bg-gray-100">
-                                        <th className="border px-4 py-2">Denomination</th>
-                                        <th className="border px-4 py-2">No. of Pieces</th>
-                                        <th className="border px-4 py-2">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td className="border px-4 py-2">₱1,000</td>
-                                        <td className="border px-4 py-2">51</td>
-                                        <td className="border px-4 py-2">₱51,000</td>
-                                    </tr>
-                                    {/* Add rows dynamically */}
-                                </tbody>
-                            </table>
-                        </div>
+                        {selectedPeriod==='Daily' ?
+                            <>
+                                {/* Cash Breakdown */}
+                                {/* <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                    <h2 className="text-lg font-semibold mb-4">Cash Breakdown</h2>
+                                    <table className="w-full border-collapse border border-gray-200">
+                                        <thead>
+                                            <tr className="bg-gray-100">
+                                                <th className="border px-4 py-2">Denomination</th>
+                                                <th className="border px-4 py-2">No. of Pieces</th>
+                                                <th className="border px-4 py-2">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td className="border px-4 py-2">₱1,000</td>
+                                                <td className="border px-4 py-2">51</td>
+                                                <td className="border px-4 py-2">₱51,000</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div> */}
 
-                        {/* Sales Summary */}
-                        <div className="bg-white p-4 shadow-md rounded-lg mb-2">
-                            <h2 className="text-lg font-semibold mb-4">Sales Summary</h2>
-                            <table className="w-full border-collapse border border-gray-200">
-                                <thead>
-                                    <tr className="bg-gray-100">
-                                        <th className="border px-4 py-2">Supplier</th>
-                                        <th className="border px-4 py-2">Item Name</th>
-                                        <th className="border px-4 py-2">Qty</th>
-                                        <th className="border px-4 py-2">Sold Date</th>
-                                        <th className="border px-4 py-2">Current</th>
-                                        <th className="border px-4 py-2">Mode of Payment</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {soldItemsToShow?.map((item, index) => (
-                                        <tr key={index}>
-                                            <td className="border px-4 py-2">{item?.supplierName}</td>
-                                            <td className="border px-4 py-2">{item?.productTypeName} {item?.itemDescription}</td>
-                                            <td className="border px-4 py-2">{toNumber(item?.quantity)}</td>
-                                            <td className="border pxpy-2">{formattedDate(new Date(item?.soldAt))}</td>
-                                            <td className="border px-4 py-2">₱ {formattedNumber(item?.totalAmount)}</td>
-                                            <td className="border px-4 py-2">{item?.paymentMethod}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                {/* Sales Summary */}
+                                <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                    <h2 className="text-lg font-semibold mb-4">Sales Summary</h2>
+                                    <table className="w-full border-collapse border border-gray-200">
+                                        <thead>
+                                            <tr className="bg-gray-100">
+                                                <th className="border px-4 py-2">Supplier</th>
+                                                <th className="border px-4 py-2">Item Name</th>
+                                                <th className="border px-4 py-2">Qty</th>
+                                                <th className="border px-4 py-2">Sold Date</th>
+                                                <th className="border px-4 py-2">Current</th>
+                                                <th className="border px-4 py-2">Mode of Payment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {soldItemsToShow?.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td className="border px-4 py-2">{item?.supplierName}</td>
+                                                    <td className="border px-4 py-2">{item?.productTypeName} {item?.itemDescription}</td>
+                                                    <td className="border px-4 py-2">{toNumber(item?.quantity)}</td>
+                                                    <td className="border px-4 text-center">{formattedDate(new Date(item?.soldAt))}</td>
+                                                    <td className="border px-4 py-2">{formattedCurrency(item?.totalAmount)}</td>
+                                                    <td className="border px-4 py-2">{item?.paymentMethod}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                        {/* Expense Summary */}
-                        <div className="bg-white p-4 shadow-md rounded-lg mb-2">
-                            <h2 className="text-lg font-semibold mb-4">Expense Summary</h2>
-                            <ul className="list-disc list-inside">
-                                {expensesToShow?.map((item, index) => (
-                                    <li key={index}>
-                                        {item?.type}:&nbsp;&nbsp;&nbsp;₱ {formattedNumber(item?.amount)}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                                {/* Expense Summary */}
+                                <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                    <h2 className="text-lg font-semibold mb-4">Expense Summary</h2>
+                                    <ul className="list-disc list-inside">
+                                        {expensesToShow?.map((item, index) => (
+                                            <li key={index}>
+                                                {item?.type}:&nbsp;&nbsp;&nbsp;{formattedCurrency(item?.amount)}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </>
+                        : 
+                            selectedPeriod==='Monthly' ?
+                                <>
+                                    <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                        <h2 className="text-lg font-semibold mb-4">{selectedMonth} {selectedYear} Sales Summary</h2>
+                                        <table className="w-full border-collapse border border-gray-200">
+                                            <thead>
+                                                <tr className="bg-gray-100">
+                                                    <th className="border px-4 py-2">Date</th>
+                                                    <th className="border px-4 py-2">Total Sales</th>
+                                                    <th className="border px-4 py-2">Total Expenses</th>
+                                                    <th className="border px-4 py-2">Net Income</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {selectedMonthData?.map((item, index) => {
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td className="border px-4 text-center">{formattedDate(new Date(item?.date))}</td>
+                                                            <td className="border px-4 py-2">{formattedCurrency(item?.totalCollection)}</td>
+                                                            <td className="border px-4 py-2">{formattedCurrency(item?.totalExpenses)}</td>
+                                                            <td className="border px-4 py-2">{formattedCurrency(item?.netIncome)}</td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </>
+                            :
+                                selectedPeriod==='Yearly' &&
+                                    <>
+                                        <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                            <h2 className="text-lg font-semibold mb-4">Sales Summary for Year {selectedYear}</h2>
+                                            <table className="w-full border-collapse border border-gray-200">
+                                                <thead>
+                                                    <tr className="bg-gray-100">
+                                                        <th className="border px-4 py-2">Month</th>
+                                                        <th className="border px-4 py-2">Total Sales</th>
+                                                        <th className="border px-4 py-2">Total Expenses</th>
+                                                        <th className="border px-4 py-2">Net Income</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {selectedYearData?.map((item, index) => {
+                                                        return (
+                                                            <tr key={index}>
+                                                                <td className="border px-4 text-center">{item?.month}</td>
+                                                                <td className="border px-4 py-2">{formattedCurrency(item?.totalCollection)}</td>
+                                                                <td className="border px-4 py-2">{formattedCurrency(item?.totalExpenses)}</td>
+                                                                <td className="border px-4 py-2">{formattedCurrency(item?.netIncome)}</td>
+                                                            </tr>
+                                                        )
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </>
+                        }
 
                         {/* Net Summary */}
                         <div className="bg-white p-4 shadow-md rounded-lg">
                             <h2 className="text-lg font-semibold">Net Summary</h2>
-                            <p>Total Collection: ₱ {formattedNumber(totalCollection)}</p>
-                            <p>Total Expenses: ₱ {formattedNumber(totalExpenses)}</p>
-                            <p className="font-bold">Net Cash Available: ₱ {formattedNumber(netCash)}</p>
+                            <p>Total Collection: {formattedCurrency(totalCollection)}</p>
+                            <p>Total Expenses: {formattedCurrency(totalExpenses)}</p>
+                            <p className="font-bold">Net Cash Available: {formattedCurrency(netCash)}</p>
                         </div>
                     </div>
                 </div>

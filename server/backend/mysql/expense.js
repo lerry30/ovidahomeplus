@@ -18,6 +18,17 @@ export const getExpensesByDate = `
     ORDER BY expenses.created_at DESC;
 `;
 
+export const getExpensesBetweenDates = `
+    SELECT 
+        id,
+        type,
+        amount,
+        created_at AS createdAt
+    FROM expenses
+    WHERE DATE(expenses.created_at) BETWEEN ? AND ?
+    ORDER BY expenses.created_at DESC;
+`;
+
 export const newExpense = 'INSERT INTO expenses(type, amount) VALUES(?, ?);';
 export const updateExpense = 'UPDATE expenses SET type=?, amount=? WHERE id=?;';
 export const deleteExpense = 'DELETE FROM expenses WHERE id=?;';
