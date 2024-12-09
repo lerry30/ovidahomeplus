@@ -35,4 +35,5 @@ export const urls = {
     dateofreport: `${apiUrl}/api/reports/date`,
     monthlyreport: `${apiUrl}/api/reports/monthly`,
     yearlyreport: `${apiUrl}/api/reports/yearly`,
+    printpdf: `${apiUrl}/api/reports/print`,
 };
