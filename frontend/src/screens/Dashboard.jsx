@@ -2,9 +2,10 @@ import Loading from '@/components/Loading';
 import AnimateNumber from '@/components/AnimateNumber';
 
 import { getData } from '@/utils/send';
+import { urls } from '@/constants/urls';
 import { toNumber } from '@/utils/number';
 
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement } from 'chart.js';
 
@@ -14,11 +15,12 @@ const Dashboard = () => {
     const [reservations, setReservations] = useState({ pending: 10, approved: 50, rejected: 5 });
     const [itemsSoldToday, setItemsSoldToday] = useState(0);
     const [itemsSold, setItemsSold] = useState(0);
-    const [users, setUsers] = useState(0);
-    const [venues, setVenues] = useState(0);
-    const [dishes, setDishes] = useState(0);
+    const [items, setItems] = useState(0);
+    const [suppliers, setSuppliers] = useState(0);
+    const [productTypes, setProductTypes] = useState(0);
+
     const [serviceSatisfactionRate, setServiceSatisfactionRate] = useState({});
-    const [monthlyComparison, setMonthlyComparison] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    const [monthlySalesThisYear, setMonthlySalesThisYear] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     const [monthlyAccount, setMonthlyAccount] = useState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     const [popularVenues, setPopularVenues] = useState({});
 
@@ -41,7 +43,7 @@ const Dashboard = () => {
         datasets: [
             {
                 label: 'Monthly Sales Comparison',
-                data: monthlyComparison,
+                data: monthlySalesThisYear,
                 backgroundColor: '#36A2EB',
                 hoverBackgroundColor: '#36A2EB'
             }
@@ -104,9 +106,24 @@ const Dashboard = () => {
     const countDocuments = async () => {
         try {
             setLoading(true);
-
-            const response = await getData('/api/dashboard');
+            const response = await getData(urls.dashboard);
             if(response) {
+                const soldItemsToday = response?.soldItemsToday;
+                const soldItems = response?.soldItems;
+                const barcodes = response?.barcodes;
+                const suppliers = response?.suppliers;
+                const productTypes = response?.productTypes;
+                const salesThisYear = response?.salesThisYear;
+
+                console.log(salesThisYear?.map(item => item?.totalCollection));
+
+                setItemsSoldToday(soldItemsToday?.length ?? 0);
+                setItemsSold(soldItems?.length ?? 0);
+                setItems(barcodes?.length ?? 0);
+                setSuppliers(suppliers?.length ?? 0);
+                setProductTypes(productTypes?.length ?? 0);
+                setMonthlySalesThisYear(salesThisYear?.map(item => item?.totalCollection));
+
                 // const countData = response?.data;
                 // const userCount = toNumber(countData?.users);
                 // const dishCount = toNumber(countData?.dishes);
@@ -131,13 +148,13 @@ const Dashboard = () => {
             }
         } catch(error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     }
 
-    useEffect(() => {
-        // countDocuments()
+    useLayoutEffect(() => {
+        countDocuments()
     }, []);
 
     if(loading) {
@@ -161,29 +178,29 @@ const Dashboard = () => {
                 <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
-                        <h2 className="font-semibold text-lg mb-2">Items Sold Today</h2>
+                        <h2 className="font-semibold text-lg mb-2">Total Sold Items Today</h2>
                         <AnimateNumber number={itemsSoldToday} size={40} />
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
-                        <h2 className="font-semibold text-lg mb-2">Sold Items</h2>
+                        <h2 className="font-semibold text-lg mb-2">Total Sold Items</h2>
                         <AnimateNumber number={itemsSold} size={40} />
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Items</h2>
-                        <AnimateNumber number={ users } size={ 40 } />
+                        <AnimateNumber number={items} size={40} />
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Suppliers</h2>
-                        <AnimateNumber number={ venues } size={ 40 } />
+                        <AnimateNumber number={suppliers} size={40} />
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Product Types</h2>
-                        <AnimateNumber number={ dishes } size={ 40 } />
+                        <AnimateNumber number={productTypes} size={40} />
                     </div>
-                    <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
+                    {/* <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">bar</h2>
                         <Bar data={reservationData} />
-                    </div>
+                    </div> */}
                     {/* <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Service Satisfaction Rate</h2>
                         <Doughnut data={satisfactionData} />

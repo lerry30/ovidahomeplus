@@ -49,3 +49,9 @@ export const daysOfMonths = (year) => {
     const isLeafYear = year%4===0 && year%100!==0 || year%400 == 0;
     return [31, isLeafYear?29:28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 }
+
+export const getMonth = (date) => {
+    const nDate = new Date(date).toLocaleString('en-US', { timeZone: process.env.TIMEZONE });
+    const [month] = nDate.split(',')[0].split('/');
+    return month
+};

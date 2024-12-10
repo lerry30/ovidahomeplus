@@ -380,7 +380,7 @@ const Report = () => {
                                                     <th className="border px-4 py-2">Supplier</th>
                                                     <th className="border px-4 py-2">Item Name</th>
                                                     <th className="border px-4 py-2">Qty</th>
-                                                    <th className="border px-4 py-2">Sold Date</th>
+                                                    {/* <th className="border px-4 py-2">Sold Date</th> */}
                                                     <th className="border px-4 py-2">Current</th>
                                                     <th className="border px-4 py-2">Mode of Payment</th>
                                                 </tr>
@@ -391,7 +391,7 @@ const Report = () => {
                                                         <td className="border px-4 py-2">{item?.supplierName}</td>
                                                         <td className="border px-4 py-2">{item?.productTypeName} {item?.itemDescription}</td>
                                                         <td className="border px-4 py-2">{toNumber(item?.quantity)}</td>
-                                                        <td className="border px-4 text-center">{formattedDate(new Date(item?.soldAt))}</td>
+                                                        {/* <td className="border px-4 text-center">{formattedDate(new Date(item?.soldAt))}</td> */}
                                                         <td className="border px-4 py-2">{formattedCurrency(item?.totalAmount)}</td>
                                                         <td className="border px-4 py-2">{item?.paymentMethod}</td>
                                                     </tr>

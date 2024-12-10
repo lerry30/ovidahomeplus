@@ -1,5 +1,5 @@
 import { requestHandler } from '../utils/requestHandler.js';
-import { isValidDate, formattedDate, daysOfMonths } from '../utils/datetime.js';
+import { isValidDate, formattedDate, daysOfMonths, getMonth } from '../utils/datetime.js';
 import { toNumber } from '../utils/number.js';
 import { getDir } from '../utils/fileDir.js';
 import { htmlWithTailwindTemplate } from '../helper/report.js';
@@ -80,7 +80,7 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
 });
 
 /*
-   desc     Get report by report
+   desc     Get report by months in a year
    route    POST /api/reports/yearly
    access   private
 */
@@ -96,13 +96,6 @@ const getReportByYear = requestHandler(async (req, res, database) => {
     const [soldItemsResults] = await database.execute(soldItemStmt.getSoldItemsBetweenDates, [startDate, endDate]);
     const [expensesResults] = await database.execute(expenseStmt.getExpensesBetweenDates, [startDate, endDate]);
 
-    // I declared it here just to make a small boost for computing of sold items and expenses
-    const nFormattedDate = (date) => {
-        const nDate = new Date(date).toLocaleString('en-US', { timeZone: process.env.TIMEZONE });
-        const [month] = nDate.split(',')[0].split('/');
-        return month
-    };
-
     const items = [];
     for (let i = 0; i < months.length; i++) {
         const month = months[i];
@@ -114,7 +107,7 @@ const getReportByYear = requestHandler(async (req, res, database) => {
         };
 
         for (const soldItem of soldItemsResults) {
-            const soldItemMonth = toNumber(nFormattedDate(soldItem?.soldAt));
+            const soldItemMonth = toNumber(getMonth(soldItem?.soldAt));
             if (soldItemMonth === i + 1) {
                 const amount = soldItem?.isDiscounted ? toNumber(soldItem?.maxDiscount) : toNumber(soldItem?.srp);
                 nItem.totalCollection = nItem.totalCollection + amount;
@@ -123,7 +116,7 @@ const getReportByYear = requestHandler(async (req, res, database) => {
         }
 
         for (const expense of expensesResults) {
-            const expenseMonth = toNumber(nFormattedDate(expense?.createdAt));
+            const expenseMonth = toNumber(getMonth(expense?.createdAt));
             if (expenseMonth === i + 1) {
                 const amount = toNumber(expense?.amount);
                 nItem.totalExpenses = nItem.totalExpenses + amount;
@@ -139,8 +132,8 @@ const getReportByYear = requestHandler(async (req, res, database) => {
 
 
 /*
-   desc     Get report by report
-   route    POST /api/reports/yearly
+   desc     Generate pdf to print
+   route    POST /api/reports/print
    access   private
 */
 const generatePDF = requestHandler(async (req, res, database) => {
