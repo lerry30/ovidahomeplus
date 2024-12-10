@@ -6,6 +6,7 @@ import * as soldItemStmt from '../mysql/soldItems.js';
 import * as barcodeStmt from '../mysql/barcode.js';
 import * as supplierStmt from '../mysql/supplier.js';
 import * as productTypeStmt from '../mysql/productType.js';
+import * as customerStmt from '../mysql/customer.js';
 
 /*
    desc     Get dashboard data for statistics
@@ -24,27 +25,36 @@ const getData = requestHandler(async (req, res, database) => {
     const endDate = `${year}-12-31`;
 
     const [soldItemsThisYear] = await database.execute(soldItemStmt.getSoldItemsBetweenDates, [startDate, endDate]);
+    const [customers] = await database.query(customerStmt.uniqueCustomersQuery, []);
 
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const salesThisYear = [];
+    const monthlySalesThisYear = [];
+    const noOfCustomersThisYear = [];
     for (let i = 0; i < months.length; i++) {
         const month = months[i];
-        const nItem = {
+        const saleData = {
             month,
             totalCollection: 0,
             netIncome: 0
         };
-
+        let noOfCustomer = 0;
         for (const soldItem of soldItemsThisYear) {
             const soldItemMonth = toNumber(getMonth(soldItem?.soldAt));
             if (soldItemMonth === i + 1) {
                 const amount = soldItem?.isDiscounted ? toNumber(soldItem?.maxDiscount) : toNumber(soldItem?.srp);
-                nItem.totalCollection = nItem.totalCollection + amount;
-                nItem.netIncome = nItem.netIncome + amount;
+                saleData.totalCollection = saleData.totalCollection + amount;
+                saleData.netIncome = saleData.netIncome + amount;
             }
         }
-        salesThisYear.push(nItem);
+        for (const customer of customers) {
+            const customerCreatedMonth = toNumber(getMonth(customer?.createdAt));
+            if (customerCreatedMonth === i + 1) noOfCustomer++;
+        }
+        monthlySalesThisYear.push(saleData);
+        noOfCustomersThisYear.push(noOfCustomer);
     }
+
+    const [rankedSoldItems] = await database.query(soldItemStmt.rankedSoldItems, []);
 
     res.status(200).json({
         soldItemsToday, 
@@ -52,7 +62,9 @@ const getData = requestHandler(async (req, res, database) => {
         barcodes, 
         suppliers,
         productTypes,
-        salesThisYear,
+        monthlySalesThisYear,
+        noOfCustomersThisYear,
+        rankedSoldItems,
     });
 });
 

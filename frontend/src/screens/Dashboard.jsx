@@ -3,40 +3,27 @@ import AnimateNumber from '@/components/AnimateNumber';
 
 import { getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
-import { toNumber } from '@/utils/number';
 
 import { useState, useLayoutEffect } from 'react';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement } from 'chart.js';
+
+import TitleFormat from '@/utils/titleFormat';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement);
 
 const Dashboard = () => {
-    const [reservations, setReservations] = useState({ pending: 10, approved: 50, rejected: 5 });
     const [itemsSoldToday, setItemsSoldToday] = useState(0);
     const [itemsSold, setItemsSold] = useState(0);
     const [items, setItems] = useState(0);
     const [suppliers, setSuppliers] = useState(0);
     const [productTypes, setProductTypes] = useState(0);
 
-    const [serviceSatisfactionRate, setServiceSatisfactionRate] = useState({});
     const [monthlySalesThisYear, setMonthlySalesThisYear] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    const [monthlyAccount, setMonthlyAccount] = useState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    const [popularVenues, setPopularVenues] = useState({});
+    const [monthlyCustomers, setMonthlyCustomers] = useState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    const [popularProducts, setPopularProducts] = useState({});
 
     const [ loading, setLoading ] = useState(false);
-
-    const reservationData = {
-        labels: ['Pending', 'Approved', 'Rejected'],
-        datasets: [
-            {
-                label: 'Reservations',
-                data: [reservations.pending, reservations.approved, reservations.rejected, reservations.expired],
-                backgroundColor: ['#FFCE56', '#36A2EB', '#FF6384', '#FF3333'],
-                hoverBackgroundColor: ['#FFCE56', '#36A2EB', '#FF6384', '#FF3333']
-            }
-        ]
-    };
 
     const monthlyData = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -50,12 +37,12 @@ const Dashboard = () => {
         ]
     };
 
-    const userGrowthData = {
+    const customerGrowthData = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         datasets: [
             {
                 label: 'Custormer Growth Over Months',
-                data: monthlyAccount,
+                data: monthlyCustomers,
                 borderColor: '#FF6384',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 fill: true,
@@ -64,44 +51,16 @@ const Dashboard = () => {
         ]
     };
 
-    const venuePopularityData = {
-        labels: Object.keys(popularVenues),
+    const productPopularityData = {
+        labels: Object.keys(popularProducts),
         datasets: [
             {
                 label: 'Product Popularity',
-                data: Object.values(popularVenues),
+                data: Object.values(popularProducts),
                 backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
             }
         ]
     };
-
-    const satisfactionData = {
-        labels: ['Satisfied', 'Neutral', 'Dissatisfied'],
-        datasets: [
-            {
-                label: 'Service Satisfaction',
-                data: [serviceSatisfactionRate?.satisfied, serviceSatisfactionRate?.neutral, serviceSatisfactionRate?.dissatisfied],
-                backgroundColor: ['#4BC0C0', '#FFCE56', '#FF6384']
-            }
-        ]
-    };
-
-    const satisfactionComputation = (ratings) => {
-        let satisfied = 0;
-        let neutral = 0;
-        let dissatisfied = 0;
-        for(const item of ratings) {
-            if(item >= 4) satisfied++;
-            else if(item >= 2) neutral++;
-            else if(item >= 0) dissatisfied++;
-        }
-
-        satisfied = satisfied / ratings.length * 100;
-        neutral = neutral / ratings.length * 100;
-        dissatisfied = dissatisfied / ratings.length * 100;
-
-        setServiceSatisfactionRate({ satisfied, neutral, dissatisfied });
-    } 
 
     const countDocuments = async () => {
         try {
@@ -113,38 +72,25 @@ const Dashboard = () => {
                 const barcodes = response?.barcodes;
                 const suppliers = response?.suppliers;
                 const productTypes = response?.productTypes;
-                const salesThisYear = response?.salesThisYear;
-
-                console.log(salesThisYear?.map(item => item?.totalCollection));
+                const monthlySalesThisYear = response?.monthlySalesThisYear;
+                const noOfCustomersThisYear = response?.noOfCustomersThisYear;
+                const rankedSoldItems = response?.rankedSoldItems;
 
                 setItemsSoldToday(soldItemsToday?.length ?? 0);
                 setItemsSold(soldItems?.length ?? 0);
                 setItems(barcodes?.length ?? 0);
                 setSuppliers(suppliers?.length ?? 0);
                 setProductTypes(productTypes?.length ?? 0);
-                setMonthlySalesThisYear(salesThisYear?.map(item => item?.totalCollection));
+                setMonthlySalesThisYear(monthlySalesThisYear?.map(item => item?.totalCollection));
+                setMonthlyCustomers(noOfCustomersThisYear);
 
-                // const countData = response?.data;
-                // const userCount = toNumber(countData?.users);
-                // const dishCount = toNumber(countData?.dishes);
-                // const drinkCount = toNumber(countData?.drinks);
-                // const venueCount = toNumber(countData?.venues);
-                // const reservationStatusesCount = countData?.reservations
-                // const setOfRatings = countData?.ratings;
-                // const monthlyReservation = countData?.months;
-                // const monthlyUserAccount = countData?.monthlyUserAccount;
-                // const venuePopularity = countData?.venuePopularity;
+                const popularityList = {};
+                for(const item of rankedSoldItems) {
+                    const product = TitleFormat(`${item?.supplierName} ${item?.productTypeName}`);
+                    popularityList[product] = item?.soldCount;
+                }
 
-                // setUsers(userCount);
-                // setDishes(dishCount);
-                // setDrinks(drinkCount);
-                // setVenues(venueCount);
-
-                // setReservations(reservationStatusesCount);
-                // satisfactionComputation(setOfRatings);
-                // setMonthlyComparison(monthlyReservation);
-                // setMonthlyAccount(monthlyUserAccount);
-                // setPopularVenues(venuePopularity);
+                setPopularProducts(popularityList);
             }
         } catch(error) {
             console.log(error);
@@ -197,25 +143,17 @@ const Dashboard = () => {
                         <h2 className="font-semibold text-lg mb-2">Product Types</h2>
                         <AnimateNumber number={productTypes} size={40} />
                     </div>
-                    {/* <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
-                        <h2 className="font-semibold text-lg mb-2">bar</h2>
-                        <Bar data={reservationData} />
-                    </div> */}
-                    {/* <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                        <h2 className="font-semibold text-lg mb-2">Service Satisfaction Rate</h2>
-                        <Doughnut data={satisfactionData} />
-                    </div> */}
                     <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-4 rounded-lg shadow-md">
                         <h2 className="font-semibold text-lg mb-2">Monthly Sales Comparison</h2>
                         <Bar data={monthlyData} />
                     </div>
                     <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-4 rounded-lg shadow-md">
                         <h2 className="font-semibold text-lg mb-2">Custormer Growth Over Months</h2>
-                        <Line data={userGrowthData} />
+                        <Line data={customerGrowthData} />
                     </div>
                     <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-4 rounded-lg shadow-md">
                         <h2 className="font-semibold text-lg mb-2">Product Popularity</h2>
-                        <Bar data={venuePopularityData} />
+                        <Bar data={productPopularityData} />
                     </div>
                 </div>
             </section>

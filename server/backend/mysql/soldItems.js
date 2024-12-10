@@ -145,3 +145,20 @@ export const getSoldItemsBetweenDates = `
       AND product_types.status = 'active'
     ORDER BY sold_items.created_at DESC;
 `;
+
+export const rankedSoldItems = `
+    SELECT 
+        items.description AS itemDescription,
+        suppliers.name AS supplierName,
+        product_types.name AS productTypeName,
+        COUNT(sold_items.barcode) AS soldCount
+    FROM sold_items
+    JOIN barcodes ON sold_items.barcode = barcodes.barcode
+    JOIN items ON barcodes.item_id = items.id
+    LEFT JOIN suppliers ON items.supplier_id = suppliers.id
+    LEFT JOIN product_types ON items.product_type_id = product_types.id
+    WHERE suppliers.status = 'active'
+      AND product_types.status = 'active'
+    GROUP BY items.id, suppliers.name, product_types.name
+    ORDER BY soldCount DESC, items.description ASC;
+`;
