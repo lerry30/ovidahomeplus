@@ -140,7 +140,7 @@ const Expense = () => {
         <main className="absolute top-0 
             left-admin-sidebar-sm lg:left-admin-sidebar-lg 
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))] 
-            h-screen bg-neutral-100 sm:p-2 md:p-4 lg:px-6
+            h-screen bg-neutral-100 p-4 lg:px-6
             flex flex-col"
         >
             <section className="flex justify-between items-center pr-2 pb-2">
@@ -187,7 +187,7 @@ const Expense = () => {
                             className="w-full flex bg-white shadow-lg rounded-xl border"
                         >
                             <article className="w-full flex justify-between p-3">
-                                <span>{item?.type}</span>
+                                <span className="w-[30vw] sm:w-full overflow-hidden mr-2">{item?.type}</span>
                                 <span>₱{formattedNumber(String(item?.amount).split('.')[0])}</span>
                             </article>
                             <div className="flex justify-center items-center px-4">

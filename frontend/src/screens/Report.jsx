@@ -339,8 +339,8 @@ const Report = () => {
                         </button>
                     </div>
                     <div className="w-full h-full
-                        overflow-x-hidden pb-32 pr-1
-                        overflow-y-auto
+                        pb-32 pr-1
+                        overflow-auto
                         [&::-webkit-scrollbar]:w-2
                         [&::-webkit-scrollbar-track]:rounded-lg
                         [&::-webkit-scrollbar-track]:bg-gray-100
@@ -372,7 +372,7 @@ const Report = () => {
                                     </div> */}
 
                                     {/* Sales Summary */}
-                                    <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                    <div className="w-full bg-white p-4 shadow-md rounded-lg mb-2">
                                         <h2 className="text-lg font-semibold mb-4">Sales Summary ({formatDateToLong(new Date(selectedDate))})</h2>
                                         <table className="w-full border-collapse border border-gray-200">
                                             <thead>
