@@ -1,20 +1,13 @@
 import { Printer } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { sendJSON, getData } from '@/utils/send';
-import { urls } from '@/constants/urls';
-import { formattedDate } from '@/utils/datetime';
+import { urls, apiUrl } from '@/constants/urls';
+import { formattedDate, formatDateToLong } from '@/utils/datetime';
 import { toNumber, formattedCurrency } from '@/utils/number';
 
 import Select from '@/components/DropDown';
 import CalendarPicker from '@/components/CalendarPicker';
 import Loading from '@/components/Loading';
-
-const styleString = `
-    .bg-white {
-        --tw-bg-opacity: 1;
-        background-color: rgb(255 255 255 / var(--tw-bg-opacity)) /* #ffffff */;
-    }
-`;
 
 const Report = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('Daily');
@@ -46,12 +39,13 @@ const Report = () => {
             setLoading(true);
             if (componentRef.current) {
                 const outerHTML = componentRef.current.outerHTML;
-                const styleString = '';
 
-                const payload = { html: outerHTML, css: styleString };
+                const payload = { html: outerHTML };
                 const response = await sendJSON(urls.printpdf, payload);
                 if(response) {
-                    console.log(response);
+                    const fileName = response?.fileName;
+                    const fulltUrl = `${apiUrl}/reports/${fileName}`;
+                    window.open(fulltUrl, '_blank');
                 }
             }
         } catch (error) {
@@ -379,7 +373,7 @@ const Report = () => {
 
                                     {/* Sales Summary */}
                                     <div className="bg-white p-4 shadow-md rounded-lg mb-2">
-                                        <h2 className="text-lg font-semibold mb-4">Sales Summary</h2>
+                                        <h2 className="text-lg font-semibold mb-4">Sales Summary ({formatDateToLong(new Date(selectedDate))})</h2>
                                         <table className="w-full border-collapse border border-gray-200">
                                             <thead>
                                                 <tr className="bg-gray-100">

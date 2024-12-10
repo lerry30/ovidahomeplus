@@ -5,6 +5,8 @@ export const formattedDateAndTime = (date) => {
     return formattedDateTime;
 }
 
+export const formatDateToLong = (date) => date.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: '2-digit'});
+
 export const formattedDate = (date) => {
     const dateParts = new Intl.DateTimeFormat('en-AU', {
         year: 'numeric',

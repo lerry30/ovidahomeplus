@@ -2,6 +2,7 @@ import { requestHandler } from '../utils/requestHandler.js';
 import { isValidDate, formattedDate, daysOfMonths } from '../utils/datetime.js';
 import { toNumber } from '../utils/number.js';
 import { getDir } from '../utils/fileDir.js';
+import { htmlWithTailwindTemplate } from '../helper/report.js';
 import * as expenseStmt from '../mysql/expense.js';
 import * as soldItemStmt from '../mysql/soldItems.js';
 
@@ -144,33 +145,17 @@ const getReportByYear = requestHandler(async (req, res, database) => {
 */
 const generatePDF = requestHandler(async (req, res, database) => {
     const html = String(req.body?.html).trim();
-    const css = String(req.body?.css).trim();
 
-    const htmlContent = `
-        <html>
-            <head>
-                <style>
-                    
-                </style>
-            </head>
-            <body>
-                ${html}
-            </body>
-        </html>
-    `;
-
-    console.log(htmlContent);
-
-    const fileName = Math.floor(Math.random() * 10000);
-    const outputPath = `${getDir('uploads/pdfs')}/${fileName}.pdf`;
+    const htmlContent = htmlWithTailwindTemplate(html);
+    const outputPath = `${getDir('uploads/pdfs')}/report.pdf`;
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(htmlContent);
     await page.pdf({ path: outputPath, format: 'A4' });
     await browser.close();
-    
-    res.status(200).json({message: 'ok kaya'});
+
+    res.status(200).json({ fileName: 'report.pdf' });
 });
 
 export {

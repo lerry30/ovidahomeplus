@@ -52,6 +52,7 @@ app.use('/suppliers', allowResourceAccess, express.static(getDir('uploads/suppli
 app.use('/producttypes', allowResourceAccess, express.static(getDir('uploads/producttypes')));
 app.use('/items', allowResourceAccess, express.static(getDir('uploads/items')));
 app.use('/barcodes', allowResourceAccess, express.static(getDir('uploads/barcodes')));
+app.use('/reports', allowResourceAccess, express.static(getDir('uploads/pdfs')));
 
 // routes
 app.use('/api/users', userRoutes);
