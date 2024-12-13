@@ -1,0 +1,7 @@
+services:
+  frontendapp:
+    image: frontend
+    ports:
+      - "2222:3000"
+    command: ["npm", "run", "preview", "--", "--port", "3000", "--host"]
+    working_dir: /app

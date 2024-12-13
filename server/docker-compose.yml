@@ -1,0 +1,10 @@
+services:
+  backendapp:
+    image: backend
+    ports:
+      - 1111:4000
+    env_file:
+      - .env
+    command: ["npm", "run", "start"]
+    volumes:
+      - ~/uploads:/app/backend/uploads

@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "4000"
+    volumes:
+      - ./backend:/app
+    deploy:
+      replicas: 3  # Create 3 backend instances
+      restart_policy:
+        condition: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000"
+    volumes:
+      - ./frontend:/app
+    deploy:
+      replicas: 2  # Create 2 frontend instances
+      restart_policy:
+        condition: on-failure
