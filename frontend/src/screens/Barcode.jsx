@@ -152,7 +152,7 @@ const Barcode = () => {
                                             <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg
                                                 ${isActive?'border-neutral-300':'border-red-600 bg-gray-200/50'}`}>
                                                 <img 
-                                                    src={`${apiUrl}/items/${item?.image}`}
+                                                    src={`${apiUrl}/fl/items/${item?.image}`}
                                                     alt="ovida-product" 
                                                     className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                     onError={ev => {
@@ -206,7 +206,7 @@ const Barcode = () => {
                                                     <div className="w-full flex lg:justify-center 
                                                         row-start-2 lg:row-start-1 lg:col-start-3">
                                                         <img 
-                                                            src={`${apiUrl}/barcodes/${barcode?.barcode}.png`}
+                                                            src={`${apiUrl}/fl/barcodes/${barcode?.barcode}.png`}
                                                             alt="ovida-product-barcode" 
                                                             className="w-[120px] h-[50px] object-contain"
                                                             onError={ev => {

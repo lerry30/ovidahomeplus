@@ -44,7 +44,7 @@ const Report = () => {
                 const response = await sendJSON(urls.printpdf, payload);
                 if(response) {
                     const fileName = response?.fileName;
-                    const fulltUrl = `${apiUrl}/reports/${fileName}`;
+                    const fulltUrl = `${apiUrl}/fl/reports/${fileName}`;
                     window.open(fulltUrl, '_blank');
                 }
             }

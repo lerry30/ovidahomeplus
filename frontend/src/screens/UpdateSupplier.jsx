@@ -105,7 +105,7 @@ const UpdateSupplier = () => {
                 <section className="bg-white rounded-md p-4">
                     <ImageUpload 
                         fileData={[image, setImage]} 
-                        initialImageSrc={`${apiUrl}/suppliers/${currentImage}`} 
+                        initialImageSrc={`${apiUrl}/fl/suppliers/${currentImage}`} 
                         className="size-[100px]" 
                     />
                 </section>

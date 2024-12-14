@@ -232,7 +232,7 @@ const Cashier = () => {
                                         <div className="h-[340px] sm:h-[270px] md:h-[280px] lg:h-[230px] 
                                             flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg">
                                             <img
-                                                src={`${apiUrl}/items/${item?.image}`}
+                                                src={`${apiUrl}/fl/items/${item?.image}`}
                                                 alt="ovida-product"
                                                 className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                 onError={ev => {

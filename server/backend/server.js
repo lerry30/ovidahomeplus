@@ -49,13 +49,14 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/suppliers', allowResourceAccess, express.static(getDir('uploads/suppliers')));
-app.use('/producttypes', allowResourceAccess, express.static(getDir('uploads/producttypes')));
-app.use('/items', allowResourceAccess, express.static(getDir('uploads/items')));
-app.use('/barcodes', allowResourceAccess, express.static(getDir('uploads/barcodes')));
-app.use('/reports', allowResourceAccess, express.static(getDir('uploads/pdfs')));
+app.use('/fl/suppliers', allowResourceAccess, express.static(getDir('uploads/suppliers')));
+app.use('/fl/producttypes', allowResourceAccess, express.static(getDir('uploads/producttypes')));
+app.use('/fl/items', allowResourceAccess, express.static(getDir('uploads/items')));
+app.use('/fl/barcodes', allowResourceAccess, express.static(getDir('uploads/barcodes')));
+app.use('/fl/reports', allowResourceAccess, express.static(getDir('uploads/pdfs')));
 
 // routes
+app.use('/api/test', (req, res) => res.status(200).json({message: 'Hi! Lerry'}));
 app.use('/api/users', userRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/producttypes', productTypeRoutes);

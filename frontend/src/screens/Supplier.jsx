@@ -206,7 +206,7 @@ const Supplier = () => {
                                                 <li key={item?.id}>
                                                     <div className="h-[180px] md:h-fit flex p-1 border border-neutral-300 rounded-lg">
                                                         <img 
-                                                            src={`${apiUrl}/suppliers/${item?.image}`}
+                                                            src={`${apiUrl}/fl/suppliers/${item?.image}`}
                                                             alt="ovida-supplier" 
                                                             className="size-[80px] rounded-lg border object-contain"
                                                             onError={ev => {

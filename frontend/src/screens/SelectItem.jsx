@@ -217,7 +217,7 @@ const SelectItem = () => {
                                                     onChange={() => checkBox(index, item?.id)}
                                                 />
                                                 <img 
-                                                    src={`${apiUrl}/items/${item?.image}`}
+                                                    src={`${apiUrl}/fl/items/${item?.image}`}
                                                     alt="ovida-product" 
                                                     className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                     onError={ev => {
@@ -278,7 +278,7 @@ const SelectItem = () => {
                                                             </span>
                                                         </article>
                                                         {/* <img 
-                                                            src={`${apiUrl}/barcodes/${item?.barcode}.png`}
+                                                            src={`${apiUrl}/fl/barcodes/${item?.barcode}.png`}
                                                             alt="ovida-product-barcode" 
                                                             className="w-[120px] h-[50px] object-contain"
                                                             onError={ev => {

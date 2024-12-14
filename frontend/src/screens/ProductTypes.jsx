@@ -206,7 +206,7 @@ const ProductTypes = () => {
                                                 <li key={item?.id}>
                                                     <div className="h-[140px] md:h-fit flex p-1 border border-neutral-300 rounded-lg">
                                                         <img 
-                                                            src={`${apiUrl}/producttypes/${item?.image}`}
+                                                            src={`${apiUrl}/fl/producttypes/${item?.image}`}
                                                             alt="ovida-product-type" 
                                                             className="size-[80px] rounded-lg border object-contain"
                                                             onError={ev => {

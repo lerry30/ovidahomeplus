@@ -1,8 +1,26 @@
 services:
-  backendapp:
+  backend01:
     image: backend
     ports:
-      - 1111:4000
+      - 4001:4000
+    env_file:
+      - .env
+    command: ["npm", "run", "start"]
+    volumes:
+      - ~/uploads:/app/backend/uploads
+  backend02:
+    image: backend
+    ports:
+      - 4002:4000
+    env_file:
+      - .env
+    command: ["npm", "run", "start"]
+    volumes:
+      - ~/uploads:/app/backend/uploads
+  backend03:
+    image: backend
+    ports:
+      - 4003:4000
     env_file:
       - .env
     command: ["npm", "run", "start"]

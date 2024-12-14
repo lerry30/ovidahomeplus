@@ -76,7 +76,7 @@ const UpdateProductType = () => {
                 <section className="bg-white rounded-md p-4">
                     <ImageUpload 
                         fileData={[image, setImage]} 
-                        initialImageSrc={`${apiUrl}/producttypes/${currentImage}`} 
+                        initialImageSrc={`${apiUrl}/fl/producttypes/${currentImage}`} 
                         className="size-[100px]" 
                     />
                 </section>

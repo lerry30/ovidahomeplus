@@ -239,7 +239,7 @@ const NewBarcode = () => {
                                                     flex flex-col sm:flex-row p-1 pb-2 border border-neutral-300 rounded-lg
                                                     ${isSelected ? 'bg-green-200/75' : 'bg-white'}`}>
                                                     <img 
-                                                        src={`${apiUrl}/items/${item?.image}`}
+                                                        src={`${apiUrl}/fl/items/${item?.image}`}
                                                         alt="ovida-product" 
                                                         className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                         onError={ev => {
@@ -295,7 +295,7 @@ const NewBarcode = () => {
                                                                 </span>
                                                             </article> */}
                                                             {/* <img 
-                                                                src={`${apiUrl}/barcodes/${item?.barcode}.png`}
+                                                                src={`${apiUrl}/fl/barcodes/${item?.barcode}.png`}
                                                                 alt="ovida-product-barcode" 
                                                                 className="w-[120px] h-[50px] object-contain"
                                                                 onError={ev => {

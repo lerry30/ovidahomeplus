@@ -71,7 +71,7 @@ const SoldItems = () => {
             <div className="p-4 space-y-3">
                 {item?.itemImage ? (
                     <img
-                        src={`${apiUrl}/items/${item?.itemImage}`}
+                        src={`${apiUrl}/fl/items/${item?.itemImage}`}
                         alt="ovida-product"
                         className="w-[80px] h-[80px] object-contain"
                         onError={ev => {
@@ -166,7 +166,7 @@ const SoldItems = () => {
                 <div className="md:w-[150px] bg-green-50 p-4 flex items-center justify-center">
                     {item?.itemImage ? (
                         <img
-                            src={`${apiUrl}/items/${item?.itemImage}`}
+                            src={`${apiUrl}/fl/items/${item?.itemImage}`}
                             alt="product"
                             className="w-[100px] h-[100px] object-contain rounded-md"
                             onError={ev => {
