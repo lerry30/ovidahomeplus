@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Plus, Pencil, Printer } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
-import { formattedNumber } from '@/utils/number';
+import { formattedNumber, toNumber } from '@/utils/number';
 
 import Loading from '@/components/Loading';
 import Select from '@/components/DropDown';
@@ -15,6 +15,8 @@ const Barcode = () => {
     const [batches, setBatches] = useState([]);
     const [batchItems, setBatchItems] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const currentSelectedBatchNo = useParams()?.batch;
 
     const selectBatch = async (batchNo, deliveryDate) => {
         try {
@@ -52,6 +54,16 @@ const Barcode = () => {
             setLoading(false);
         }
     }
+
+    useLayoutEffect(() => {
+        if(batches.length > 0) {
+            const nBatchNo = toNumber(currentSelectedBatchNo);
+            if(nBatchNo > 0) {
+                const batch = batches.find(item => item.batchNo===nBatchNo);
+                selectBatch(batch?.batchNo, batch.deliveryDate);
+            }
+        }
+    }, [batches]);
 
     useLayoutEffect(() => {
         getBatches();
@@ -149,15 +161,16 @@ const Barcode = () => {
                                 >
                                     {item?.barcodes?.map(barcode => (
                                         <div key={barcode?.id}>
-                                            <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg
-                                                ${isActive?'border-neutral-300':'border-red-600 bg-gray-200/50'}`}>
+                                            <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg 
+                                                ${isActive ? 'border-neutral-300' : 'border-red-600 bg-gray-200/50'}
+                                                ${!!barcode?.isSold ? 'bg-red-200' : 'bg-white'}`}>
                                                 <img 
                                                     src={`${apiUrl}/fl/items/${item?.image}`}
                                                     alt="ovida-product" 
                                                     className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                     onError={ev => {
-                                                        ev.target.src='../../public/image-off.png'
-                                                        ev.onerror=null;
+                                                        ev.target.src=`${apiUrl}/image-off.png`
+                                                        ev.onerror=null; // prevents infinite loop
                                                     }}
                                                 />
                                                 <hr />
@@ -210,19 +223,25 @@ const Barcode = () => {
                                                             alt="ovida-product-barcode" 
                                                             className="w-[120px] h-[50px] object-contain"
                                                             onError={ev => {
-                                                                ev.target.src='../../public/image-off.png'
-                                                                ev.onerror=null;
+                                                                ev.target.src=`${apiUrl}/image-off.png`
+                                                                ev.onerror=null; // prevents infinite loop
                                                             }}
                                                         />
                                                     </div>
                                                     <div className="flex flex-col items-end md:justify-start
                                                         row-start-1 col-start-2 lg:col-start-4">
-                                                        <button
-                                                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
-                                                        >
-                                                            <Printer />
-                                                            <span className="hidden sm:flex text-nowrap">Print Barcode</span>
-                                                        </button>
+                                                        {!!barcode?.isSold ?
+                                                            <span className="bg-red-600 text-white px-2 rounded-lg font-semibold">
+                                                                Sold
+                                                            </span>
+                                                        :
+                                                            <button
+                                                                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                            >
+                                                                <Printer />
+                                                                <span className="hidden sm:flex text-nowrap">Print Barcode</span>
+                                                            </button>
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>

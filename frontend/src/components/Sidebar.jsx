@@ -33,7 +33,7 @@ const SidebarLayout = () => {
                     <PackageCheck />
                     <span className="hidden lg:flex">Sold Items</span>
             </NavLink>
-            <NavLink to="/admin/barcodes" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}}
+            <NavLink to="/admin/barcodes/0" end style={state => state?.isActive ? {backgroundColor: 'green', color: 'white'} : {}}
                 className="flex items-center gap-4 rounded-lg px-4 py-2 leading-none">
                     <Barcode />
                     <span className="hidden lg:flex">Barcodes</span>

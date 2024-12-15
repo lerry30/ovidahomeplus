@@ -32,11 +32,13 @@ const newBarcode = requestHandler(async (req, res, database) => {
     // make it multi insert
     let nForMultiInsertStmt = barcodeStmt.newBarcode;
     const dataToInsert = []
+    const barcodePromiseAll = [];
     while(quantity > 0) {
         nForMultiInsertStmt = nForMultiInsertStmt + '(?, ?, ?),';
 
         const itemBarcode = setBarcodeSequence(itemId, batchNo, barcodes);
-        generateBarcode(itemBarcode);
+        const barcodePromise = generateBarcode(itemBarcode);
+        barcodePromiseAll.push(barcodePromise);
         barcodes.push(itemBarcode);
 
         dataToInsert.push(itemId);
@@ -45,6 +47,8 @@ const newBarcode = requestHandler(async (req, res, database) => {
 
         quantity--;
     }
+
+    Promise.all(barcodePromiseAll);
 
     nForMultiInsertStmt = nForMultiInsertStmt?.substring(0, nForMultiInsertStmt.length-1) + ';';
     // console.log(nForMultiInsertStmt);

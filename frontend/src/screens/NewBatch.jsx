@@ -41,7 +41,7 @@ const NewBatch = () => {
             const payload = {batchNo, deliveryRecieptNo, deliveryDate};
             const response = await sendJSON(urls.newbatch, payload);
             if(response) {
-                navigate('/admin/barcodes');
+                navigate(`/admin/barcodes/${batchNo}`);
             }
         } catch(error) {
             console.log(error);

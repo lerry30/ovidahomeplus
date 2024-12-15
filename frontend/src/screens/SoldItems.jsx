@@ -75,8 +75,8 @@ const SoldItems = () => {
                         alt="ovida-product"
                         className="w-[80px] h-[80px] object-contain"
                         onError={ev => {
-                            ev.target.src = '../../public/image-off.png'
-                            ev.onerror = null;
+                            ev.target.src=`${apiUrl}/image-off.png`
+                            ev.onerror=null; // prevents infinite loop
                         }}
                     />
                 ) : (
@@ -170,8 +170,8 @@ const SoldItems = () => {
                             alt="product"
                             className="w-[100px] h-[100px] object-contain rounded-md"
                             onError={ev => {
-                                ev.target.src = '../../public/image-off.png'
-                                ev.onerror = null;
+                                ev.target.src=`${apiUrl}/image-off.png`
+                                ev.onerror=null; // prevents infinite loop
                             }}
                         />
                     ) : (

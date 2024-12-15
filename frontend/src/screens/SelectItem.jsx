@@ -221,8 +221,8 @@ const SelectItem = () => {
                                                     alt="ovida-product" 
                                                     className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                     onError={ev => {
-                                                        ev.target.src='../../public/image-off.png'
-                                                        ev.onerror=null;
+                                                        ev.target.src=`${apiUrl}/image-off.png`
+                                                        ev.onerror=null; // prevents infinite loop
                                                     }}
                                                 />
                                                 <hr />
@@ -282,8 +282,8 @@ const SelectItem = () => {
                                                             alt="ovida-product-barcode" 
                                                             className="w-[120px] h-[50px] object-contain"
                                                             onError={ev => {
-                                                                ev.target.src='../../public/image-off.png'
-                                                                ev.onerror=null;
+                                                                ev.target.src=`${apiUrl}/image-off.png`
+                                                                ev.onerror=null; // prevents infinite loop
                                                             }}
                                                         /> */}
                                                     </div>
