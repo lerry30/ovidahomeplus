@@ -1,4 +1,4 @@
-import { CalendarSearch, Plus, Ellipsis } from 'lucide-react';
+import { Plus, Ellipsis } from 'lucide-react';
 import { Prompt } from '@/components/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef } from 'react';
@@ -6,7 +6,7 @@ import { getData, sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { zExpense } from '@/store/expense';
 import { toNumber, formattedNumber } from '@/utils/number';
-import { areDatesEqual, formattedDate } from '@/utils/datetime';
+import { areDatesEqual } from '@/utils/datetime';
 
 import CalendarPicker from '@/components/CalendarPicker';
 import Loading from '@/components/Loading';
@@ -19,7 +19,6 @@ const Expense = () => {
     const [loading, setLoading] = useState(false);
     const [disablePrompt, setDisablePrompt] = useState(false);
 
-    const calendarInputRef = useRef(null);
     const actionId = useRef(null);
 
     const navigate = useNavigate();
@@ -75,12 +74,6 @@ const Expense = () => {
     const openDropdown = (ev, index) => {
         ev.stopPropagation();
         setExpenseActions(state => state.map((_, i) => i===index));
-    }
-
-    const openCalendar = () => {
-        try {
-            calendarInputRef.current?.showPicker();
-        } catch(error) {}
     }
 
     const getExpensesToday = async () => {

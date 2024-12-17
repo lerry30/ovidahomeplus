@@ -5,15 +5,15 @@ services:
       - "3001:3000"
     command: ["npm", "run", "preview", "--", "--port", "3000", "--host"]
     working_dir: /app
-  frontend02:
-    image: frontend
-    ports:
-      - "3002:3000"
-    command: ["npm", "run", "preview", "--", "--port", "3000", "--host"]
-    working_dir: /app
-  frontend03:
-    image: frontend
-    ports:
-      - "3003:3000"
-    command: ["npm", "run", "preview", "--", "--port", "3000", "--host"]
-    working_dir: /app
+      #frontend02:
+      #image: frontend
+      #ports:
+      #- "3002:3000"
+      #command: ["npm", "run", "preview", "--", "--port", "3000", "--host"]
+      #working_dir: /app
+      #frontend03:
+      #image: frontend
+      #ports:
+      #- "3003:3000"
+      #command: ["npm", "run", "preview", "--", "--port", "3000", "--host"]
+      #working_dir: /app
