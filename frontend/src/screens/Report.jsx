@@ -230,6 +230,16 @@ const Report = () => {
         getExpensesToday();
     }, []);
 
+    const PrinterButton = ({className}) => (
+        <button
+            onClick={handleCaptureHTMLAndPrintPDF}
+            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${className}`}
+        >
+            <Printer />
+            <span className="hidden sm:flex text-nowrap">Print</span>
+        </button>
+    );
+
     if (loading) {
         return (
             <Loading customStyle="w-full h-screen" />
@@ -243,16 +253,19 @@ const Report = () => {
             h-screen bg-neutral-100 p-4 lg:px-6
             flex flex-col"
         >
-            <section className="">
+            <section className="flex justify-between">
                 <h1 className="text-xl font-bold">Business Report</h1>
+                <PrinterButton className="flex md:hidden" />
             </section>
             <section className="grow w-full h-full relative">
-                <div className="w-full absolute top-0 left-0 right-0 bottom-0 mt-2 overflow-hidden">
+                <div className="w-full absolute top-0 left-0 right-0 bottom-0 mt-2 pb-10">
                     <div className="flex py-1  px-2 rounded-lg bg-white mb-2 mr-1">
-                        <div className="w-full h-full flex items-center space-x-2">
+                        <div 
+                            className="w-full h-full flex
+                                flex-wrap md:items-center md:gap-2">
                             <Select
                                 name={`${selectedPeriod || 'Select Period'}`}
-                                className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-50"
                             >
                                 <button
                                     onClick={() => setSelectedPeriod('Daily')}
@@ -277,7 +290,7 @@ const Report = () => {
                                     <>
                                         <Select
                                             name={`${selectedYear || 'Select Year'}`}
-                                            className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                            className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-30"
                                         >
                                             {Array(today.getFullYear() - YEAR_STARTED + 1).fill(0)?.map((_, index) => {
                                                 const nYear = YEAR_STARTED + index;
@@ -294,7 +307,7 @@ const Report = () => {
                                         </Select>
                                         <Select
                                             name={`${selectedMonth || 'Select Month'}`}
-                                            className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                            className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10"
                                         >
                                             {months?.map((month, index) => (
                                                 <button
@@ -330,16 +343,10 @@ const Report = () => {
                                         <></>
                             }
                         </div>
-                        <button
-                            onClick={handleCaptureHTMLAndPrintPDF}
-                            className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800"
-                        >
-                            <Printer />
-                            <span className="hidden sm:flex text-nowrap">Print</span>
-                        </button>
+                        <PrinterButton className="hidden md:flex"/>
                     </div>
                     <div className="w-full h-full
-                        pb-32 pr-1
+                        pr-1 flex sm:block
                         overflow-auto
                         [&::-webkit-scrollbar]:w-2
                         [&::-webkit-scrollbar-track]:rounded-lg
@@ -347,7 +354,7 @@ const Report = () => {
                         [&::-webkit-scrollbar-thumb]:rounded-lg
                         [&::-webkit-scrollbar-thumb]:bg-gray-300
                     ">
-                        <div ref={componentRef}>
+                        <div ref={componentRef} className="sm:w-full">
                             {selectedPeriod === 'Daily' ?
                                 <>
                                     {/* Cash Breakdown */}
@@ -430,10 +437,10 @@ const Report = () => {
                                                     {selectedMonthData?.map((item, index) => {
                                                         return (
                                                             <tr key={index}>
-                                                                <td className="border px-4 text-center">{formattedDate(new Date(item?.date))}</td>
-                                                                <td className="border px-4 py-2">{formattedCurrency(item?.totalCollection)}</td>
-                                                                <td className="border px-4 py-2">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 text-center text-nowrap">{formattedDate(new Date(item?.date))}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalCollection)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalExpenses)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.netIncome)}</td>
                                                             </tr>
                                                         )
                                                     })}

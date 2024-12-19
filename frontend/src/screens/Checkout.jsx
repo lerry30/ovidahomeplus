@@ -201,6 +201,26 @@ const Checkout = () => {
         )
     }
 
+    const AllPaymentOptions = () => (
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+            {/* Payment Methods */}
+            <div className="flex flex-wrap gap-4 justify-center lg:justify-start w-full lg:w-auto">
+                <PaymentOption name="Bank Transfer" description="Customer paid via bank transfer." />
+                <PaymentOption name="Credit/Debit Card" description="Customer used a card to pay." />
+                <PaymentOption name="E-Wallet" description="Paid via e-wallet (GCash, Paymaya, Paypal)." />
+                <PaymentOption name="Cash Payment" description="Customer paid in cash." />
+            </div>
+
+            {/* Place Order Button */}
+            <button
+                onClick={() => handlePlacingOrder({header: 'Place Order', message: 'Are you sure you want to place this order?'})}
+                className="h-fit px-2 py-3 rounded-lg bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition w-full lg:w-[19%]"
+            >
+                Place Order
+            </button>
+        </div>
+    );
+
     if(placeOrderPrompt?.header || placeOrderPrompt?.message) {
         return (
             <Prompt 
@@ -232,10 +252,15 @@ const Checkout = () => {
         <div className="w-full min-h-screen">
             <SidebarLayout />
             <main className="absolute top-0 
-        left-admin-sidebar-sm lg:left-admin-sidebar-lg 
-        w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
-        h-full md:h-screen bg-neutral-100 p-4 flex flex-col overflow-hidden
-    ">
+                left-admin-sidebar-sm lg:left-admin-sidebar-lg 
+                w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
+                h-full md:h-screen bg-neutral-100 p-4 flex flex-col overflow-y-auto
+                [&::-webkit-scrollbar]:w-2
+                [&::-webkit-scrollbar-track]:rounded-lg
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:rounded-lg
+                [&::-webkit-scrollbar-thumb]:bg-gray-300
+                ">
                 {/* Breadcrumbs Section */}
                 <section className="w-full h-[30px] flex items-center gap-4">
                     <Breadcrumbs
@@ -246,7 +271,8 @@ const Checkout = () => {
                 </section>
 
                 {/* Main Content */}
-                <section className="grow w-full flex flex-col lg:flex-row gap-4 overflow-hidden">
+                <section 
+                    className="grow w-full flex flex-col lg:flex-row gap-4">
                     {/* Customer Info */}
                     <div className="w-full lg:w-1/2 p-8 bg-white shadow-md rounded-lg">
                         <h1 className="font-semibold text-lg">Customer Info</h1>
@@ -303,27 +329,18 @@ const Checkout = () => {
 
                 {/* Footer Section */}
                 <section
+                    className="bg-gray-100 shadow-md border-t p-6 mt-2
+                    block md:hidden"
+                >
+                    <AllPaymentOptions />
+                </section>
+                <section
                     className="fixed bottom-0 left-admin-sidebar-sm lg:left-admin-sidebar-lg 
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
-            bg-gray-100 shadow-md border-t p-6"
+            bg-gray-100 shadow-md border-t p-6
+                    hidden md:flex"
                 >
-                    <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-                        {/* Payment Methods */}
-                        <div className="flex flex-wrap gap-4 justify-center lg:justify-start w-full lg:w-auto">
-                            <PaymentOption name="Bank Transfer" description="Customer paid via bank transfer." />
-                            <PaymentOption name="Credit/Debit Card" description="Customer used a card to pay." />
-                            <PaymentOption name="E-Wallet" description="Paid via e-wallet (GCash, Paymaya, Paypal)." />
-                            <PaymentOption name="Cash Payment" description="Customer paid in cash." />
-                        </div>
-
-                        {/* Place Order Button */}
-                        <button
-                            onClick={() => handlePlacingOrder({header: 'Place Order', message: 'Are you sure you want to place this order?'})}
-                            className="h-fit px-2 py-3 rounded-lg bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition w-full lg:w-[19%]"
-                        >
-                            Place Order
-                        </button>
-                    </div>
+                    <AllPaymentOptions />
                 </section>
             </main>
         </div>

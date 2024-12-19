@@ -99,9 +99,12 @@ const CustomerInfo = () => {
                         />
                     </div>
                 </section>
-                <section className="grow w-full h-full flex flex-col gap-4 py-10 px-20 bg-white rounded-lg">
-                    <div className="w-full flex flex-col md:flex-row">
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                <section 
+                    className="grow w-full h-full flex flex-col gap-4 bg-white rounded-lg
+                        py-4 md:py-10 md:px-20
+                    ">
+                    <div className="w-full flex flex-col md:flex-row gap-4 md:gap-0">
+                        <div className="w-full md:w-1/2 flex flex-col px-4 gap-2">
                             <label htmlFor="firstname" className="font-semibold">
                                 First Name
                                 <span className="text-red-500">*</span>
@@ -119,7 +122,7 @@ const CustomerInfo = () => {
                             />
                             <ErrorField message={errorData?.firstname || ''} />
                         </div>
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                        <div className="w-full md:w-1/2 flex flex-col px-4 gap-2">
                             <label htmlFor="lastname" className="font-semibold">
                                 Last Name
                                 <span className="text-red-500">*</span>
@@ -138,7 +141,7 @@ const CustomerInfo = () => {
                             <ErrorField message={errorData?.lastname || ''} />
                         </div>
                     </div>
-                    <div className="w-full flex flex-col sm:px-4 gap-2">
+                    <div className="w-full flex flex-col px-4 gap-2">
                         <label htmlFor="address" className="font-semibold">
                             Address
                             <span className="text-red-500">*</span>
@@ -156,8 +159,8 @@ const CustomerInfo = () => {
                         />
                         <ErrorField message={errorData?.address || ''} />
                     </div>
-                    <div className="w-full flex flex-col md:flex-row">
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                    <div className="w-full flex flex-col md:flex-row gap-4 md:gap-0">
+                        <div className="w-full md:w-1/2 flex flex-col px-4 gap-2">
                             <label htmlFor="first-contact-no" className="font-semibold">
                                 1st Contact Number
                                 <span className="text-red-500">*</span>
@@ -175,7 +178,7 @@ const CustomerInfo = () => {
                             />
                             <ErrorField message={errorData?.contact || ''} />
                         </div>
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                        <div className="w-full md:w-1/2 flex flex-col px-4 gap-2">
                             <label htmlFor="second-contact-no" className="font-semibold">
                                 2nd Contact Number
                             </label>
