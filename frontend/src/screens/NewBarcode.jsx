@@ -200,7 +200,7 @@ const NewBarcode = () => {
                         <span className="hidden sm:flex text-nowrap">Create Item</span>
                     </button>
                     <Link 
-                        to="/admin/barcodes" 
+                        to={`/admin/barcodes/${selectedBatchNo}`}
                         className="max-w-96 h-[40px] flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
                     >
                         Cancel

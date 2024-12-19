@@ -3,11 +3,11 @@ import { isValidDate, formattedDate, daysOfMonths, getMonth } from '../utils/dat
 import { toNumber } from '../utils/number.js';
 import { getDir } from '../utils/fileDir.js';
 import { htmlWithTailwindTemplate } from '../helper/report.js';
+import { writeFile, readdir, unlink } from 'fs/promises';
 import * as expenseStmt from '../mysql/expense.js';
 import * as soldItemStmt from '../mysql/soldItems.js';
 
 import puppeteer from 'puppeteer';
-
 
 /*
    desc     Get report by date
@@ -140,15 +140,25 @@ const generatePDF = requestHandler(async (req, res, database) => {
     const html = String(req.body?.html).trim();
 
     const htmlContent = htmlWithTailwindTemplate(html);
-    const outputPath = `${getDir('uploads/pdfs')}/report.pdf`;
+    const rootDir = getDir('uploads/pdfs');
+    const fileName = Date.now();
+    const outputPath = `${rootDir}/${fileName}.pdf`;
 
-    const browser = await puppeteer.launch();
+    const files = await readdir(rootDir);
+    await Promise.all(files.map(file => unlink(`${rootDir}/${file}`)));
+
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Disable the sandbox
+    });
     const page = await browser.newPage();
     await page.setContent(htmlContent);
-    await page.pdf({ path: outputPath, format: 'A4' });
+    const pdf = await page.pdf({ format: 'A4' });
+
+    await writeFile(outputPath, pdf);
+
     await browser.close();
 
-    res.status(200).json({ fileName: 'report.pdf' });
+    res.status(200).json({ fileName: `${fileName}.pdf` });
 });
 
 export {

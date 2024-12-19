@@ -3,6 +3,7 @@ import AnimateNumber from '@/components/AnimateNumber';
 
 import { getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
+import { toNumber } from '@/utils/number';
 
 import { useState, useLayoutEffect } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
@@ -76,9 +77,13 @@ const Dashboard = () => {
                 const noOfCustomersThisYear = response?.noOfCustomersThisYear;
                 const rankedSoldItems = response?.rankedSoldItems;
 
+                const noOfBarcodes = toNumber(barcodes?.length);
+                const noOfSoldItems = toNumber(soldItems?.length);
+                const totalItems = noOfBarcodes - noOfSoldItems;
+
                 setItemsSoldToday(soldItemsToday?.length ?? 0);
-                setItemsSold(soldItems?.length ?? 0);
-                setItems(barcodes?.length ?? 0);
+                setItemsSold(noOfSoldItems);
+                setItems(totalItems);
                 setSuppliers(suppliers?.length ?? 0);
                 setProductTypes(productTypes?.length ?? 0);
                 setMonthlySalesThisYear(monthlySalesThisYear?.map(item => item?.totalCollection));

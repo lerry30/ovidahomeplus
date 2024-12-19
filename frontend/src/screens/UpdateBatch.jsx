@@ -41,7 +41,7 @@ const UpdateBatch = () => {
             const payload = {batchNo, deliveryRecieptNo, deliveryDate};
             const response = await sendJSON(urls.updatebatch, payload, 'PUT');
             if(response) {
-                navigate('/admin/barcodes');
+                navigate(`/admin/barcodes/${batchNo}`);
             }
         } catch(error) {
             console.log(error);
@@ -89,12 +89,14 @@ const UpdateBatch = () => {
     return (
         <div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
             <header className="w-full h-[70px] flex items-center mb-2">
-                <Link to="/admin/barcodes" className="md:hidden flex justify-center items-center text-sm">
+                <Link 
+                    to={`/admin/barcodes/${selectedBatchNo}`} 
+                    className="md:hidden flex justify-center items-center text-sm">
                     <ChevronLeft />
                     back
                 </Link>
                 <div className="hidden md:flex">
-                    <AppLogo segment="/barcodes" />
+                    <AppLogo segment={`/barcodes/${selectedBatchNo}`}/>
                 </div>
                 <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Edit Batch {selectedBatchNo}</h1>
             </header>
@@ -151,7 +153,7 @@ const UpdateBatch = () => {
                     </div>
                     <div className="sm:px-4 sm:py-2 flex gap-2">
                         <Link 
-                            to="/admin/barcodes" 
+                            to={`/admin/barcodes/${selectedBatchNo}`} 
                             className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
                         >
                             Cancel
