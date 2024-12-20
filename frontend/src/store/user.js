@@ -14,9 +14,9 @@ export const zUser = create(set => ({
     image: '',
 
     saveUserData: async () => {
-        if(!checkCookieExists('jwt')) {
-            signout();
-        }
+        //if(!checkCookieExists('jwt')) {
+        //    signout();
+        //}
 
         const isLocalUserDataExist = (Object.keys(JSON.parse(localStorage.getItem(localStorageName) || '{}')).length > 0);
         if(!isLocalUserDataExist) {
@@ -25,7 +25,6 @@ export const zUser = create(set => ({
         }
         
         const { firstname, lastname, username, image } = JSON.parse(localStorage.getItem(localStorageName) || '{}');
-
         set(state => {
             const fullname = createFullname(firstname, lastname);
             return { firstname, lastname, username, fullname, image };

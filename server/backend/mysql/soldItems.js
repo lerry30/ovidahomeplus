@@ -49,8 +49,6 @@ export const getSoldItemsToday = `
     LEFT JOIN product_types ON items.product_type_id = product_types.id
     LEFT JOIN batches ON batches.id = barcodes.batch_no
     WHERE DATE(sold_items.created_at) = CURDATE()
-      AND suppliers.status = 'active'
-      AND product_types.status = 'active'
     ORDER BY sold_items.created_at DESC;
 `;
 
@@ -95,8 +93,6 @@ export const getSoldItemsByDate = `
     LEFT JOIN product_types ON items.product_type_id = product_types.id
     LEFT JOIN batches ON batches.id = barcodes.batch_no
     WHERE DATE(sold_items.created_at) = ?
-      AND suppliers.status = 'active'
-      AND product_types.status = 'active'
     ORDER BY sold_items.created_at DESC;
 `;
 
@@ -141,8 +137,6 @@ export const getSoldItemsBetweenDates = `
     LEFT JOIN product_types ON items.product_type_id = product_types.id
     LEFT JOIN batches ON batches.id = barcodes.batch_no
     WHERE DATE(sold_items.created_at) BETWEEN ? AND ?
-      AND suppliers.status = 'active'
-      AND product_types.status = 'active'
     ORDER BY sold_items.created_at DESC;
 `;
 
@@ -157,8 +151,6 @@ export const rankedSoldItems = `
     JOIN items ON barcodes.item_id = items.id
     LEFT JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN product_types ON items.product_type_id = product_types.id
-    WHERE suppliers.status = 'active'
-      AND product_types.status = 'active'
     GROUP BY items.id, suppliers.name, product_types.name
     ORDER BY soldCount DESC, items.description ASC;
 `;

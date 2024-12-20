@@ -134,7 +134,7 @@ const updateItem = requestHandler(async (req, res, database) => {
         newImage = image;
         const filePath = `uploads/items/${currentImage}`;
         const isFileExists = await fileExists(filePath);
-        if(isFileExists) await unlink(getDir(filePath));
+        if(isFileExists) await unlink(getDir(filePath)); // delete existing file for updates
     }
 
     // to make sure that product description is unique

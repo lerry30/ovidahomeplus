@@ -1,6 +1,7 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
-import { upload } from '../utils/multerConfig.js';
+import { storeFileInMemory } from '../middleware/storeFileInMemory.js';
+import { reduceImageQuality } from '../middleware/reduceQuality.js';
 
 import {
     newProductType,
@@ -11,12 +12,10 @@ import {
 
 const router = express.Router();
 
-(async () => {
-    const uploadMiddleware = await upload('producttypes');
-    router.post('/new', protect, uploadMiddleware.single('file'), newProductType);
-    router.get('/get', getProductTypes);
-    router.patch('/status', protect, changeProductTypeStatus);
-    router.put('/update', protect, uploadMiddleware.single('file'), updateProductType);
-})();
+const uploadMiddleware = [storeFileInMemory, reduceImageQuality('producttypes')]
+router.post('/new', protect, uploadMiddleware, newProductType);
+router.get('/get', getProductTypes);
+router.patch('/status', protect, changeProductTypeStatus);
+router.put('/update', protect, uploadMiddleware, updateProductType);
 
 export default router;
