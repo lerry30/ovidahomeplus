@@ -1,14 +1,13 @@
-import { ShoppingBag, X } from 'lucide-react';
+// import { Boxes } from 'lucide-react';
 import { Prompt, ErrorModal } from '@/components/Modal';
-import { breadcrumbsOrder, selectedItemsForCashier, customerInfo, payment } from '@/constants/localStorageNames';
+import { breadcrumbsOrder, selectedItemsForCashier, customerInfo } from '@/constants/localStorageNames';
 import { useState, useRef, useLayoutEffect } from 'react';
 import { zCustomerInfo } from '@/store/customerInfo';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
-import { zPayment } from '@/store/payment';
 import { useNavigate } from 'react-router-dom';
 import { getData, sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
-import { toNumber, formattedNumber, formattedCurrency } from '@/utils/number';
+import { toNumber, formattedNumber } from '@/utils/number';
 
 import SidebarLayout from '@/components/Sidebar';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -20,20 +19,14 @@ const Checkout = () => {
     const currentAddress = zCustomerInfo(state => state?.address);
     const currentContacts = zCustomerInfo(state => state?.contacts);
 
-    const currentPaymentMethod = zPayment(state => state?.paymentMethod);
-    const currentDenominations = zPayment(state => state?.cash?.denominations);
-    const currentTotalPayment = zPayment(state => state?.cash?.totalPayment);
-    const currentCustomerChange = zPayment(state => state?.cash?.change);
-
     const [items, setItems] = useState([]); // from database
     const [selectedItems, setSelectedItems] = useState([]); // from local storage which is the customer order details or it is just info of the order
     const [itemDetails, setItemDetails] = useState({}); // defines the barcodes and if they are discounted
     const [total, setTotal] = useState(0);
-    const [selectedPayment, setSelectedPayment] = useState('Cash Payment'); // radio button
+    const [selectedPayment, setSelectedPayment] = useState(''); // radio button
     const [loading, setLoading] = useState(false);
     const [placeOrderPrompt, setPlaceOrderPrompt] = useState({header: '', message: ''});
-
-    const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
+    const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
     const sending = useRef(false);
     const navigate = useNavigate();
@@ -45,21 +38,19 @@ const Checkout = () => {
             if(!sending.current) {
                 sending.current = true;
 
-                // customer info
                 if(!currentFirstname || !currentLastname || !currentAddress || !currentContacts?.first) {
                     setErrorMessage({
                         header: 'Customer Info',
                         message: 'Please provide the complete info of the customer.'
                     });
                     setTimeout(() => {
-                        localStorage.setItem(breadcrumbsOrder, JSON.stringify([true, true, false, false]));
+                        localStorage.setItem(breadcrumbsOrder, JSON.stringify([true, true, false]));
                         localStorage.removeItem(customerInfo);
                         navigate('/admin/customer-info');
                     }, 4000);
                     throw new Error('Please provide the complete info of the customer.');
                 }
 
-                // item
                 if(Object.keys(itemDetails).length > 0) {
                     let error = false;
                     for(const key in itemDetails) {
@@ -73,43 +64,12 @@ const Checkout = () => {
                             message: 'There\'s something wrong.'
                         });
                         setTimeout(() => {
-                            localStorage.setItem(breadcrumbsOrder, JSON.stringify([true, false, false, false]));
+                            localStorage.setItem(breadcrumbsOrder, JSON.stringify([true, false, false]));
                             localStorage.removeItem(selectedItemsForCashier);
                             localStorage.removeItem(customerInfo);
                             navigate('/admin/cashier');
                         }, 4000);
                         throw new Error('There\'s something wrong.');
-                    }
-                }
-
-                if(selectedPayment === 'Cash Payment') {
-                    // payment recompute everything for security reason
-                    let totalPayment = 0;
-                    let customerChange = 0;
-                    for(const [bill, count] of Object.entries(currentDenominations)) {
-                        totalPayment = totalPayment + wordToNumberDenomination[bill] * count;
-                    }
-                    customerChange = totalPayment - total;
-                    if(customerChange < 0 || totalPayment <= 0) { 
-                        setErrorMessage({
-                            header: 'Customer Payment',
-                            message: 'The total payment does not match the purchase amount. Please review the denominations and ensure the full amount is disclosed.'
-                        });
-                        setTimeout(() => {
-                            localStorage.setItem(breadcrumbsOrder, JSON.stringify([true, true, true, false]));
-                            localStorage.removeItem(payment);
-                            navigate('/admin/payment');
-                        }, 4000);
-                        throw new Error('The total payment does not match the purchase amount. Please review the denominations and ensure the full amount is disclosed.');
-                    }
-                }
-
-                // check for method if cash or not so denominations in cast
-                // able to be omitted for other types.
-                const paymentData = {paymentMethod: selectedPayment};
-                if(selectedPayment === 'Cash Payment') {
-                    paymentData.cash = {
-                        denominations: currentDenominations,
                     }
                 }
 
@@ -124,13 +84,12 @@ const Checkout = () => {
                         }
                     },
                     orders: itemDetails,
-                    payment: paymentData
+                    paymentMethod: selectedPayment
                 }
                 const response = await sendJSON(urls.neworder, payload);
                 if(response) {
                     localStorage.removeItem(selectedItemsForCashier);
                     localStorage.removeItem(customerInfo);
-                    localStorage.removeItem(payment);
                     navigate(0);
                 }
             }
@@ -142,6 +101,20 @@ const Checkout = () => {
             setPlaceOrderPrompt({header: '', message: ''});
         }
     }
+
+    const handlePlacingOrder = ({header, message}) => {
+        if(!selectedPayment) {
+            setErrorMessage({
+                header: 'Payment',
+                message: 'Please select the customer\'s payment method first.'
+            });
+            return;
+        }
+
+        setPlaceOrderPrompt({header, message});
+    }
+
+    const handlePaymentChange = (method) => setSelectedPayment(method);
 
     const computeTotal = () => {
         const overAllTotal = selectedItems.reduce((t, item) => {
@@ -182,9 +155,8 @@ const Checkout = () => {
     }
 
     useLayoutEffect(() => {
-        if(currentPaymentMethod) 
-            setSelectedPayment(currentPaymentMethod);
-    }, [currentPaymentMethod]);
+        setTimeout(() => setErrorMessage({header: '', message: ''}), 7000);
+    }, [errorMessage]);
 
     useLayoutEffect(computeTotal, [selectedItems]);
     useLayoutEffect(setSelectedToDisplay, [items]);
@@ -199,12 +171,55 @@ const Checkout = () => {
 
         zCustomerInfo.getState()?.reloadCustomerData();
         zCashierSelectedItem.getState()?.reloadSelectedItemData();
-        zPayment.getState()?.reloadPaymentData();
 
         const selected = zCashierSelectedItem.getState()?.items;
         if(selected) setItemDetails({ ...selected });
         getItems();
     }, []);
+
+    const PaymentOption = ({ name, description, children }) => {
+        const isSelected = selectedPayment===name;
+        return (
+            <div 
+                onClick={() => handlePaymentChange(name)}
+                className={`flex-1 rounded-md p-4 border shadow-md hover:shadow-lg cursor-pointer flex flex-col gap-2
+                    ${isSelected ? 'bg-green-600/10 border-green-500' : 'bg-white border-gray-300'}`}>
+                <div className="flex items-center gap-2">
+                    <input 
+                        type="radio" 
+                        name="payment" 
+                        value={name}
+                        checked={isSelected} 
+                        onChange={() => handlePaymentChange(name)} 
+                        className="w-5 h-5 accent-green-600" 
+                    />
+                    <h3 className="font-semibold text-gray-800">{name}</h3>
+                </div>
+                <p className="text-sm text-gray-500">{description}</p>
+                {children}
+            </div>
+        )
+    }
+
+    const AllPaymentOptions = () => (
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+            {/* Payment Methods */}
+            <div className="flex flex-wrap gap-4 justify-center lg:justify-start w-full lg:w-auto">
+                <PaymentOption name="Bank Transfer" description="Customer paid via bank transfer." />
+                <PaymentOption name="Credit/Debit Card" description="Customer used a card to pay." />
+                <PaymentOption name="E-Wallet" description="Paid via e-wallet (GCash, Paymaya, Paypal)." />
+                <PaymentOption name="Cash Payment" description="Customer paid in cash." />
+            </div>
+
+            {/* Place Order Button */}
+            <button
+                onClick={() => handlePlacingOrder({header: 'Place Order', message: 'Are you sure you want to place this order?'})}
+                className="h-fit px-2 py-3 rounded-lg bg-green-600 text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition w-full lg:w-[19%]"
+            >
+                Place Order
+            </button>
+        </div>
+    );
 
     if(placeOrderPrompt?.header || placeOrderPrompt?.message) {
         return (
@@ -213,6 +228,16 @@ const Checkout = () => {
                 message={placeOrderPrompt?.message} 
                 callback={finilizedOrder} 
                 onClose={() => setPlaceOrderPrompt({header: '', message: ''})} 
+            />
+        )
+    }
+
+    if(errorMessage?.header || errorMessage?.message) {
+        return (
+            <ErrorModal 
+                header={errorMessage?.header}
+                message={errorMessage?.message} 
+                callback={() => setErrorMessage({header: '', message: ''})} 
             />
         )
     }
@@ -239,8 +264,8 @@ const Checkout = () => {
                 {/* Breadcrumbs Section */}
                 <section className="w-full h-[30px] flex items-center gap-4">
                     <Breadcrumbs
-                        tabNames={['Purchase Items', 'Customer Info', 'Payment', 'Checkout']}
-                        tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/payment', '/admin/checkout']}
+                        tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
+                        tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
                         localStorageName={breadcrumbsOrder}
                     />
                 </section>
@@ -250,71 +275,29 @@ const Checkout = () => {
                     className="grow w-full flex flex-col lg:flex-row gap-4">
                     {/* Customer Info */}
                     <div className="w-full lg:w-1/2 p-8 bg-white shadow-md rounded-lg">
-                        <div>
-                            <h1 className="font-semibold text-lg">Customer Info</h1>
-                            <article className="py-2">
-                                <h2 className="text-lg">{currentFirstname} {currentLastname}</h2>
-                                <address className="text-sm text-neutral-600 flex flex-col gap-1">
-                                    <p className="italic">{currentAddress}</p>
-                                    {currentContacts?.first && (
-                                        <a href={`tel:+63${currentContacts?.first?.substring(1)}`}>
-                                            +63 {currentContacts?.first?.substring(1)}
-                                        </a>
-                                    )}
-                                    {currentContacts?.second && (
-                                        <a href={`tel:+63${currentContacts?.second?.substring(1)}`}>
-                                            +63 {currentContacts?.second?.substring(1)}
-                                        </a>
-                                    )}
-                                </address>
-                            </article>
-                        </div>
-                        <hr/>
-                        <div className="flex flex-col gap-2 mt-4">
-                            <h1 className="font-semibold text-lg">Payment Details.</h1>
-                            {selectedPayment==='Cash Payment' ? (
-                                <>
-                                    <article>
-                                        {Object.entries(currentDenominations ?? {}).map((cash, index) => {
-                                            const [bill, count] = cash;
-                                            if(toNumber(count)===0) return null;
-                                            const billNumberFormat = wordToNumberDenomination[bill];
-                                            return (
-                                                <article key={index} className="flex gap-2 items-center">
-                                                    <span>{billNumberFormat}</span>
-                                                    <X size={14} />
-                                                    <span>{count}</span>
-                                                </article>
-                                            )
-                                        })}
-                                    </article>
-                                    <article className="w-full flex justify-between">
-                                        <span>Total Amount Paid:</span>
-                                        <span className="font-semibold">
-                                            {formattedCurrency(currentTotalPayment)}
-                                        </span>
-                                    </article>
-                                    <hr/>
-                                    <article className="w-full flex justify-between">
-                                        <span>Change Due:</span>
-                                        <span className="font-semibold">
-                                            {formattedCurrency(currentCustomerChange)}
-                                        </span>
-                                    </article>
-                                </>) : (
-                                    <article className="flex">
-                                        <span>Payment Method:&nbsp;&nbsp;</span>
-                                        <span className="font-semibold">{selectedPayment}</span>
-                                    </article>
-                                )
-                            }
-                        </div>
+                        <h1 className="font-semibold text-lg">Customer Info</h1>
+                        <article className="pt-4">
+                            <h2 className="text-lg">{currentFirstname} {currentLastname}</h2>
+                            <address className="text-sm text-neutral-600 flex flex-col gap-1">
+                                <p className="italic">{currentAddress}</p>
+                                {currentContacts?.first && (
+                                    <a href={`tel:+63${currentContacts?.first?.substring(1)}`}>
+                                        +63 {currentContacts?.first?.substring(1)}
+                                    </a>
+                                )}
+                                {currentContacts?.second && (
+                                    <a href={`tel:+63${currentContacts?.second?.substring(1)}`}>
+                                        +63 {currentContacts?.second?.substring(1)}
+                                    </a>
+                                )}
+                            </address>
+                        </article>
                     </div>
 
                     {/* Order Summary */}
                     <div className="w-full lg:w-1/2 p-8 bg-white shadow-md rounded-lg">
                         <h1 className="font-semibold text-lg">Order Summary</h1>
-                        <ul className="max-h-[50%] mt-2
+                        <ul className="max-h-[50%] mt-4
                             overflow-x-hidden overflow-y-auto pr-1
                             [&::-webkit-scrollbar]:w-2
                             [&::-webkit-scrollbar-track]:rounded-lg
@@ -341,20 +324,27 @@ const Checkout = () => {
                                 ₱ {formattedNumber(total)}
                             </span>
                         </div>
-                        {/* Place Order Button */}
-                        <div className="w-full flex justify-end mt-4">
-                            <button
-                                onClick={() => setPlaceOrderPrompt({header: 'Place Order', message: 'Are you sure you want to place this order?'})}
-                                className="h-fit flex gap-2 px-2 py-3 rounded-lg bg-green-600 text-nowrap text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition"
-                            >
-                                <ShoppingBag />
-                                Finalize Transaction
-                            </button>
-                        </div>
                     </div>
+                </section>
+
+                {/* Footer Section */}
+                <section
+                    className="bg-gray-100 shadow-md border-t p-6 mt-2
+                    block lg:hidden"
+                >
+                    <AllPaymentOptions />
+                </section>
+                <section
+                    className="fixed bottom-0 left-admin-sidebar-sm lg:left-admin-sidebar-lg 
+            w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
+            bg-gray-100 shadow-md border-t p-6
+                    hidden lg:flex"
+                >
+                    <AllPaymentOptions />
                 </section>
             </main>
         </div>
+
     )
 }
 

@@ -1,6 +1,16 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState } from 'react';
+
+import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
+import { zCustomerInfo } from '@/store/customerInfo';
+import { zExpense } from '@/store/expense';
+import { zItem } from '@/store/item';
+import { zPayment } from '@/store/payment';
+import { zProductType } from '@/store/productType';
+import { zSupplier } from '@/store/supplier';
 import { zUser } from '@/store/user';
+
+import * as localStorageNames from '@/constants/localStorageNames';
 
 import SidebarRoute from '@/routes/SidebarRoute';
 import SignUp from '@/screens/SignUp';
@@ -16,6 +26,7 @@ import NewBatch from '@/screens/NewBatch';
 import UpdateBatch from '@/screens/UpdateBatch';
 import NewBarcode from '@/screens/NewBarcode';
 import CustomerInfo from '@/screens/CustomerInfo';
+import Payment from '@/screens/Payment';
 import Checkout from '@/screens/Checkout';
 import NewExpense from '@/screens/NewExpense';
 import UpdateExpense from '@/screens/UpdateExpense';
@@ -39,6 +50,21 @@ const App = () => {
 					await zUser.getState()?.saveUserData();
 				} catch(error) {
 					console.log('Error 29884714398', error);
+
+                    zCashierSelectedItem.getState().wipeOutData();
+                    zCustomerInfo.getState().wipeOutData();
+                    zExpense.getState().wipeOutData();
+                    zItem.getState().wipeOutData();
+                    zPayment.getState().wipeOutData();
+                    zProductType.getState().wipeOutData();
+                    zSupplier.getState().wipeOutData();
+                    zUser.getState().wipeOutData();
+
+                    for(const key in localStorageNames) {
+                        const storageName = localStorageNames[key];
+                        localStorage.removeItem(storageName);
+                    }
+
 					navigate('/signin');
 					//location.reload();
 				} finally {
@@ -47,6 +73,18 @@ const App = () => {
 			})();
 		}
 	}, [pathname, navigate]);
+
+    useLayoutEffect(() => {
+        //console.log('');
+        //console.log(' ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓███████▓▒░ ░▒▓██████▓▒░');
+        //console.log('░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░');
+        //console.log('░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░');
+        //console.log('░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░');
+        //console.log('░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░');
+        //console.log('░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░');
+        //console.log(' ░▒▓██████▓▒░   ░▒▓██▓▒░  ░▒▓█▓▒░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░');
+        //console.log('');
+    }, []);
 
 	if(loading) {
 		return (
@@ -69,6 +107,7 @@ const App = () => {
 			<Route path="/admin/select-item" element={<SelectItem />} />
 			<Route path="/admin/new-barcode/:batch" element={<NewBarcode />} />
 			<Route path="/admin/customer-info" element={<CustomerInfo />} />
+			<Route path="/admin/payment" element={<Payment />} />
 			<Route path="/admin/checkout" element={<Checkout />} />
 			<Route path="/admin/new-expense" element={<NewExpense />} />
 			<Route path="/admin/update-expense" element={<UpdateExpense />} />

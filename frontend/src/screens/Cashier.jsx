@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Minus, ShoppingBag, CircleX } from 'lucide-react';
+import { Plus, Minus, UserRoundPlus, CircleX } from 'lucide-react';
 import { PromptCheckBoxes } from '@/components/Modal';
 import { useLayoutEffect, useState } from 'react';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
@@ -187,8 +187,8 @@ const Cashier = () => {
                 {/* <h1 className="text-nowrap font-semibold text-lg">Order Details</h1> */}
                 <div className="">
                     <Breadcrumbs
-                        tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
-                        tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
+                        tabNames={['Purchase Items', 'Customer Info', 'Payment', 'Checkout']}
+                        tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/payment', '/admin/checkout']}
                         localStorageName={localStorageName}
                     />
                 </div>
@@ -375,8 +375,8 @@ const Cashier = () => {
                             className={`flex gap-2 items-center justify-center leading-none font-bold rounded-lg p-2 sm:px-4 
                             bg-green-600 text-white hover:bg-green-800 ${!total ? 'pointer-events-none opacity-70' : ''}`}
                         >
-                            <ShoppingBag />
-                            <span className="hidden sm:flex text-nowrap">Proceed to Checkout</span>
+                            <UserRoundPlus />
+                            <span className="hidden sm:flex text-nowrap">Proceed to Customer Info</span>
                         </button>
                     </div>
                 </div>

@@ -122,3 +122,38 @@ CREATE TABLE expenses(
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE cash_denominations(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    one_thousand INT NOT NULL,
+    five_hundred INT NOT NULL,
+    two_hundred INT NOT NULL,
+    one_hundred INT NOT NULL,
+    fifty INT NOT NULL,
+    twenty INT NOT NULL,
+    ten INT NOT NULL,
+    five INT NOT NULL,
+    one INT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE cash_payments(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    payment_denomination_id INT NOT NULL,
+    total_payment INT NOT NULL,
+    total_change INT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY(customer_id) REFERENCES customers(id),
+    FOREIGN KEY(payment_denomination_id) REFERENCES cash_denominations(id)
+);
+
+CREATE TABLE cash_drawer_contents(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    cash_denomination_id INT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY(cash_denomination_id) REFERENCES cash_denominations(id)
+);

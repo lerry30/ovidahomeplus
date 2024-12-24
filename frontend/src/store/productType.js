@@ -18,5 +18,14 @@ export const zProductType = create(set => ({
             const {id, name, image, status} = localProductTypeData;
             set({id, name, image, status});
         }
+    },
+
+    wipeOutData: () => {
+        set({
+            id: 0,
+            name: '',
+            image: '',
+            status: ''
+        });
     }
 }));

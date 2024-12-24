@@ -50,7 +50,7 @@ export const ErrorModal = ({ header, message, callback }) => {
                 </article>
                 
                 <h1 className="font font-headings font-bold text-2xl pt-2">{ header }</h1>
-                <p className="font-paragraphs w-60 py-4 text-center text-neutral-800 dark:text-neutral-400">{ message }</p>
+                <p className="font-paragraphs w-60 py-4 text-center text-neutral-800">{ message }</p>
             </div>
         </div>
     );

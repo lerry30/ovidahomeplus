@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { Banknote } from 'lucide-react';
 import { breadcrumbsOrder as localStorageName, selectedItemsForCashier } from '@/constants/localStorageNames';
 import { useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -58,7 +58,7 @@ const CustomerInfo = () => {
                     TitleFormat(data?.address), 
                     contacts
                 );
-            navigate('/admin/checkout');
+            navigate('/admin/payment');
         } catch(error) {
             console.log(error?.message);
             setErrorData(state => ({...state, default: error?.message}));
@@ -93,15 +93,20 @@ const CustomerInfo = () => {
                     {/* <h1 className="text-nowrap font-semibold text-lg">Order Details</h1> */}
                     <div className="">
                         <Breadcrumbs
-                            tabNames={['Purchase Items', 'Customer Info', 'Checkout']}
-                            tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/checkout']}
+                            tabNames={['Purchase Items', 'Customer Info', 'Payment', 'Checkout']}
+                            tabLinks={['/admin/cashier', '/admin/customer-info', '/admin/payment', '/admin/checkout']}
                             localStorageName={localStorageName}
                         />
                     </div>
                 </section>
+
+                <header className="w-full">
+                    <h1 className="text-2xl font-bold text-gray-800">Customer Info</h1>
+                </header>
+
                 <section 
                     className="grow w-full h-full flex flex-col gap-4 bg-white rounded-lg
-                        py-4 md:py-10 md:px-20
+                        py-4 md:py-10 md:px-10
                     ">
                     <div className="w-full flex flex-col md:flex-row gap-4 md:gap-0">
                         <div className="w-full md:w-1/2 flex flex-col px-4 gap-2">
@@ -200,8 +205,8 @@ const CustomerInfo = () => {
                             onClick={saveCustomerInfo}
                             className="flex items-center justify-center gap-2 leading-none bg-green-600 text-white font-bold rounded-lg p-3 hover:bg-green-800"
                         >
-                            <Plus size={26} />
-                            <span className="hidden sm:flex text-nowrap">Continue to Review</span>
+                            <Banknote />
+                            <span className="hidden sm:flex text-nowrap">Proceed to Payment</span>
                         </button>
                     </div>
                     <ErrorField message={errorData?.default || ''} />

@@ -31,5 +31,13 @@ export const zExpense = create(set => ({
 
             set({type, amount});
         }
+    },
+
+    wipeOutData: () => {
+        set({
+            id: '',
+            type: '',
+            amount: 0
+        });
     }
 }));

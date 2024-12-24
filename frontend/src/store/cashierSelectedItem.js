@@ -16,4 +16,9 @@ export const zCashierSelectedItem = create(set => ({
             set({items});
         }
     },
+
+    wipeOutData: () => {
+        console.log('test');
+        set({items: {}});
+    }
 }));

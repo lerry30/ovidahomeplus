@@ -31,5 +31,17 @@ export const zCustomerInfo = create(set => ({
         if(firstname && lastname && address && contacts?.first) {
             set({firstname, lastname, address, contacts});
         }
+    },
+
+    wipeOutData: () => {
+        set({
+            firstname: '',
+            lastname: '',
+            address: '',
+            contacts: {
+                first: '',
+                second: ''
+            }
+        }); 
     }
 }));

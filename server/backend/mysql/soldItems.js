@@ -140,6 +140,7 @@ export const getSoldItemsBetweenDates = `
     ORDER BY sold_items.created_at DESC;
 `;
 
+// dashboard
 export const rankedSoldItems = `
     SELECT 
         items.description AS itemDescription,

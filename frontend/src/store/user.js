@@ -18,11 +18,11 @@ export const zUser = create(set => ({
         //    signout();
         //}
 
-        const isLocalUserDataExist = (Object.keys(JSON.parse(localStorage.getItem(localStorageName) || '{}')).length > 0);
-        if(!isLocalUserDataExist) {
+        //const isLocalUserDataExist = (Object.keys(JSON.parse(localStorage.getItem(localStorageName) || '{}')).length > 0);
+        //if(!isLocalUserDataExist) {
             const response = await getData(urls.user);
             localStorage.setItem(localStorageName, JSON.stringify(response));
-        }
+        //}
         
         const { firstname, lastname, username, image } = JSON.parse(localStorage.getItem(localStorageName) || '{}');
         set(state => {

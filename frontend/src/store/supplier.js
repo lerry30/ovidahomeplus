@@ -19,5 +19,15 @@ export const zSupplier = create(set => ({
             const {id, name, contact, image, status} = localSupplierData;
             set({id, name, contact, image, status});
         }
+    },
+
+    wipeOutData: () => {
+        set({
+            id: 0,
+            name: '',
+            contact: '',
+            image: '',
+            status: ''
+        });
     }
 }));

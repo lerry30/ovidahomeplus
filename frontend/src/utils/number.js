@@ -16,7 +16,7 @@ export const formattedNumber = (number) => {
 
 export const formattedCurrency = (money) => {
     const nMoney = toNumber(money);
-    if(nMoney > 0) return `₱${formattedNumber(nMoney)}`;
-    if(nMoney < 0) return `-₱${formattedNumber(Math.abs(nMoney))}`;
+    if(nMoney > 0) return `₱ ${formattedNumber(nMoney)}`;
+    if(nMoney < 0) return `-₱ ${formattedNumber(Math.abs(nMoney))}`;
     return '0';
 }

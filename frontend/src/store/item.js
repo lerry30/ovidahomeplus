@@ -76,5 +76,27 @@ export const zItem = create(set => ({
             };
             set(dataSet);
         }
+    },
+
+    wipeOutData: () => {
+        set({
+            id: 0,
+            supplierName: '',
+            supplierContact: '',
+            supplierStatus: '',
+            deliveryPrice: 0,
+            deliveryDate: '',
+            productTypeName: '',
+            description: '',
+            itemCode: '',
+            barcode: '',
+            srp: 0,
+            maxDiscount: 0,
+            unit: '',
+            status: '',
+            image: '',
+            createdAt: '',
+            updatedAt: ''
+        });
     }
 }));
