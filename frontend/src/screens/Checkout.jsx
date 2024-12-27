@@ -131,6 +131,7 @@ const Checkout = () => {
                     localStorage.removeItem(selectedItemsForCashier);
                     localStorage.removeItem(customerInfo);
                     localStorage.removeItem(payment);
+                    navigate('/admin/update-cash-drawer');
                     navigate(0);
                 }
             }
@@ -348,7 +349,7 @@ const Checkout = () => {
                                 className="h-fit flex gap-2 px-2 py-3 rounded-lg bg-green-600 text-nowrap text-white font-semibold shadow-md hover:bg-green-700 hover:shadow-lg transition"
                             >
                                 <ShoppingBag />
-                                Finalize Transaction
+                                Complete Sale
                             </button>
                         </div>
                     </div>

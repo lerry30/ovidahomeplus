@@ -1,4 +1,4 @@
-export const apiUrl = 'http://192.168.1.23:4000';
+export const apiUrl = 'http://192.168.1.24:4000';
 
 export const urls = {
     signup: `${apiUrl}/api/users/`,
@@ -37,4 +37,6 @@ export const urls = {
     yearlyreport: `${apiUrl}/api/reports/yearly`,
     printpdf: `${apiUrl}/api/reports/print`,
     dashboard: `${apiUrl}/api/dashboard/get`,
+    cashdrawer: `${apiUrl}/api/cashdrawer/get`,
+    updatecashdrawer: `${apiUrl}/api/cashdrawer/update`,
 };

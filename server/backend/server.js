@@ -17,6 +17,7 @@ import soldItemRoutes from './routes/soldItemRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import cashDrawerRoutes from './routes/cashDrawerRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { getDir } from './utils/fileDir.js';
 import { allowResourceAccess } from './middleware/corsFileMiddleware.js';
@@ -68,6 +69,7 @@ app.use('/api/solditems', soldItemRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/cashdrawer', cashDrawerRoutes);
 
 // fall back when route is not found
 app.use(notFound);

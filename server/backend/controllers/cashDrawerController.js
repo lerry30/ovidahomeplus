@@ -1,0 +1,72 @@
+import { requestHandler } from '../utils/requestHandler.js';
+import { toNumber } from '../utils/number.js';
+import * as cashDrawerStmt from '../mysql/cashDrawer.js';
+import * as denominationStmt from '../mysql/denomination.js';
+
+const getCashDrawerContents = requestHandler(async (req, res, database) => {
+    const [drawer] = await database.query(cashDrawerStmt.cashDrawer, []);
+    const todaysDrawerCashDenom = drawer[0];
+    if(todaysDrawerCashDenom) {
+        // get the cash drawer denom in denomination table
+        const denomId = todaysDrawerCashDenom?.cashDenominationId;
+        const [cashDrawerDenom] = await database.execute(denominationStmt.denomination, [denomId]);
+        const currentCashCont = cashDrawerDenom[0];
+
+        if(currentCashCont) {
+            res.status(200).json({cashDenominations: currentCashCont});
+            return;
+        }
+    }
+
+    throw {status: 400, message: 'There\'s something wrong. Cash Drawer data not found or no sold items yet.'}
+});
+
+const updateCashDrawer = requestHandler(async (req, res, database) => {
+    const data = req.body?.data;
+
+    if(!data.hasOwnProperty('onethousand') ||
+        !data.hasOwnProperty('fivehundred') ||
+        !data.hasOwnProperty('twohundred') ||
+        !data.hasOwnProperty('onehundred') ||
+        !data.hasOwnProperty('fifty') ||
+        !data.hasOwnProperty('twenty') ||
+        !data.hasOwnProperty('ten') ||
+        !data.hasOwnProperty('five') ||
+        !data.hasOwnProperty('one')) {
+        throw new Error('A certain property not exists in your request.');
+    }
+
+    const oneThousand = toNumber(data?.onethousand);
+    const fiveHundred = toNumber(data?.fivehundred);
+    const twoHundred = toNumber(data?.twohundred);
+    const oneHundred = toNumber(data?.onehundred);
+    const fifty = toNumber(data?.fifty);
+    const twenty = toNumber(data?.twenty);
+    const ten = toNumber(data?.ten);
+    const five = toNumber(data?.five);
+    const one = toNumber(data?.one);
+
+    const [drawer] = await database.query(cashDrawerStmt.cashDrawer, []);
+    const todaysDrawerCashDenom = drawer[0];
+    if(todaysDrawerCashDenom) {
+        // get the cash drawer denom in denomination table
+        const denomId = todaysDrawerCashDenom?.cashDenominationId;
+
+        //'UPDATE cash_denominations SET one_thousand=?, five_hundred=?, two_hundred=?, one_hundred=?, fifty=?, twenty=?, ten=?, five=?, one=? WHERE id=?;';
+        const [result] = await database.execute(denominationStmt.updateDenomination, 
+            [oneThousand, fiveHundred, twoHundred, oneHundred, fifty, twenty, ten, five, one, denomId]);
+        const isUpdated = result.affectedRows;
+
+        if(isUpdated) {
+            res.status(200).json({data});
+            return;
+        }
+    }
+
+    throw new Error('Updating the cash denomination error.');
+});
+
+export {
+    getCashDrawerContents,
+    updateCashDrawer,
+};

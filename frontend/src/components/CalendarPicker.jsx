@@ -1,19 +1,49 @@
 import { CalendarSearch } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
+import { create } from 'zustand';
 import { areDatesEqual, formattedDate } from '@/utils/datetime';
+import { toNumber } from '@/utils/number';
+
+const zCalendar = create(set => ({sameDate: false}));
 
 const CalendarPicker = ({callback=(value)=>{}, selectedDate=''}) => {
     const calendarInputRef = useRef(null);
+    const currentYear = useRef(0);
+    const currentMonth = useRef(0);
+    const currentDay = useRef(0);
     const today = new Date();
 
     const selectDate = (ev) => {
         const input = ev.target.value;
+        const dateArray = input.split('-');
+        if(dateArray?.length === 0) return;
+        const year = toNumber(dateArray[0]);
+        const month = toNumber(dateArray[1]);
+        const day = toNumber(dateArray[2]);
+
+        if((year !== currentYear.current ||
+            month !== currentMonth.current) &&
+            day === currentDay.current) {
+            //!zCalendar.getState().sameDate) {
+            //zCalendar.getState().sameDate = true;
+            //console.log('--');
+            return;
+        }
+
+        zCalendar.getState().sameDate = false;
+
         callback(input);
     }
 
     const openCalendar = () => {
         try {
             calendarInputRef.current?.showPicker();
+
+            if(currentMonth===0||currentYear===0||currentDay===0) {
+                currentMonth.current = today.getMonth()+1;
+                currentYear.current = today.getFullYear();
+                currentDay.current = today.getDate();
+            }
         } catch(error) {}
     }
 

@@ -47,7 +47,7 @@ const UpdateExpense = () => {
             const payload = {id, expenseType, expenseAmount};
             const response = await sendJSON(urls.updateexpense, payload, 'PUT');
             if(response) {
-                navigate('/admin/expenses');
+                navigate('/admin/update-cash-drawer');
             }
         } catch(error) {
             console.log(error?.message);

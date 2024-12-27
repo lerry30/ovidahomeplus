@@ -5,5 +5,4 @@ export const cashDrawer = `
     WHERE DATE(created_at) = CURDATE();
 `;
 
-//WHERE DATE(sold_items.created_at) = CURDATE()
 export const newCashDrawer = 'INSERT INTO cash_drawer_contents(cash_denomination_id) VALUES(?);';
