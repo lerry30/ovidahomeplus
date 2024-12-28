@@ -5,7 +5,7 @@ import { useLayoutEffect, useState, useRef } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { zExpense } from '@/store/expense';
-import { toNumber, formattedNumber } from '@/utils/number';
+import { toNumber, formattedCurrency } from '@/utils/number';
 import { areDatesEqual } from '@/utils/datetime';
 
 import CalendarPicker from '@/components/CalendarPicker';
@@ -136,17 +136,19 @@ const Expense = () => {
             h-screen bg-neutral-100 p-4 lg:px-6
             flex flex-col"
         >
-            <section className="flex justify-between items-center pr-2 pb-2">
+            <section className="flex items-center pr-2 pb-2">
                 <h1 className="hidden sm:flex font-semibold text-lg">Expenses</h1>
                 {/* <Searchbar ref={searchBar} search={() => {}} /> */}
                 {areDatesEqual(today, new Date(selectedDate)) && (
-                    <Link 
-                        to="/admin/new-expense"
-                        className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
-                    >
-                        <Plus />
-                        <span className="hidden md:flex">Log New Expense</span>
-                    </Link>
+                    <div className="w-full flex justify-end">
+                        <Link 
+                            to="/admin/new-expense"
+                            className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
+                        >
+                            <Plus />
+                            <span className="hidden md:flex">Log New Expense</span>
+                        </Link>
+                    </div>
                 )}
             </section>
             <section>
@@ -157,7 +159,7 @@ const Expense = () => {
                     <CalendarPicker callback={selectDate} selectedDate={selectedDate}/>
                     <article>
                         <span>Total: </span>
-                        <span className="font-semibold">₱{formattedNumber(total)}</span>
+                        <span className="font-semibold">{formattedCurrency(total)}</span>
                     </article>
                 </div>
                 {expensesToShow?.length<=0 && (
@@ -181,7 +183,7 @@ const Expense = () => {
                         >
                             <article className="w-full flex justify-between p-3">
                                 <span className="w-[30vw] sm:w-full overflow-hidden mr-2">{item?.type}</span>
-                                <span>₱{formattedNumber(String(item?.amount).split('.')[0])}</span>
+                                <span className="text-nowrap">{formattedCurrency(String(item?.amount).split('.')[0])}</span>
                             </article>
                             <div className="flex justify-center items-center px-4">
                                 <div className="relative size-[26px] rounded-lg hover:cursor-pointer hover:bg-gray-200">

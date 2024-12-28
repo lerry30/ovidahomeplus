@@ -39,4 +39,5 @@ export const urls = {
     dashboard: `${apiUrl}/api/dashboard/get`,
     cashdrawer: `${apiUrl}/api/cashdrawer/get`,
     updatecashdrawer: `${apiUrl}/api/cashdrawer/update`,
+    dateofcashdenominations: `${apiUrl}/api/cashdrawer/date`,
 };

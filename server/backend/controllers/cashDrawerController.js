@@ -1,5 +1,6 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
+import { isValidDate, formattedDate } from '../utils/datetime.js';
 import * as cashDrawerStmt from '../mysql/cashDrawer.js';
 import * as denominationStmt from '../mysql/denomination.js';
 
@@ -66,7 +67,29 @@ const updateCashDrawer = requestHandler(async (req, res, database) => {
     throw new Error('Updating the cash denomination error.');
 });
 
+const getCashDrawerByDate = requestHandler(async (req, res, database) => {
+    const date = String(req.body.date).trim();
+
+    if(!isValidDate(date)) throw {status: 400, message: 'Invalid date.'};
+
+    const nDate = formattedDate(date);
+    const [results] = await database.execute(cashDrawerStmt.getCashDrawerByDate, [nDate]);
+    const todaysCashDenom = results[0];
+    if(todaysCashDenom) {
+        const denomId = todaysCashDenom.cashDenominationId;
+        const [cashDrawerDenom] = await database.execute(denominationStmt.denomination, [denomId]);
+        const currentCashCont = cashDrawerDenom[0];
+
+        if(currentCashCont) {
+            res.status(200).json({results: currentCashCont});
+            return;
+        }
+    }
+    throw new Error('Getting cash denominations by date error.');
+});
+
 export {
     getCashDrawerContents,
     updateCashDrawer,
+    getCashDrawerByDate,
 };

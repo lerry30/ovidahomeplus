@@ -58,7 +58,7 @@ const UpdateCashDrawer = () => {
     useLayoutEffect(() => {
         if(isUpdated) {
             setTimeout(() => {
-                navigate('/admin/cashier');
+                navigate('/admin/cash-denominations');
             }, 1000);
         }
     }, [isUpdated]);
