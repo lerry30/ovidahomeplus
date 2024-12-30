@@ -133,7 +133,7 @@ const SignUp = () => {
                         <ErrorField message={errorData?.password || ''} />
                     </div>
                     <div className="px-4 py-2">
-                        <button type="submit" className="w-[300px] flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">Sign In</button>
+                        <button type="submit" className="w-[300px] flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">Sign Up</button>
                     </div>
                     <ErrorField message={errorData?.default || ''} />
                     <small>

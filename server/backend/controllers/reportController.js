@@ -35,7 +35,53 @@ const getReportByDate = requestHandler(async (req, res, database) => {
             currentCashCont = cashDrawerDenom[0];
         }
     }
-    const results = { expenses: expensesResults, soldItems: soldItemsResults, cashDenominations: currentCashCont };
+
+    // I just move the computation here in backend
+    let totalExp = 0;
+    for (const expense of expensesResults)
+        totalExp = totalExp + expense?.amount;
+
+    let gross = 0;
+    let totalCash = 0;
+    let totalNonCash = 0;
+    for (const soldItem of soldItemsResults) {
+        const amount = soldItem?.isDiscounted ? soldItem?.maxDiscount : soldItem?.srp;
+        gross = gross + amount;
+        if(soldItem?.paymentMethod === 'Cash Payment') {
+            totalCash = totalCash + amount;
+        } else {
+            totalNonCash = totalNonCash + amount;
+        }
+    }
+
+    totalCash = totalCash - totalExp;
+
+    const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
+
+    let totalOfDenominations = 0;
+    for(const key in currentCashCont) {
+        const nKey = String(key).toLowerCase();
+        const value = currentCashCont[key];
+        if(!wordToNumberDenomination[nKey]) continue;
+        totalOfDenominations = totalOfDenominations + wordToNumberDenomination[nKey] * value;
+    }
+
+    const discrepancy = totalOfDenominations - totalCash;
+
+    const results = {
+        expenses: expensesResults, 
+        soldItems: soldItemsResults, 
+        cashDenominations: currentCashCont,
+        
+        grossSales: gross,
+        totalExpenses: totalExp,
+        cashPayments: totalCash,
+        nonCashPayments: totalNonCash,
+        cashDenominationsTotal: totalOfDenominations,
+        discrepancy: discrepancy,
+    };
+
+    //console.log(results);
     res.status(200).json({ results });
 });
 
@@ -71,18 +117,26 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
     for(let i = 0; i < numberOfDays; i++) {
         const nItem = {
             date: `${year}-${month}-${i + 1}`,
-            totalCollection: 0,
+            grossSales: 0,
             totalExpenses: 0,
-            netIncome: 0,
+            //totalPayments: 0,
+            cashPayments: 0,
+            nonCashPayments: 0,
             cashDenominationsTotal: 0,
-            discrepancy: 0
+            discrepancy: 0,
         };
 
         for(const soldItem of soldItemsResults) {
             if(formattedDate(soldItem?.soldAt) === nItem.date) {
                 const amount = soldItem?.isDiscounted ? toNumber(soldItem?.maxDiscount) : toNumber(soldItem?.srp);
-                nItem.totalCollection = nItem.totalCollection + amount;
-                nItem.netIncome = nItem.netIncome + amount;
+                nItem.grossSales = nItem.grossSales + amount;
+                //nItem.totalPayments = nItem.totalPayments + amount;
+
+                if(soldItem?.paymentMethod === 'Cash Payment') {
+                    nItem.cashPayments = nItem.cashPayments + amount;
+                } else {
+                    nItem.nonCashPayments = nItem.nonCashPayments + amount;
+                }
             }
         }
 
@@ -90,7 +144,8 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
             if(formattedDate(expense?.createdAt) === nItem.date) {
                 const amount = toNumber(expense?.amount);
                 nItem.totalExpenses = nItem.totalExpenses + amount;
-                nItem.netIncome = nItem.netIncome - amount;
+                //nItem.totalPayments = nItem.totalPayments - amount;
+                nItem.cashPayments = nItem.cashPayments - amount;
             }
         }
 
@@ -107,7 +162,7 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
             }
         }
 
-        nItem.discrepancy = nItem.cashDenominationsTotal - nItem.netIncome;
+        nItem.discrepancy = nItem.cashDenominationsTotal - nItem.cashPayments;
         items.push(nItem);
     }
 
@@ -143,19 +198,27 @@ const getReportByYear = requestHandler(async (req, res, database) => {
         const month = months[i];
         const nItem = {
             month,
-            totalCollection: 0,
+            grossSales: 0,
             totalExpenses: 0,
-            netIncome: 0,
+            //totalPayments: 0,
+            cashPayments: 0,
+            nonCashPayments: 0,
             cashDenominationsTotal: 0,
-            discrepancy: 0
+            discrepancy: 0,
         };
 
         for (const soldItem of soldItemsResults) {
             const soldItemMonth = toNumber(getMonth(soldItem?.soldAt));
             if (soldItemMonth === i + 1) {
                 const amount = soldItem?.isDiscounted ? toNumber(soldItem?.maxDiscount) : toNumber(soldItem?.srp);
-                nItem.totalCollection = nItem.totalCollection + amount;
-                nItem.netIncome = nItem.netIncome + amount;
+                nItem.grossSales = nItem.grossSales + amount;
+                //nItem.totalPayments = nItem.totalPayments + amount;
+
+                if(soldItem?.paymentMethod === 'Cash Payment') {
+                    nItem.cashPayments = nItem.cashPayments + amount;
+                } else {
+                    nItem.nonCashPayments = nItem.nonCashPayments + amount;
+                }
             }
         }
 
@@ -164,7 +227,8 @@ const getReportByYear = requestHandler(async (req, res, database) => {
             if (expenseMonth === i + 1) {
                 const amount = toNumber(expense?.amount);
                 nItem.totalExpenses = nItem.totalExpenses + amount;
-                nItem.netIncome = nItem.netIncome - amount;
+                //nItem.totalPayments = nItem.totalPayments - amount;
+                nItem.cashPayments = nItem.cashPayments - amount;
             }
         }
 
@@ -182,7 +246,7 @@ const getReportByYear = requestHandler(async (req, res, database) => {
             }
         }
 
-        nItem.discrepancy = nItem.cashDenominationsTotal - nItem.netIncome;
+        nItem.discrepancy = nItem.cashDenominationsTotal - nItem.cashPayments;
         items.push(nItem);
     }
 

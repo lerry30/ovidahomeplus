@@ -131,7 +131,9 @@ const Checkout = () => {
                     localStorage.removeItem(selectedItemsForCashier);
                     localStorage.removeItem(customerInfo);
                     localStorage.removeItem(payment);
-                    navigate('/admin/update-cash-drawer');
+
+                    if(selectedPayment === 'Cash Payment') 
+                        navigate('/admin/update-cash-drawer');
                     navigate(0);
                 }
             }

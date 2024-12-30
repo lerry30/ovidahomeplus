@@ -55,6 +55,7 @@ const newOrder = requestHandler(async (req, res, database) => {
         // barcode, is_discounted, customer_id, payment_method
         const [insertedOrder] = await database.execute(nForMultiInsertStmt, dataToInsert);
         if(insertedOrder?.insertId > 0) {
+            let denominations = undefined;
             if(paymentMethod === 'Cash Payment') {
                 // get all items just to compute the amount of purchase
                 const [items] = await database.query(itemStmt.excludedSoldItems, []);
@@ -69,7 +70,7 @@ const newOrder = requestHandler(async (req, res, database) => {
                     } 
                 }
 
-                const {denominations} = payment?.cash;
+                denominations = payment?.cash?.denominations;
                 const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
                 let totalPayment = 0; // get the total of denomination
                 for(const [bill, count] of Object.entries(denominations)) {
@@ -119,25 +120,26 @@ const newOrder = requestHandler(async (req, res, database) => {
                             const [updatedCashDrawerDenom] = await database.execute(denominationStmt.updateDenomination, [...Object.values(nDenom), denomId]);
                         }
 
-                        res.status(200).json({results: {
-                            customerInfo: {
-                                firstname,
-                                lastname,
-                                address,
-                                contacts: {
-                                    first: fContact,
-                                    second: sContact
-                                },
-                            },
-                            paymentMethod,
-                            allBarcodes,
-                            denominations
-                        }});
-                        return;
 
                     }
                 }
             }
+
+            res.status(200).json({results: {
+                customerInfo: {
+                    firstname,
+                    lastname,
+                    address,
+                    contacts: {
+                        first: fContact,
+                        second: sContact
+                    },
+                },
+                paymentMethod,
+                allBarcodes,
+                denominations
+            }});
+            return;
         }
     }
 

@@ -25,9 +25,11 @@ const Report = () => {
     const [soldItemsToShow, setSoldItemsToShow] = useState([]);
     const [expensesToShow, setExpensesToShow] = useState([]);
 
-    const [totalCollection, setTotalCollection] = useState(0);
+    const [grossSales, setGrossSales] = useState(0);
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [netCash, setNetCash] = useState(0);
+
+    const [totalNonCashPayments, setTotalNonCashPayments] = useState(0);
 
     const [discrepancy, setDiscrepancy] = useState(0);
 
@@ -65,17 +67,14 @@ const Report = () => {
         const contents = {onethousand: 0, fivehundred: 0, twohundred: 0, onehundred: 0, fifty: 0, twenty: 0, ten: 0, five: 0, one: 0};
         const nDenominations = {...contents};
         const nTotals = {...contents};
-        let nTotal = 0;
         for(const key in cashDenominations) {
             const denom = toNumber(cashDenominations[key]);
             const nKey = String(key).toLowerCase().trim();
             nDenominations[nKey] = denom;
             const eachDenomTotal = denom * wordToNumberDenomination[nKey];
             nTotals[nKey] = eachDenomTotal;
-            nTotal = nTotal + eachDenomTotal;
         }
         setCashDenominations({pieces: nDenominations, totals: nTotals});
-        setDenominationTotal(nTotal);
     }
 
     const mergeResemblance = (items) => {
@@ -102,20 +101,28 @@ const Report = () => {
     }
 
     const monthlyNYearlySummary = (data) => {
-        let totalCol = 0;
+        let gross = 0;
+        let totalCash = 0;
+        let totalNonCash = 0;
         let totalExp = 0;
         let denomTotal = 0;
         let discrep = 0
         // the total of net income will be computed in useLayoutEffect
         for (const details of data) {
-            totalCol = toNumber(totalCol + details?.totalCollection);
-            totalExp = toNumber(totalExp + details?.totalExpenses);
-            denomTotal = toNumber(denomTotal + details?.cashDenominationsTotal);
-            discrep = toNumber(discrep + details?.discrepancy);
+            gross = gross + details?.grossSales;
+            totalCash = totalCash + details?.cashPayments;
+            totalNonCash = totalNonCash + details?.nonCashPayments;
+
+            totalExp = totalExp + details?.totalExpenses;
+            denomTotal = denomTotal + details?.cashDenominationsTotal;
+            discrep = discrep + details?.discrepancy;
         }
-        setTotalCollection(totalCol);
+        setGrossSales(gross); // cash + non-cash would work but in backend expenses were deducted
+        setNetCash(totalCash);
+        setTotalNonCashPayments(totalNonCash);
         setTotalExpenses(totalExp);
         setDenominationTotal(denomTotal);
+        setDiscrepancy(discrep);
     }
 
     const selectYear = async (year) => {
@@ -166,23 +173,30 @@ const Report = () => {
             const response = await sendJSON(urls.dateofreport, payload);
             if (response) {
                 // console.log(response?.results);
-                const { expenses, soldItems, cashDenominations } = response?.results;
-
-                let totalExp = 0;
-                for (const expense of expenses) {
-                    totalExp = totalExp + toNumber(expense?.amount);
-                }
+                const {
+                    expenses, 
+                    soldItems, 
+                    cashDenominations,
+                    
+                    grossSales,
+                    totalExpenses,
+                    cashPayments,
+                    nonCashPayments,
+                    cashDenominationsTotal,
+                    discrepancy,
+                } = response?.results;
 
                 const nSoldItems = mergeResemblance(soldItems);
-                let totalColl = 0;
-                for (const soldItem of nSoldItems) {
-                    totalColl = totalColl + soldItem?.totalAmount;
-                }
 
                 setExpensesToShow(expenses);
                 setSoldItemsToShow(nSoldItems);
-                setTotalExpenses(totalExp);
-                setTotalCollection(totalColl);
+
+                setGrossSales(grossSales);
+                setTotalExpenses(totalExpenses);
+                setNetCash(cashPayments);
+                setTotalNonCashPayments(nonCashPayments);
+                setDenominationTotal(cashDenominationsTotal);
+                setDiscrepancy(discrepancy);
 
                 transferCashDenominations(cashDenominations);
             }
@@ -194,87 +208,21 @@ const Report = () => {
         }
     }
 
-    const getTodaysCashDenominations = async () => {
-        try {
-            setLoading(true);
-            const response = await getData(urls.cashdrawer);
-            if(response) {
-                const cashDenominations = response?.cashDenominations ?? {};
-                transferCashDenominations(cashDenominations);
-            }
-        } catch(error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const getSoldItemsToday = async () => {
-        try {
-            setLoading(true);
-            const response = await getData(urls.solditemstoday);
-            if (response) {
-                const data = response?.results;
-                const nData = mergeResemblance(data);
-                let total = 0;
-                for (const soldItem of nData) {
-                    total = total + soldItem?.totalAmount;
-                }
-                setSoldItemsToShow(nData);
-                setTotalCollection(total);
-            }
-        } catch (error) {
-            console.log(error?.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const getExpensesToday = async () => {
-        try {
-            setLoading(true);
-            const response = await getData(urls.getexpensestoday);
-            if (response) {
-                // console.log(response);
-                const data = response?.results;
-                let total = 0;
-                for (const expense of data) {
-                    total = total + toNumber(expense?.amount);
-                }
-
-                setExpensesToShow(data);
-                setTotalExpenses(total);
-            }
-        } catch (error) {
-            console.log(error?.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    useLayoutEffect(() => {
-        setDiscrepancy(denominationTotal - netCash);
-    }, [denominationTotal, netCash]);
-
-    useLayoutEffect(() => {
-        const net = toNumber(totalCollection) - toNumber(totalExpenses);
-        setNetCash(net);
-    }, [totalExpenses, totalCollection]);
-
     useLayoutEffect(() => {
         if (selectedPeriod) {
-            setTotalCollection(0);
+            setGrossSales(0);
             setTotalExpenses(0);
+            setNetCash(0);
             setDenominationTotal(0);
             setDiscrepancy(0);
+            setTotalNonCashPayments(0);
             setSelectedMonthData([]);
+            setSelectedYearData([]);
         }
     }, [selectedPeriod]);
 
     useLayoutEffect(() => {
-        getSoldItemsToday();
-        getExpensesToday();
-        getTodaysCashDenominations();
+        selectDate(formattedDate(today));
     }, []);
 
     const PrinterButton = ({className}) => (
@@ -438,7 +386,7 @@ const Report = () => {
                                     )}
 
                                     {/* Sales Summary */}
-                                    {totalCollection > 0 && (
+                                    {grossSales > 0 && (
                                         <div className="w-full bg-white p-4 shadow-md rounded-lg mb-2">
                                             <h2 className="text-lg font-semibold mb-4">Sales Summary ({formatDateToLong(new Date(selectedDate))})</h2>
                                             <table className="w-full border-collapse border border-gray-200">
@@ -490,12 +438,15 @@ const Report = () => {
                                             <table className="w-full border-collapse border border-gray-200">
                                                 <thead>
                                                     <tr className="bg-gray-100">
-                                                        <th className="border px-4 py-2">Date</th>
-                                                        <th className="border px-4 py-2">Total Sales</th>
-                                                        <th className="border px-4 py-2">Total Expenses</th>
-                                                        <th className="border px-4 py-2">Net Income</th>
-                                                        <th className="border px-4 py-2">Cash Denominations Total</th>
-                                                        <th className="border px-4 py-2">Discrepancy</th>
+                                                        <th className="border px-4 py-2 text-sm">
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        </th>
+                                                        <th className="border px-4 py-2 text-sm">Gross Sales</th>
+                                                        <th className="border px-4 py-2 text-sm">Total Expenses</th>
+                                                        <th className="border px-4 py-2 text-sm">Cash</th>
+                                                        <th className="border px-4 py-2 text-sm">Non-Cash</th>
+                                                        <th className="border px-4 py-2 text-sm">Cash Denominations Total</th>
+                                                        <th className="border px-4 py-2 text-sm">Discrepancy</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -504,9 +455,10 @@ const Report = () => {
                                                         return (
                                                             <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
                                                                 <td className="border px-4 text-center text-nowrap bg-transparent">{formattedDate(new Date(item?.date))}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalCollection)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.grossSales)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashPayments)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.nonCashPayments)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
@@ -517,19 +469,20 @@ const Report = () => {
                                         </div>
                                     </>
                                     :
-                                    selectedPeriod === 'Yearly' &&
+                                    (selectedPeriod === 'Yearly' && selectedYearData?.length > 0) &&
                                     <>
                                         <div className="bg-white p-4 shadow-md rounded-lg mb-2">
                                             <h2 className="text-lg font-semibold mb-4">Sales Summary for Year {selectedYear}</h2>
                                             <table className="w-full border-collapse border border-gray-200">
                                                 <thead>
                                                     <tr className="bg-gray-100">
-                                                        <th className="border px-4 py-2">Month</th>
-                                                        <th className="border px-4 py-2">Total Sales</th>
-                                                        <th className="border px-4 py-2">Total Expenses</th>
-                                                        <th className="border px-4 py-2">Net Income</th>
-                                                        <th className="border px-4 py-2">Cash Denominations Total</th>
-                                                        <th className="border px-4 py-2">Discrepancy</th>
+                                                        <th className="border px-4 py-2 text-sm">Month</th>
+                                                        <th className="border px-4 py-2 text-sm">Gross Sales</th>
+                                                        <th className="border px-4 py-2 text-sm">Total Expenses</th>
+                                                        <th className="border px-4 py-2 text-sm">Cash</th>
+                                                        <th className="border px-4 py-2 text-sm">Non-Cash</th>
+                                                        <th className="border px-4 py-2 text-sm">Cash Denominations Total</th>
+                                                        <th className="border px-4 py-2 text-sm">Discrepancy</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -537,10 +490,11 @@ const Report = () => {
                                                         const discrepancy = item?.discrepancy;
                                                         return (
                                                             <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
-                                                                <td className="border px-4 text-center">{item?.month}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalCollection)}</td>
+                                                                <td className="border px-4 text-center text-sm">{item?.month}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.grossSales)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashPayments)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.nonCashPayments)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
@@ -555,7 +509,7 @@ const Report = () => {
                             {/* Net Summary */}
                             <div className="bg-white p-4 shadow-md rounded-lg">
                                 <h2 className="text-lg font-semibold">Net Summary</h2>
-                                <p>Total Collection:&nbsp;&nbsp;&nbsp;{formattedCurrency(totalCollection)}</p>
+                                <p>Gross Sales:&nbsp;&nbsp;&nbsp;{formattedCurrency(grossSales)}</p>
                                 <p>Total Expenses:&nbsp;&nbsp;&nbsp;{formattedCurrency(totalExpenses)}</p>
                                 <p className="font-bold">
                                     Net Cash Available:&nbsp;&nbsp;&nbsp;{formattedCurrency(netCash)}
@@ -565,6 +519,13 @@ const Report = () => {
                                 </p>
                                 <p className={`font-bold ${discrepancy<0 ? 'text-red-600' : 'text-black'}`}>
                                     Discrepancy:&nbsp;&nbsp;&nbsp;{formattedCurrency(discrepancy)}
+                                </p>
+                                <p className="font-bold">
+                                    Total Non-Cash Payments:&nbsp;&nbsp;&nbsp;{formattedCurrency(totalNonCashPayments)}
+                                </p>
+                                <hr/>
+                                <p className="font-bold text-lg pt-2">
+                                    Total Collections:&nbsp;&nbsp;&nbsp;{formattedCurrency(netCash + totalNonCashPayments)}
                                 </p>
                             </div>
                         </div>
