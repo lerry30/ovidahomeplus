@@ -196,19 +196,27 @@ const SoldItems = () => {
                         {item?.secondContactNo && <span> / {item?.secondContactNo}</span>}
                     </div>
 
-                    <div className="flex items-center space-x-3">
+                    <div className="flex justify-center items-center space-x-3">
+                        <Barcode className="w-5 h-5 text-green-700" />
+                        <span>{item?.barcode}</span>
+                    </div>
+
+                    <div className="flex justify-end items-center space-x-3">
                         <Calendar className="w-5 h-5 text-green-700" />
                         <span>{formattedDateAndTime(new Date(item?.soldAt))}</span>
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <Barcode className="w-5 h-5 text-green-700" />
-                        <span>{item?.barcode}</span>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
                         <Hash className="w-5 h-5 text-green-700" />
                         <span>{item?.itemCode}</span>
+                    </div>
+
+                    <div className="flex justify-center items-center space-x-3">
+                        <div className="flex items-center space-x-2">
+                            <PhilippinePeso className="w-5 h-5 text-green-600" />
+                            <span>SRP</span>
+                        </div>
+                        <span className="font-bold text-green-600">{item?.srp}</span>
                     </div>
 
                     <div className="col-span-3 flex justify-between items-center bg-green-50 p-3 rounded-md">
@@ -217,14 +225,6 @@ const SoldItems = () => {
                             <span className="font-semibold">{item?.itemDescription}</span>
                         </div>
                         <span className="text-sm text-green-800">{item?.productTypeName}</span>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-2">
-                            <PhilippinePeso className="w-5 h-5 text-green-600" />
-                            <span>SRP</span>
-                        </div>
-                        <span className="font-bold text-green-600">{item?.srp}</span>
                     </div>
 
                     <div className="flex items-center space-x-3">

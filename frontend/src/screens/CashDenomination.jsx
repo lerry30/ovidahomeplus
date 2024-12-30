@@ -2,6 +2,7 @@ import { Pencil, X, Equal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLayoutEffect, useState } from 'react';
 import { formattedCurrency, toNumber } from '@/utils/number';
+import { areDatesEqual } from '@/utils/datetime';
 import { getData, sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 
@@ -87,15 +88,18 @@ const CashDenomination = () => {
         ">
             <section className="flex items-center pr-2 pb-2">
                 <h1 className="hidden sm:flex font-semibold text-lg text-nowrap">Cash Denominations</h1>
-                <div className="w-full flex justify-end">
-                    <Link 
-                        to="/admin/update-cash-drawer"
-                        className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
-                    >
-                        <Pencil />
-                        <span className="hidden md:flex">Edit Cash Denominations</span>
-                    </Link>
-                </div>
+
+                {areDatesEqual(today, new Date(selectedDate)) && (
+                    <div className="w-full flex justify-end">
+                        <Link 
+                            to="/admin/update-cash-drawer"
+                            className="flex space-x-2 p-2 bg-[#080] text-white rounded-lg shadow-sm"
+                        >
+                            <Pencil />
+                            <span className="hidden md:flex">Edit Cash Denominations</span>
+                        </Link>
+                    </div>
+                )}
             </section>
             <section>
                 <h1 className="flex sm:hidden font-semibold text-lg">Cash Denominations</h1>
@@ -108,30 +112,39 @@ const CashDenomination = () => {
                         <span className="font-semibold">{formattedCurrency(total)}</span>
                     </article>
                 </div>
-                <ul className="w-full h-full flex flex-col gap-2 pr-1
-                        overflow-x-hidden overflow-y-auto
-                        [&::-webkit-scrollbar]:w-2
-                        [&::-webkit-scrollbar-track]:rounded-lg
-                        [&::-webkit-scrollbar-track]:bg-gray-400/70
-                        [&::-webkit-scrollbar-thumb]:rounded-lg
-                        [&::-webkit-scrollbar-thumb]:bg-gray-300
+                <div className="w-full h-full flex flex-col gap-2 bg-white p-4 rounded-lg
+                    overflow-auto
+                    [&::-webkit-scrollbar]:h-1
+                    [&::-webkit-scrollbar]:w-1
+                    [&::-webkit-scrollbar-track]:rounded-lg
+                    [&::-webkit-scrollbar-track]:bg-gray-400/70
+                    [&::-webkit-scrollbar-thumb]:rounded-lg
+                    [&::-webkit-scrollbar-thumb]:bg-gray-300
                     ">
-                    {Object.entries(wordToNumberDenomination)?.map((item, index) => {
-                        const [key, currency] = item;
-                        return (
-                            <li
-                                key={index} 
-                                className="w-full flex items-center gap-2 bg-white shadow-lg rounded-xl border px-4 py-3"
-                            >
-                                <span className="">{currency}</span>
-                                <X size={20} />
-                                <span>{data[key]}</span>
-                                <Equal size={20} />
-                                <span className="font-semibold">{formattedCurrency(totals[key])}</span>
-                            </li>
-                        )
-                    })}
-                </ul>
+                    <table className="w-full border-collapse border border-gray-200">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="border px-4 py-2">Denomination</th>
+                                <th className="border px-4 py-2">No. of Pieces</th>
+                                <th className="border px-4 py-2">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.entries(wordToNumberDenomination).map((item, index) => {
+                                const [key, currency] = item;
+                                return (
+                                    <tr key={index}>
+                                        <td className="border px-4 py-2">{currency}</td>
+                                        <td className="border px-4 py-2">{data[key]}</td>
+                                        <td className="border px-4 py-2 text-nowrap">
+                                            {formattedCurrency(totals[key])}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </div>
             </section>
         </main>
     )

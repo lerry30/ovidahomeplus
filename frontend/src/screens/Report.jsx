@@ -18,6 +18,9 @@ const Report = () => {
     const [selectedMonth, setSelectedMonth] = useState('');
     const [selectedMonthData, setSelectedMonthData] = useState([]);
 
+    const [cashDenominations, setCashDenominations] = useState({pieces: {}, totals: {}});
+    const [denominationTotal, setDenominationTotal] = useState(0);
+
     const [selectedDate, setSelectedDate] = useState(new Date().getTime()); // ui
     const [soldItemsToShow, setSoldItemsToShow] = useState([]);
     const [expensesToShow, setExpensesToShow] = useState([]);
@@ -26,11 +29,14 @@ const Report = () => {
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [netCash, setNetCash] = useState(0);
 
+    const [discrepancy, setDiscrepancy] = useState(0);
+
     const [loading, setLoading] = useState(false);
 
     const componentRef = useRef(null);
 
     const today = new Date();
+    const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const YEAR_STARTED = 2024;
 
@@ -53,6 +59,23 @@ const Report = () => {
         } finally {
             setLoading(false);
         }
+    }
+
+    const transferCashDenominations = (cashDenominations) => {
+        const contents = {onethousand: 0, fivehundred: 0, twohundred: 0, onehundred: 0, fifty: 0, twenty: 0, ten: 0, five: 0, one: 0};
+        const nDenominations = {...contents};
+        const nTotals = {...contents};
+        let nTotal = 0;
+        for(const key in cashDenominations) {
+            const denom = toNumber(cashDenominations[key]);
+            const nKey = String(key).toLowerCase().trim();
+            nDenominations[nKey] = denom;
+            const eachDenomTotal = denom * wordToNumberDenomination[nKey];
+            nTotals[nKey] = eachDenomTotal;
+            nTotal = nTotal + eachDenomTotal;
+        }
+        setCashDenominations({pieces: nDenominations, totals: nTotals});
+        setDenominationTotal(nTotal);
     }
 
     const mergeResemblance = (items) => {
@@ -78,6 +101,23 @@ const Report = () => {
         return Object.values(itemKeys);
     }
 
+    const monthlyNYearlySummary = (data) => {
+        let totalCol = 0;
+        let totalExp = 0;
+        let denomTotal = 0;
+        let discrep = 0
+        // the total of net income will be computed in useLayoutEffect
+        for (const details of data) {
+            totalCol = toNumber(totalCol + details?.totalCollection);
+            totalExp = toNumber(totalExp + details?.totalExpenses);
+            denomTotal = toNumber(denomTotal + details?.cashDenominationsTotal);
+            discrep = toNumber(discrep + details?.discrepancy);
+        }
+        setTotalCollection(totalCol);
+        setTotalExpenses(totalExp);
+        setDenominationTotal(denomTotal);
+    }
+
     const selectYear = async (year) => {
         try {
             setLoading(true);
@@ -89,16 +129,7 @@ const Report = () => {
                 const data = response?.results;
                 // console.log(data);
                 setSelectedYearData(data);
-
-                let totalCol = 0;
-                let totalExp = 0;
-                // the total of net income will be computed in useLayoutEffect
-                for (const details of data) {
-                    totalCol = toNumber(totalCol + details?.totalCollection);
-                    totalExp = toNumber(totalExp + details?.totalExpenses);
-                }
-                setTotalCollection(totalCol);
-                setTotalExpenses(totalExp);
+                monthlyNYearlySummary(data);
             }
         } catch (error) {
             console.log(error?.message);
@@ -116,18 +147,9 @@ const Report = () => {
             const response = await sendJSON(urls.monthlyreport, payload);
             if (response) {
                 const data = response?.results;
-                // console.log(data);
+                // console.table(data);
                 setSelectedMonthData(data);
-
-                let totalCol = 0;
-                let totalExp = 0;
-                // the total of net income will be computed in useLayoutEffect
-                for (const details of data) {
-                    totalCol = toNumber(totalCol + details?.totalCollection);
-                    totalExp = toNumber(totalExp + details?.totalExpenses);
-                }
-                setTotalCollection(totalCol);
-                setTotalExpenses(totalExp);
+                monthlyNYearlySummary(data);
             }
         } catch (error) {
             console.log(error?.message);
@@ -144,7 +166,7 @@ const Report = () => {
             const response = await sendJSON(urls.dateofreport, payload);
             if (response) {
                 // console.log(response?.results);
-                const { expenses, soldItems } = response?.results;
+                const { expenses, soldItems, cashDenominations } = response?.results;
 
                 let totalExp = 0;
                 for (const expense of expenses) {
@@ -161,12 +183,29 @@ const Report = () => {
                 setSoldItemsToShow(nSoldItems);
                 setTotalExpenses(totalExp);
                 setTotalCollection(totalColl);
+
+                transferCashDenominations(cashDenominations);
             }
         } catch (error) {
             console.log(error?.message);
         } finally {
             setLoading(false);
             setSelectedDate(value);
+        }
+    }
+
+    const getTodaysCashDenominations = async () => {
+        try {
+            setLoading(true);
+            const response = await getData(urls.cashdrawer);
+            if(response) {
+                const cashDenominations = response?.cashDenominations ?? {};
+                transferCashDenominations(cashDenominations);
+            }
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -214,6 +253,10 @@ const Report = () => {
     }
 
     useLayoutEffect(() => {
+        setDiscrepancy(denominationTotal - netCash);
+    }, [denominationTotal, netCash]);
+
+    useLayoutEffect(() => {
         const net = toNumber(totalCollection) - toNumber(totalExpenses);
         setNetCash(net);
     }, [totalExpenses, totalCollection]);
@@ -222,12 +265,16 @@ const Report = () => {
         if (selectedPeriod) {
             setTotalCollection(0);
             setTotalExpenses(0);
+            setDenominationTotal(0);
+            setDiscrepancy(0);
+            setSelectedMonthData([]);
         }
     }, [selectedPeriod]);
 
     useLayoutEffect(() => {
         getSoldItemsToday();
         getExpensesToday();
+        getTodaysCashDenominations();
     }, []);
 
     const PrinterButton = ({className}) => (
@@ -346,11 +393,12 @@ const Report = () => {
                         <PrinterButton className="hidden md:flex"/>
                     </div>
                     <div className="w-full h-full
-                        pr-1 flex sm:block
+                        pr-1 flex sm:block pb-20
                         overflow-auto
-                        [&::-webkit-scrollbar]:w-2
+                        [&::-webkit-scrollbar]:h-1
+                        [&::-webkit-scrollbar]:w-1
                         [&::-webkit-scrollbar-track]:rounded-lg
-                        [&::-webkit-scrollbar-track]:bg-gray-100
+                        [&::-webkit-scrollbar-track]:bg-gray-400/70
                         [&::-webkit-scrollbar-thumb]:rounded-lg
                         [&::-webkit-scrollbar-thumb]:bg-gray-300
                     ">
@@ -358,69 +406,84 @@ const Report = () => {
                             {selectedPeriod === 'Daily' ?
                                 <>
                                     {/* Cash Breakdown */}
-                                    {/* <div className="bg-white p-4 shadow-md rounded-lg mb-2">
-                                        <h2 className="text-lg font-semibold mb-4">Cash Breakdown</h2>
-                                        <table className="w-full border-collapse border border-gray-200">
-                                            <thead>
-                                                <tr className="bg-gray-100">
-                                                    <th className="border px-4 py-2">Denomination</th>
-                                                    <th className="border px-4 py-2">No. of Pieces</th>
-                                                    <th className="border px-4 py-2">Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td className="border px-4 py-2">₱1,000</td>
-                                                    <td className="border px-4 py-2">51</td>
-                                                    <td className="border px-4 py-2">₱51,000</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div> */}
+                                    {denominationTotal > 0 && (
+                                        <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                            <h2 className="text-lg font-semibold mb-4">Cash Breakdown</h2>
+                                            <table className="w-full border-collapse border border-gray-200">
+                                                <thead>
+                                                    <tr className="bg-gray-100">
+                                                        <th className="border px-4 py-2">Denomination</th>
+                                                        <th className="border px-4 py-2">No. of Pieces</th>
+                                                        <th className="border px-4 py-2">Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {Object.entries(wordToNumberDenomination).map((item, index) => {
+                                                        const [key, currency] = item;
+                                                        const pieces = cashDenominations?.pieces[key];
+                                                        if(pieces===0) return null;
+                                                        return (
+                                                            <tr key={index}>
+                                                                <td className="border px-4 py-2">{currency}</td>
+                                                                <td className="border px-4 py-2">{pieces}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">
+                                                                    {formattedCurrency(cashDenominations?.totals[key])}
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
 
                                     {/* Sales Summary */}
-                                    <div className="w-full bg-white p-4 shadow-md rounded-lg mb-2">
-                                        <h2 className="text-lg font-semibold mb-4">Sales Summary ({formatDateToLong(new Date(selectedDate))})</h2>
-                                        <table className="w-full border-collapse border border-gray-200">
-                                            <thead>
-                                                <tr className="bg-gray-100">
-                                                    <th className="border px-4 py-2">Supplier</th>
-                                                    <th className="border px-4 py-2">Item Name</th>
-                                                    <th className="border px-4 py-2">Qty</th>
-                                                    {/* <th className="border px-4 py-2">Sold Date</th> */}
-                                                    <th className="border px-4 py-2">Current</th>
-                                                    <th className="border px-4 py-2">Mode of Payment</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {soldItemsToShow?.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td className="border px-4 py-2">{item?.supplierName}</td>
-                                                        <td className="border px-4 py-2">{item?.productTypeName} {item?.itemDescription}</td>
-                                                        <td className="border px-4 py-2">{toNumber(item?.quantity)}</td>
-                                                        {/* <td className="border px-4 text-center">{formattedDate(new Date(item?.soldAt))}</td> */}
-                                                        <td className="border px-4 py-2">{formattedCurrency(item?.totalAmount)}</td>
-                                                        <td className="border px-4 py-2">{item?.paymentMethod}</td>
+                                    {totalCollection > 0 && (
+                                        <div className="w-full bg-white p-4 shadow-md rounded-lg mb-2">
+                                            <h2 className="text-lg font-semibold mb-4">Sales Summary ({formatDateToLong(new Date(selectedDate))})</h2>
+                                            <table className="w-full border-collapse border border-gray-200">
+                                                <thead>
+                                                    <tr className="bg-gray-100">
+                                                        <th className="border px-4 py-2">Supplier</th>
+                                                        <th className="border px-4 py-2">Item Name</th>
+                                                        <th className="border px-4 py-2">Qty</th>
+                                                        {/* <th className="border px-4 py-2">Sold Date</th> */}
+                                                        <th className="border px-4 py-2">Current</th>
+                                                        <th className="border px-4 py-2">Mode of Payment</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody>
+                                                    {soldItemsToShow?.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td className="border px-4 py-2">{item?.supplierName}</td>
+                                                            <td className="border px-4 py-2">{item?.productTypeName} {item?.itemDescription}</td>
+                                                            <td className="border px-4 py-2">{toNumber(item?.quantity)}</td>
+                                                            {/* <td className="border px-4 text-center">{formattedDate(new Date(item?.soldAt))}</td> */}
+                                                            <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalAmount)}</td>
+                                                            <td className="border px-4 py-2">{item?.paymentMethod}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
 
                                     {/* Expense Summary */}
-                                    <div className="bg-white p-4 shadow-md rounded-lg mb-2">
-                                        <h2 className="text-lg font-semibold mb-4">Expense Summary</h2>
-                                        <ul className="list-disc list-inside">
-                                            {expensesToShow?.map((item, index) => (
-                                                <li key={index}>
-                                                    {item?.type}:&nbsp;&nbsp;&nbsp;{formattedCurrency(item?.amount)}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                                    {totalExpenses > 0 && (
+                                        <div className="bg-white p-4 shadow-md rounded-lg mb-2">
+                                            <h2 className="text-lg font-semibold mb-4">Expense Summary</h2>
+                                            <ul className="list-disc list-inside">
+                                                {expensesToShow?.map((item, index) => (
+                                                    <li key={index}>
+                                                        {item?.type}:&nbsp;&nbsp;&nbsp;{formattedCurrency(item?.amount)}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                 </>
                                 :
-                                selectedPeriod === 'Monthly' ?
+                                selectedPeriod === 'Monthly' && selectedMonthData?.length > 0 ?
                                     <>
                                         <div className="bg-white p-4 shadow-md rounded-lg mb-2">
                                             <h2 className="text-lg font-semibold mb-4">{selectedMonth} {selectedYear} Sales Summary</h2>
@@ -431,16 +494,21 @@ const Report = () => {
                                                         <th className="border px-4 py-2">Total Sales</th>
                                                         <th className="border px-4 py-2">Total Expenses</th>
                                                         <th className="border px-4 py-2">Net Income</th>
+                                                        <th className="border px-4 py-2">Cash Denominations Total</th>
+                                                        <th className="border px-4 py-2">Discrepancy</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {selectedMonthData?.map((item, index) => {
+                                                        const discrepancy = item?.discrepancy;
                                                         return (
-                                                            <tr key={index}>
+                                                            <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
                                                                 <td className="border px-4 text-center text-nowrap">{formattedDate(new Date(item?.date))}</td>
                                                                 <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalCollection)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalExpenses)}</td>
                                                                 <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.cashDenominationsTotal)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
                                                         )
                                                     })}
@@ -460,16 +528,21 @@ const Report = () => {
                                                         <th className="border px-4 py-2">Total Sales</th>
                                                         <th className="border px-4 py-2">Total Expenses</th>
                                                         <th className="border px-4 py-2">Net Income</th>
+                                                        <th className="border px-4 py-2">Cash Denominations Total</th>
+                                                        <th className="border px-4 py-2">Discrepancy</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {selectedYearData?.map((item, index) => {
+                                                        const discrepancy = item?.discrepancy;
                                                         return (
-                                                            <tr key={index}>
+                                                            <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
                                                                 <td className="border px-4 text-center">{item?.month}</td>
-                                                                <td className="border px-4 py-2">{formattedCurrency(item?.totalCollection)}</td>
-                                                                <td className="border px-4 py-2">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalCollection)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalExpenses)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.cashDenominationsTotal)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
                                                         )
                                                     })}
@@ -482,9 +555,17 @@ const Report = () => {
                             {/* Net Summary */}
                             <div className="bg-white p-4 shadow-md rounded-lg">
                                 <h2 className="text-lg font-semibold">Net Summary</h2>
-                                <p>Total Collection: {formattedCurrency(totalCollection)}</p>
-                                <p>Total Expenses: {formattedCurrency(totalExpenses)}</p>
-                                <p className="font-bold">Net Cash Available: {formattedCurrency(netCash)}</p>
+                                <p>Total Collection:&nbsp;&nbsp;&nbsp;{formattedCurrency(totalCollection)}</p>
+                                <p>Total Expenses:&nbsp;&nbsp;&nbsp;{formattedCurrency(totalExpenses)}</p>
+                                <p className="font-bold">
+                                    Net Cash Available:&nbsp;&nbsp;&nbsp;{formattedCurrency(netCash)}
+                                </p>
+                                <p className="font-bold">
+                                    Total Cash Denominations:&nbsp;&nbsp;&nbsp;{formattedCurrency(denominationTotal)}
+                                </p>
+                                <p className={`font-bold ${discrepancy<0 ? 'text-red-600' : 'text-black'}`}>
+                                    Discrepancy:&nbsp;&nbsp;&nbsp;{formattedCurrency(discrepancy)}
+                                </p>
                             </div>
                         </div>
                     </div>

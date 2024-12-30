@@ -6,6 +6,8 @@ import { htmlWithTailwindTemplate } from '../helper/report.js';
 import { writeFile, readdir, unlink } from 'fs/promises';
 import * as expenseStmt from '../mysql/expense.js';
 import * as soldItemStmt from '../mysql/soldItems.js';
+import * as cashDrawerStmt from '../mysql/cashDrawer.js';
+import * as denominationStmt from '../mysql/denomination.js';
 
 import puppeteer from 'puppeteer';
 
@@ -23,7 +25,17 @@ const getReportByDate = requestHandler(async (req, res, database) => {
     const [expensesResults] = await database.execute(expenseStmt.getExpensesByDate, [nDate]);
     const [soldItemsResults] = await database.execute(soldItemStmt.getSoldItemsByDate, [nDate]);
 
-    const results = { expenses: expensesResults, soldItems: soldItemsResults };
+    const [cashDrawerResults] = await database.execute(cashDrawerStmt.getCashDrawerByDate, [nDate]);
+    let currentCashCont = {};
+    if(cashDrawerResults?.length > 0) {
+        const todaysCashDenom = cashDrawerResults[0];
+        const denomId = todaysCashDenom.cashDenominationId;
+        const [cashDrawerDenom] = await database.execute(denominationStmt.denomination, [denomId]);
+        if(cashDrawerDenom?.length > 0) {
+            currentCashCont = cashDrawerDenom[0];
+        }
+    }
+    const results = { expenses: expensesResults, soldItems: soldItemsResults, cashDenominations: currentCashCont };
     res.status(200).json({ results });
 });
 
@@ -47,32 +59,55 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
 
     const [soldItemsResults] = await database.execute(soldItemStmt.getSoldItemsBetweenDates, [startDate, endDate]);
     const [expensesResults] = await database.execute(expenseStmt.getExpensesBetweenDates, [startDate, endDate]);
+    const [cashDrawerResults] = await database.execute(cashDrawerStmt.getCashDrawerBetweenDates, [startDate, endDate]);
+
+    const createPlaceHolder = cashDrawerResults?.map(() => '?').join(', ');
+    const cashDrawerIds = cashDrawerResults?.map(item => item.cashDenominationId);
+    const [denominationResults] = await database.execute(
+        `${denominationStmt.denominations}(${createPlaceHolder});`, cashDrawerIds);
+    const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
 
     const items = [];
-    for (let i = 0; i < numberOfDays; i++) {
+    for(let i = 0; i < numberOfDays; i++) {
         const nItem = {
             date: `${year}-${month}-${i + 1}`,
             totalCollection: 0,
             totalExpenses: 0,
-            netIncome: 0
+            netIncome: 0,
+            cashDenominationsTotal: 0,
+            discrepancy: 0
         };
 
-        for (const soldItem of soldItemsResults) {
-            if (formattedDate(soldItem?.soldAt) === nItem.date) {
+        for(const soldItem of soldItemsResults) {
+            if(formattedDate(soldItem?.soldAt) === nItem.date) {
                 const amount = soldItem?.isDiscounted ? toNumber(soldItem?.maxDiscount) : toNumber(soldItem?.srp);
                 nItem.totalCollection = nItem.totalCollection + amount;
                 nItem.netIncome = nItem.netIncome + amount;
             }
         }
 
-        for (const expense of expensesResults) {
-            if (formattedDate(expense?.createdAt) === nItem.date) {
+        for(const expense of expensesResults) {
+            if(formattedDate(expense?.createdAt) === nItem.date) {
                 const amount = toNumber(expense?.amount);
                 nItem.totalExpenses = nItem.totalExpenses + amount;
                 nItem.netIncome = nItem.netIncome - amount;
             }
         }
 
+        for(const denom of denominationResults) {
+            if(formattedDate(denom?.createdAt) === nItem.date) {
+                let total = 0;
+                for(const key in denom) {
+                    const nKey = String(key).toLowerCase();
+                    if(!wordToNumberDenomination[nKey]) continue;
+                    total = total + wordToNumberDenomination[nKey] * denom[key];
+                }
+                nItem.cashDenominationsTotal = total;
+                break;
+            }
+        }
+
+        nItem.discrepancy = nItem.cashDenominationsTotal - nItem.netIncome;
         items.push(nItem);
     }
 
@@ -95,6 +130,13 @@ const getReportByYear = requestHandler(async (req, res, database) => {
 
     const [soldItemsResults] = await database.execute(soldItemStmt.getSoldItemsBetweenDates, [startDate, endDate]);
     const [expensesResults] = await database.execute(expenseStmt.getExpensesBetweenDates, [startDate, endDate]);
+    const [cashDrawerResults] = await database.execute(cashDrawerStmt.getCashDrawerBetweenDates, [startDate, endDate]);
+
+    const createPlaceHolder = cashDrawerResults?.map(() => '?').join(', ');
+    const cashDrawerIds = cashDrawerResults?.map(item => item.cashDenominationId);
+    const [denominationResults] = await database.execute(
+        `${denominationStmt.denominations}(${createPlaceHolder});`, cashDrawerIds);
+    const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
 
     const items = [];
     for (let i = 0; i < months.length; i++) {
@@ -103,7 +145,9 @@ const getReportByYear = requestHandler(async (req, res, database) => {
             month,
             totalCollection: 0,
             totalExpenses: 0,
-            netIncome: 0
+            netIncome: 0,
+            cashDenominationsTotal: 0,
+            discrepancy: 0
         };
 
         for (const soldItem of soldItemsResults) {
@@ -124,6 +168,21 @@ const getReportByYear = requestHandler(async (req, res, database) => {
             }
         }
 
+        for(const denom of denominationResults) {
+            const denomMonth = toNumber(getMonth(denom?.createdAt));
+            if(denomMonth === i + 1) {
+                let total = 0;
+                for(const key in denom) {
+                    const nKey = String(key).toLowerCase();
+                    if(!wordToNumberDenomination[nKey]) continue;
+                    total = total + wordToNumberDenomination[nKey] * denom[key];
+                }
+                nItem.cashDenominationsTotal = total;
+                break;
+            }
+        }
+
+        nItem.discrepancy = nItem.cashDenominationsTotal - nItem.netIncome;
         items.push(nItem);
     }
 

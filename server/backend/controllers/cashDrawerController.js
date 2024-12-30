@@ -4,6 +4,11 @@ import { isValidDate, formattedDate } from '../utils/datetime.js';
 import * as cashDrawerStmt from '../mysql/cashDrawer.js';
 import * as denominationStmt from '../mysql/denomination.js';
 
+/*
+   desc     Get the contents of the cash drawer
+   route    GET /api/cashdrawer/get
+   access   private
+*/
 const getCashDrawerContents = requestHandler(async (req, res, database) => {
     const [drawer] = await database.query(cashDrawerStmt.cashDrawer, []);
     const todaysDrawerCashDenom = drawer[0];
@@ -11,7 +16,7 @@ const getCashDrawerContents = requestHandler(async (req, res, database) => {
         // get the cash drawer denom in denomination table
         const denomId = todaysDrawerCashDenom?.cashDenominationId;
         const [cashDrawerDenom] = await database.execute(denominationStmt.denomination, [denomId]);
-        const currentCashCont = cashDrawerDenom[0];
+        const currentCashCont = cashDrawerDenom[0] ?? {};
 
         if(currentCashCont) {
             res.status(200).json({cashDenominations: currentCashCont});
@@ -22,6 +27,11 @@ const getCashDrawerContents = requestHandler(async (req, res, database) => {
     throw {status: 400, message: 'There\'s something wrong. Cash Drawer data not found or no sold items yet.'}
 });
 
+/*
+   desc     Update the cash drawer contents
+   route    PUT /api/cashdrawer/update
+   access   private
+*/
 const updateCashDrawer = requestHandler(async (req, res, database) => {
     const data = req.body?.data;
 
@@ -67,6 +77,11 @@ const updateCashDrawer = requestHandler(async (req, res, database) => {
     throw new Error('Updating the cash denomination error.');
 });
 
+/*
+   desc     Get the contents of cash drawer with the specific amount
+   route    POST /api/cashdrawer/date
+   access   private
+*/
 const getCashDrawerByDate = requestHandler(async (req, res, database) => {
     const date = String(req.body.date).trim();
 
@@ -78,7 +93,7 @@ const getCashDrawerByDate = requestHandler(async (req, res, database) => {
     if(todaysCashDenom) {
         const denomId = todaysCashDenom.cashDenominationId;
         const [cashDrawerDenom] = await database.execute(denominationStmt.denomination, [denomId]);
-        const currentCashCont = cashDrawerDenom[0];
+        const currentCashCont = cashDrawerDenom[0] ?? {};
 
         if(currentCashCont) {
             res.status(200).json({results: currentCashCont});
