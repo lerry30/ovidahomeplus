@@ -176,7 +176,7 @@ const NewItem = () => {
     }
 
     useLayoutEffect(() => {
-        const profitMargin = toNumber(data?.deliveryPrice) * PROFIT_MARGIN + toNumber(data?.deliveryPrice);
+        const profitMargin = Math.ceil(toNumber(data?.deliveryPrice) * PROFIT_MARGIN + toNumber(data?.deliveryPrice));
         setData(state => ({...state, srp: profitMargin}));
     }, [data?.deliveryPrice]);
 

@@ -503,12 +503,12 @@ const Report = () => {
                                                         const discrepancy = item?.discrepancy;
                                                         return (
                                                             <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
-                                                                <td className="border px-4 text-center text-nowrap">{formattedDate(new Date(item?.date))}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalCollection)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.netIncome)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.cashDenominationsTotal)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(discrepancy)}</td>
+                                                                <td className="border px-4 text-center text-nowrap bg-transparent">{formattedDate(new Date(item?.date))}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalCollection)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
                                                         )
                                                     })}
@@ -538,11 +538,11 @@ const Report = () => {
                                                         return (
                                                             <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
                                                                 <td className="border px-4 text-center">{item?.month}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalCollection)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.netIncome)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.cashDenominationsTotal)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">{formattedCurrency(discrepancy)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalCollection)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.netIncome)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
+                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
                                                         )
                                                     })}

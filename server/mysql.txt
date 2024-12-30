@@ -53,9 +53,9 @@ CREATE TABLE items(
 	product_type_id INT NOT NULL,
 	description VARCHAR(255) NOT NULL,
 	item_code VARCHAR(255) NOT NULL,
-	delivery_price DECIMAL(10, 2) NOT NULL,
-	srp DECIMAL(10, 2) NOT NULL,
-	max_discount DECIMAL(10, 2) NOT NULL,
+	delivery_price INT NOT NULL,
+	srp INT NOT NULL,
+	max_discount INT NOT NULL,
 	unit ENUM('pcs', 'set') DEFAULT 'pcs',
 	image VARCHAR(255) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -118,7 +118,7 @@ CREATE TABLE sold_items(
 CREATE TABLE expenses(
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	type VARCHAR(255) NOT NULL,
-	amount DECIMAL(10, 2) NOT NULL,
+	amount INT NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
