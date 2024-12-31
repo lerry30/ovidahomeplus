@@ -118,7 +118,7 @@ const Dashboard = () => {
         <main className="absolute top-0 
             left-admin-sidebar-sm lg:left-admin-sidebar-lg 
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
-            h-full bg-neutral-100 p-4 pb-[30px] overflow-y-auto
+            h-full bg-neutral-100 p-2 sm:p-4 pb-[30px] overflow-y-auto
             [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:rounded-lg
             [&::-webkit-scrollbar-track]:bg-gray-100

@@ -172,7 +172,7 @@ const Payment = () => {
             <main className="absolute top-0 
                 left-admin-sidebar-sm lg:left-admin-sidebar-lg 
                 w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
-                h-full lg:h-screen bg-neutral-100 p-4
+                h-full lg:h-screen bg-neutral-100 p-2 sm:p-4
                 flex flex-col
                 overflow-hidden
             ">

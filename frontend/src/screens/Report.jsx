@@ -245,7 +245,7 @@ const Report = () => {
         <main className="absolute top-0 
             left-admin-sidebar-sm lg:left-admin-sidebar-lg 
             w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))] 
-            h-screen bg-neutral-100 p-4 lg:px-6
+            h-screen bg-neutral-100 p-2 sm:p-4 lg:px-6
             flex flex-col"
         >
             <section className="flex justify-between">
