@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Minus, UserRoundPlus, CircleX } from 'lucide-react';
+import { Plus, Minus, UserRoundPlus, CircleX, Camera } from 'lucide-react';
 import { PromptCheckBoxes } from '@/components/Modal';
 import { useLayoutEffect, useState } from 'react';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
@@ -207,13 +207,21 @@ const Cashier = () => {
                     bg-white shadow-md rounded-lg overflow-hidden">
                     <header className="w-full flex justify-between pb-2">
                         <h2>Items</h2>
-                        <Link
-                            to="/admin/select-item"
-                            className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-1 sm:pr-4 hover:bg-green-800"
-                        >
-                            <Plus />
-                            <span className="hidden sm:flex text-nowrap">Select Item</span>
-                        </Link>
+                        <div className="flex gap-2">
+                            <Link
+                                to="/admin/camera-scanner"
+                                className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg py-1 px-2 hover:bg-green-800"
+                            >
+                                <Camera />
+                            </Link>
+                            <Link
+                                to="/admin/select-item"
+                                className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-1 sm:pr-4 hover:bg-green-800"
+                            >
+                                <Plus />
+                                <span className="hidden sm:flex text-nowrap">Select Item</span>
+                            </Link>
+                        </div>
                     </header>
                     <hr />
                     <ul className="

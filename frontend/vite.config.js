@@ -19,5 +19,5 @@ export default defineConfig({
       target: 'http://localhost:4000',
       secure: false
     },
-  },
+  }
 });

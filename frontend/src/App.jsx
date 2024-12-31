@@ -31,6 +31,7 @@ import Checkout from '@/screens/Checkout';
 import NewExpense from '@/screens/NewExpense';
 import UpdateExpense from '@/screens/UpdateExpense';
 import UpdateCashDrawer from '@/screens/UpdateCashDrawer';
+import CameraScanner from '@/screens/CameraScanner';
 import NotFound from '@/screens/NotFound';
 import Loading from '@/components/Loading';
 
@@ -113,6 +114,7 @@ const App = () => {
 			<Route path="/admin/new-expense" element={<NewExpense />} />
 			<Route path="/admin/update-expense" element={<UpdateExpense />} />
             <Route path="/admin/update-cash-drawer" element={<UpdateCashDrawer />} />
+            <Route path="/admin/camera-scanner" element={<CameraScanner />} />
 			<Route path="/admin/*" element={<SidebarRoute />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>
