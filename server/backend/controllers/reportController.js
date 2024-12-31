@@ -275,7 +275,7 @@ const generatePDF = requestHandler(async (req, res, database) => {
     });
     const page = await browser.newPage();
     await page.setContent(htmlContent);
-    const pdf = await page.pdf({ format: 'A4' });
+    const pdf = await page.pdf({ format: 'Letter' });
 
     await writeFile(outputPath, pdf);
 

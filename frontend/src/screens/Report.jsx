@@ -374,7 +374,7 @@ const Report = () => {
                                                             <tr key={index}>
                                                                 <td className="border px-4 py-2">{currency}</td>
                                                                 <td className="border px-4 py-2">{pieces}</td>
-                                                                <td className="border px-4 py-2 text-nowrap">
+                                                                <td className="border px-4 py-2 ">
                                                                     {formattedCurrency(cashDenominations?.totals[key])}
                                                                 </td>
                                                             </tr>
@@ -407,7 +407,7 @@ const Report = () => {
                                                             <td className="border px-4 py-2">{item?.productTypeName} {item?.itemDescription}</td>
                                                             <td className="border px-4 py-2">{toNumber(item?.quantity)}</td>
                                                             {/* <td className="border px-4 text-center">{formattedDate(new Date(item?.soldAt))}</td> */}
-                                                            <td className="border px-4 py-2 text-nowrap">{formattedCurrency(item?.totalAmount)}</td>
+                                                            <td className="border px-4 py-2 ">{formattedCurrency(item?.totalAmount)}</td>
                                                             <td className="border px-4 py-2">{item?.paymentMethod}</td>
                                                         </tr>
                                                     ))}
@@ -441,12 +441,12 @@ const Report = () => {
                                                         <th className="border px-4 py-2 text-sm">
                                                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                         </th>
-                                                        <th className="border px-4 py-2 text-sm">Gross Sales</th>
-                                                        <th className="border px-4 py-2 text-sm">Total Expenses</th>
-                                                        <th className="border px-4 py-2 text-sm">Cash</th>
-                                                        <th className="border px-4 py-2 text-sm">Non-Cash</th>
-                                                        <th className="border px-4 py-2 text-sm">Cash Denominations Total</th>
-                                                        <th className="border px-4 py-2 text-sm">Discrepancy</th>
+                                                        <th className="border px-4 py-2">Gross Sales</th>
+                                                        <th className="border px-4 py-2">Total Expenses</th>
+                                                        <th className="border px-4 py-2">Cash</th>
+                                                        <th className="border px-4 py-2">Non-Cash</th>
+                                                        <th className="border px-4 py-2">Cash Denominations Total</th>
+                                                        <th className="border px-4 py-2">Discrepancy</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -454,13 +454,13 @@ const Report = () => {
                                                         const discrepancy = item?.discrepancy;
                                                         return (
                                                             <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
-                                                                <td className="border px-4 text-center text-nowrap bg-transparent">{formattedDate(new Date(item?.date))}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.grossSales)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashPayments)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.nonCashPayments)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(discrepancy)}</td>
+                                                                <td className="border px-4 text-center bg-transparent">{formattedDate(new Date(item?.date))}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.grossSales)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.cashPayments)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.nonCashPayments)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
                                                         )
                                                     })}
@@ -491,12 +491,12 @@ const Report = () => {
                                                         return (
                                                             <tr key={index} className={`${discrepancy < 0 ? 'bg-red-100' : discrepancy > 0 ? 'bg-green-100' : ''}`}>
                                                                 <td className="border px-4 text-center text-sm">{item?.month}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.grossSales)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashPayments)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.nonCashPayments)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
-                                                                <td className="border px-4 py-2 text-nowrap bg-transparent">{formattedCurrency(discrepancy)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.grossSales)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.totalExpenses)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.cashPayments)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.nonCashPayments)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(item?.cashDenominationsTotal)}</td>
+                                                                <td className="border px-4 py-2 bg-transparent">{formattedCurrency(discrepancy)}</td>
                                                             </tr>
                                                         )
                                                     })}
