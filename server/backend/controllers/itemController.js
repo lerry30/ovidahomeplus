@@ -148,7 +148,7 @@ const updateItem = requestHandler(async (req, res, database) => {
         //     await unlink(getDir(`uploads/barcodes/${prevBarcode}.png`));
         //     generateBarcode(itemBarcode);
         // }
-        res.status(201).json({message: 'Inserted successfully.'});
+        res.status(201).json({message: 'Updated successfully.'});
         return;
     }
 
