@@ -221,7 +221,7 @@ const Barcode = () => {
                                                         <img 
                                                             src={`${apiUrl}/fl/barcodes/${barcode?.barcode}.png`}
                                                             alt="ovida-product-barcode" 
-                                                            className="w-[120px] h-[50px] object-contain"
+                                                            className="w-[124px] h-[50px] object-contain"
                                                             onError={ev => {
                                                                 ev.target.src=`${apiUrl}/image-off.png`
                                                                 ev.onerror=null; // prevents infinite loop

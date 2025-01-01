@@ -107,11 +107,19 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
     const [expensesResults] = await database.execute(expenseStmt.getExpensesBetweenDates, [startDate, endDate]);
     const [cashDrawerResults] = await database.execute(cashDrawerStmt.getCashDrawerBetweenDates, [startDate, endDate]);
 
-    const createPlaceHolder = cashDrawerResults?.map(() => '?').join(', ');
-    const cashDrawerIds = cashDrawerResults?.map(item => item.cashDenominationId);
-    const [denominationResults] = await database.execute(
-        `${denominationStmt.denominations}(${createPlaceHolder});`, cashDrawerIds);
     const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
+    let allDenominations = [];
+
+    if(cashDrawerResults?.length > 0) {
+        const createPlaceHolder = cashDrawerResults?.map(() => '?').join(', ');
+        const cashDrawerIds = cashDrawerResults?.map(item => item.cashDenominationId);
+
+        const [denominationResults] = await database.execute(
+            `${denominationStmt.denominations}(${createPlaceHolder});`, cashDrawerIds);
+
+        if(denominationResults?.length > 0)
+            allDenominations = denominationResults;
+    }
 
     const items = [];
     for(let i = 0; i < numberOfDays; i++) {
@@ -149,7 +157,7 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
             }
         }
 
-        for(const denom of denominationResults) {
+        for(const denom of allDenominations) {
             if(formattedDate(denom?.createdAt) === nItem.date) {
                 let total = 0;
                 for(const key in denom) {
@@ -187,11 +195,19 @@ const getReportByYear = requestHandler(async (req, res, database) => {
     const [expensesResults] = await database.execute(expenseStmt.getExpensesBetweenDates, [startDate, endDate]);
     const [cashDrawerResults] = await database.execute(cashDrawerStmt.getCashDrawerBetweenDates, [startDate, endDate]);
 
-    const createPlaceHolder = cashDrawerResults?.map(() => '?').join(', ');
-    const cashDrawerIds = cashDrawerResults?.map(item => item.cashDenominationId);
-    const [denominationResults] = await database.execute(
-        `${denominationStmt.denominations}(${createPlaceHolder});`, cashDrawerIds);
     const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
+    let allDenominations = [];
+
+    if(cashDrawerResults?.length > 0) {
+        const createPlaceHolder = cashDrawerResults?.map(() => '?').join(', ');
+        const cashDrawerIds = cashDrawerResults?.map(item => item.cashDenominationId);
+
+        const [denominationResults] = await database.execute(
+            `${denominationStmt.denominations}(${createPlaceHolder});`, cashDrawerIds);
+
+        if(denominationResults?.length > 0)
+            allDenominations = denominationResults;
+    }
 
     const items = [];
     for (let i = 0; i < months.length; i++) {
@@ -232,7 +248,7 @@ const getReportByYear = requestHandler(async (req, res, database) => {
             }
         }
 
-        for(const denom of denominationResults) {
+        for(const denom of allDenominations) {
             const denomMonth = toNumber(getMonth(denom?.createdAt));
             if(denomMonth === i + 1) {
                 let total = 0;
