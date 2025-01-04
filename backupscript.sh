@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # save it in /usr/local/bin/backupscript.sh
+# chmod +x /usr/local/bin/backupscript.sh
+# crontab -e # make sure you are not adding 'sudo'
+# 0 10 * * * /usr/local/bin/backupscript.sh
 
 # Database credentials
 DB_USER="your_username"
