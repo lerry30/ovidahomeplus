@@ -5,7 +5,7 @@ import { urls } from '@/constants/urls';
 //import { zUser } from '@/store/user';
 import { Eye, EyeOff } from 'lucide-react';
 
-//import OvidaHomePlus from '@/ovida-front.jpg';
+import OvidaHomePlus from '@/ovida-front.jpg';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
 
@@ -55,7 +55,11 @@ const SignIn = () => {
     return (
         <main className="relative flex justify-center items-center lg:static lg:grid lg:grid-cols-2 min-h-screen">
             <section className="absolute lg:static">
-                {/*<img src={OvidaHomePlus} alt="Ovida Home Plus" className="w-full h-full min-h-screen object-cover"/>*/}
+                <img 
+                    src={OvidaHomePlus} 
+                    alt="Ovida Home Plus" 
+                    className="w-full min-h-screen object-cover rounded-xl p-2"
+                />
             </section>
             <section className="absolute lg:static w-full min-h-screen flex flex-col justify-center items-center bg-neutral-300/25 backdrop-blur-sm">
                 <form onSubmit={signin} className="flex justify-center items-center flex-col bg-white rounded-lg py-6 px-6 lg:px-10">
@@ -106,10 +110,10 @@ const SignIn = () => {
                         <button type="submit" className="w-[300px] flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">Sign In</button>
                     </div>
                     <ErrorField message={errorData?.default || ''} />
-                    <small>
+                    {/*<small>
                         Don't have an account yet?{' '}
                         <Link to="/signup" className="text-blue-800 font-bold">Sign Up</Link>
-                    </small>
+                    </small>*/}
                 </form>
             </section>
         </main>
