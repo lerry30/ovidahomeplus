@@ -125,6 +125,7 @@ const QuaggaScanner = () => {
                     Quagga.stop(); // Stop scanning after detection
                     stopCamera();
                     navigate('/admin/cashier');
+                    navigate(0);
                 } else {
                     setBarcodes({...barcodes}); // reset
                 }

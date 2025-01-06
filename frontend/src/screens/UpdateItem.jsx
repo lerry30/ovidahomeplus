@@ -9,6 +9,7 @@ import { zItem } from '@/store/item';
 
 import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
+import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
 import Select from '@/components/DropDown';
@@ -260,8 +261,7 @@ const UpdateItem = () => {
         )
     }
 
-    return (
-        <div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
+        /*<div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
             <header className="w-full h-[70px] flex items-center mb-2">
                 <Link to="/admin/inventory" className="md:hidden flex justify-center items-center text-sm">
                     <ChevronLeft />
@@ -272,102 +272,50 @@ const UpdateItem = () => {
                 </div>
                 <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Update Item</h1>
             </header>
-            <main className="grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 p-4">    
-                <section className="bg-white rounded-md p-4">
-                    <ImageUpload 
-                        fileData={[image, setImage]} 
-                        initialImageSrc={`${apiUrl}/fl/items/${currentImage}`}
-                        className="size-[100px]" 
-                    />
-                </section>
-                <section className="lg:col-start-2 lg:col-span-3 bg-white rounded-md p-4 flex flex-col gap-2">
-                    <h3 className="font-bold text-lg">Product Details</h3>
-                    {/* Product */}
-                    <hr />
-                    <div className="flex flex-col sm:px-4 gap-2">
-                        <h3 className="font-semibold">
-                            Product Type
-                            <span className="text-red-500">*</span>
-                        </h3>
-                        <div className="flex items-center gap-4">
-                            <Select name="Select Product Type" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-30">
-                                {
-                                    productTypes.map((item, index) => {
-                                        if(item?.status !== 'active') return null;
-                                        return (
-                                            <button
-                                                key={index}
-                                                onClick={() => {
-                                                    setData(state => ({...state, productType: item?.name, productTypeId: item?.id}));
-                                                }}
-                                                className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                            >
-                                                {item?.name}
-                                            </button>
-                                        )
-                                    })
-                                }
-                            </Select>
-                            {/* Dropdown output */}
-                            {data?.productType && <span className="bg-green-400/50 p-2 rounded-md">{data?.productType}</span>}
-                        </div>
-                        <ErrorField message={errorData?.productType || ''} />
-                    </div>
-                    <div className="w-full sm:px-4">
-                        <h3 className="font-semibold">
-                            Description
-                            {/* <span className="text-red-500">*</span> */}
-                        </h3>
-                        <small>Add up to a maximum of 4 description categories.</small>
-                        <article 
-                            onClick={focusOnInput}
-                            className="w-full min-h-[50px] flex flex-wrap gap-2 border rounded-lg p-2"
-                        >
-                            {data.description.map((item, index) => {
-                                if(!item) return null;
-                                return (
-                                    <div key={index} className="flex items-center gap-2 border rounded-lg p-2">
-                                        <span className="text-wrap">
-                                            {item}
-                                        </span>
-                                        <button 
-                                            onClick={() => {
-                                                const descriptionArray = data?.description?.filter((_, i) => i!==index);
-                                                setData(state => ({...state, description: descriptionArray}));
-                                            }}
-                                        >
-                                            <CircleX size={20} />
-                                        </button>
-                                    </div>
-                                )
-                            })}
-                            <input 
-                                ref={descriptionInputRef}
-                                onKeyDown={enterNewDescription}
-                                className="min-w-[100px] outline-none" 
-                            />
-                        </article>
-                        <ErrorField message={errorData?.description || ''} />
-                    </div>
-
-                    {/* Supplier */}
-                    <hr />
-                    <div className="w-full flex flex-col md:flex-row gap-2">
+            <main className="grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 p-4">*/
+    return (
+        <div className="w-full min-h-screen bg-neutral-50">
+            <SidebarLayout />
+            <main
+                className="absolute top-0 left-admin-sidebar-sm lg:left-admin-sidebar-lg
+                    w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
+                    h-full md:h-screen bg-neutral-100 p-2 sm:p-4 lg:px-6 
+                    flex flex-col overflow-y-auto
+                    [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-100
+                    [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-thumb]:bg-gray-300"
+            >
+                <header className="w-full h-[40px] flex items-center">
+                    <h1 className="font-semibold text-lg px-4">
+                        Update Item
+                    </h1>
+                </header>
+                <div className="h-full grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 pt-2">
+                    <section className="bg-white rounded-md p-4">
+                        <ImageUpload
+                            fileData={[image, setImage]} 
+                            initialImageSrc={`${apiUrl}/fl/items/${currentImage}`}
+                            className="size-[100px]" 
+                        />
+                    </section>
+                    <section className="lg:col-start-2 lg:col-span-3 bg-white rounded-md p-4 flex flex-col gap-2">
+                        <h3 className="font-bold text-lg">Product Details</h3>
+                        {/* Product */}
+                        <hr />
                         <div className="flex flex-col sm:px-4 gap-2">
                             <h3 className="font-semibold">
-                                Supplier
+                                Product Type
                                 <span className="text-red-500">*</span>
                             </h3>
                             <div className="flex items-center gap-4">
-                                <Select name="Select Supplier" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20">
+                                <Select name="Select Product Type" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-30">
                                     {
-                                        suppliers.map((item, index) => {
+                                        productTypes.map((item, index) => {
                                             if(item?.status !== 'active') return null;
                                             return (
                                                 <button
                                                     key={index}
                                                     onClick={() => {
-                                                        setData(state => ({...state, supplier: item?.name, supplierId: item?.id}));
+                                                        setData(state => ({...state, productType: item?.name, productTypeId: item?.id}));
                                                     }}
                                                     className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
                                                 >
@@ -378,131 +326,201 @@ const UpdateItem = () => {
                                     }
                                 </Select>
                                 {/* Dropdown output */}
-                                {data?.supplier && <span className="bg-green-400/50 p-2 rounded-md">{data?.supplier}</span>}
+                                {data?.productType && <span className="bg-green-400/50 p-2 rounded-md">{data?.productType}</span>}
                             </div>
-                            <ErrorField message={errorData?.supplier || ''} />
+                            <ErrorField message={errorData?.productType || ''} />
                         </div>
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
-                            <label htmlFor="delivery-price" className="font-semibold">
-                                Delivery Price
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input 
-                                id="delivery-price"
-                                value={formattedNumber(data?.deliveryPrice)}
-                                onChange={elem => {
-                                    const input = Math.max(0, toNumber(elem.target.value));
-                                    console.log(typeof input);
-                                    setData(state => ({...state, deliveryPrice: input}))
-                                }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
-                                required
-                            />
-                            <ErrorField message={errorData?.deliveryPrice || ''} />
+                        <div className="w-full sm:px-4">
+                            <h3 className="font-semibold">
+                                Description
+                                {/* <span className="text-red-500">*</span> */}
+                            </h3>
+                            <small>Add up to a maximum of 4 description categories.</small>
+                            <article 
+                                onClick={focusOnInput}
+                                className="w-full min-h-[50px] flex flex-wrap gap-2 border rounded-lg p-2"
+                            >
+                                {data.description.map((item, index) => {
+                                    if(!item) return null;
+                                    return (
+                                        <div key={index} className="flex items-center gap-2 border rounded-lg p-2">
+                                            <span className="text-wrap">
+                                                {item}
+                                            </span>
+                                            <button 
+                                                onClick={() => {
+                                                    const descriptionArray = data?.description?.filter((_, i) => i!==index);
+                                                    setData(state => ({...state, description: descriptionArray}));
+                                                }}
+                                            >
+                                                <CircleX size={20} />
+                                            </button>
+                                        </div>
+                                    )
+                                })}
+                                <input 
+                                    ref={descriptionInputRef}
+                                    onKeyDown={enterNewDescription}
+                                    className="min-w-[100px] outline-none" 
+                                />
+                            </article>
+                            <ErrorField message={errorData?.description || ''} />
                         </div>
-                        {/* <div className="w-1/2 flex flex-col sm:px-4 gap-2">
-                            <label htmlFor="delivery-date" className="font-semibold">
-                                Delivery Date
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input 
-                                id="delivery-date"
-                                type="date"
-                                value={data?.deliveryDate}
-                                onChange={elem => {
-                                    const input = elem.target.value;
-                                    setData(state => ({...state, deliveryDate: input}))
-                                }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
-                                required
-                            />
-                            <ErrorField message={errorData?.deliveryDate || ''} />
-                        </div> */}
-                    </div>
-                    {/* Item details */}
-                    <hr />
-                    <div className="w-full flex flex-col md:flex-row">
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
-                            <label htmlFor="item-code" className="font-semibold">
-                                Item Code
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input 
-                                id="item-code"
-                                value={data?.itemCode}
-                                onChange={elem => {
-                                    const input = elem.target.value;
-                                    setData(state => ({...state, itemCode: input}))
-                                }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
-                                placeholder="Item Code"
-                                required
-                            />
-                            <ErrorField message={errorData?.itemCode || ''} />
-                        </div>
-                        <div className="w-1/2 flex flex-col sm:px-4 gap-2">
-                            <label htmlFor="srp" className="font-semibold">
-                                SRP
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input 
-                                id="srp"
-                                value={formattedNumber(data?.srp)}
-                                onChange={elem => {
-                                    const input = Math.max(0, toNumber(elem.target.value));
-                                    setData(state => ({...state, srp: input}));
-                                }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
-                                required
-                            />
-                            <ErrorField message={errorData?.srp || ''} />
-                        </div>
-                    </div>
-                    <div className="flex flex-col sm:px-4 gap-2">
-                        <h3 className="font-semibold">
-                            Units
-                            <span className="text-red-500">*</span>
-                        </h3>
-                        <div className="flex items-center gap-4">
-                            <Select name="Select Unit" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10">
-                                <button
-                                    onClick={() => {
-                                        setData(state => ({...state, units: 'pcs'}));
-                                    }}
-                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                >
-                                    pcs
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setData(state => ({...state, units: 'set'}));
-                                    }}
-                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                >
-                                    set
-                                </button>
-                            </Select>
-                            {/* Dropdown output */}
-                            {data?.units && <span className="bg-green-400/50 p-2 rounded-md">{data?.units}</span>}
-                        </div>
-                        <ErrorField message={errorData?.units || ''} />
-                    </div>
 
-                    <div className="w-full flex justify-end gap-2 sm:px-4 sm:py-2">
-                        <Link 
-                            to="/admin/inventory" 
-                            className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
-                        >
-                            Cancel
-                        </Link>
-                        <button 
-                            onClick={item} 
-                            className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">
-                            Update Item
-                        </button>
-                    </div>
-                    <ErrorField message={errorData?.default || ''} />
-                </section>
+                        {/* Supplier */}
+                        <hr />
+                        <div className="w-full flex flex-col md:flex-row gap-2">
+                            <div className="flex flex-col sm:px-4 gap-2">
+                                <h3 className="font-semibold">
+                                    Supplier
+                                    <span className="text-red-500">*</span>
+                                </h3>
+                                <div className="flex items-center gap-4">
+                                    <Select name="Select Supplier" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20">
+                                        {
+                                            suppliers.map((item, index) => {
+                                                if(item?.status !== 'active') return null;
+                                                return (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => {
+                                                            setData(state => ({...state, supplier: item?.name, supplierId: item?.id}));
+                                                        }}
+                                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                                    >
+                                                        {item?.name}
+                                                    </button>
+                                                )
+                                            })
+                                        }
+                                    </Select>
+                                    {/* Dropdown output */}
+                                    {data?.supplier && <span className="bg-green-400/50 p-2 rounded-md">{data?.supplier}</span>}
+                                </div>
+                                <ErrorField message={errorData?.supplier || ''} />
+                            </div>
+                            <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                                <label htmlFor="delivery-price" className="font-semibold">
+                                    Delivery Price
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    id="delivery-price"
+                                    value={formattedNumber(data?.deliveryPrice)}
+                                    onChange={elem => {
+                                        const input = Math.max(0, toNumber(elem.target.value));
+                                        console.log(typeof input);
+                                        setData(state => ({...state, deliveryPrice: input}))
+                                    }}
+                                    className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
+                                    required
+                                />
+                                <ErrorField message={errorData?.deliveryPrice || ''} />
+                            </div>
+                            {/* <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                                <label htmlFor="delivery-date" className="font-semibold">
+                                    Delivery Date
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    id="delivery-date"
+                                    type="date"
+                                    value={data?.deliveryDate}
+                                    onChange={elem => {
+                                        const input = elem.target.value;
+                                        setData(state => ({...state, deliveryDate: input}))
+                                    }}
+                                    className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
+                                    required
+                                />
+                                <ErrorField message={errorData?.deliveryDate || ''} />
+                            </div> */}
+                        </div>
+                        {/* Item details */}
+                        <hr />
+                        <div className="w-full flex flex-col md:flex-row">
+                            <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                                <label htmlFor="item-code" className="font-semibold">
+                                    Item Code
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    id="item-code"
+                                    value={data?.itemCode}
+                                    onChange={elem => {
+                                        const input = elem.target.value;
+                                        setData(state => ({...state, itemCode: input}))
+                                    }}
+                                    className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
+                                    placeholder="Item Code"
+                                    required
+                                />
+                                <ErrorField message={errorData?.itemCode || ''} />
+                            </div>
+                            <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                                <label htmlFor="srp" className="font-semibold">
+                                    SRP
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    id="srp"
+                                    value={formattedNumber(data?.srp)}
+                                    onChange={elem => {
+                                        const input = Math.max(0, toNumber(elem.target.value));
+                                        setData(state => ({...state, srp: input}));
+                                    }}
+                                    className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
+                                    required
+                                />
+                                <ErrorField message={errorData?.srp || ''} />
+                            </div>
+                        </div>
+                        <div className="flex flex-col sm:px-4 gap-2">
+                            <h3 className="font-semibold">
+                                Units
+                                <span className="text-red-500">*</span>
+                            </h3>
+                            <div className="flex items-center gap-4">
+                                <Select name="Select Unit" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10">
+                                    <button
+                                        onClick={() => {
+                                            setData(state => ({...state, units: 'pcs'}));
+                                        }}
+                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                    >
+                                        pcs
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setData(state => ({...state, units: 'set'}));
+                                        }}
+                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                    >
+                                        set
+                                    </button>
+                                </Select>
+                                {/* Dropdown output */}
+                                {data?.units && <span className="bg-green-400/50 p-2 rounded-md">{data?.units}</span>}
+                            </div>
+                            <ErrorField message={errorData?.units || ''} />
+                        </div>
+
+                        <div className="w-full flex justify-end gap-2 sm:px-4 sm:py-2">
+                            <Link 
+                                to="/admin/inventory" 
+                                className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
+                            >
+                                Cancel
+                            </Link>
+                            <button 
+                                onClick={item} 
+                                className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800">
+                                Update Item
+                            </button>
+                        </div>
+                        <ErrorField message={errorData?.default || ''} />
+                    </section>
+                </div>
             </main>
         </div>
     )

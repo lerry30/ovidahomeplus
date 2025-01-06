@@ -7,6 +7,7 @@ import { toNumber } from '@/utils/number';
 
 import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
+import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
 import TitleFormat from '@/utils/titleFormat';
@@ -93,66 +94,82 @@ const UpdateSupplier = () => {
         )
     }
 
-    return (
-        <div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
+       /*<div className="w-full min-h-screen py-4 px-4 md:px-10 lg:px-30 xl:px-40">
             <header className="w-full h-[70px] flex items-center mb-2">
                 <div className="hidden md:flex">
                     <AppLogo segment="/suppliers" />
                 </div>
                 <h1 className="md:absolute md:left-1/2 md:-translate-x-1/2 font-bold text-lg md:text-2xl px-4">Update Supplier</h1>
-            </header>
-            <main className="grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 p-4">    
-                <section className="bg-white rounded-md p-4">
-                    <ImageUpload 
-                        fileData={[image, setImage]} 
-                        initialImageSrc={`${apiUrl}/fl/suppliers/${currentImage}`} 
-                        className="size-[100px]" 
-                    />
-                </section>
-                <section className="lg:col-start-2 lg:col-span-3 bg-white rounded-md p-4 flex flex-col gap-2">
-                    <h3 className="font-bold text-lg">Supplier Details</h3>
-                    <hr />
-                    <div className="flex flex-col sm:px-4 gap-2">
-                        <label htmlFor="supplier-name" className="font-semibold">
-                            Supplier Name
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <input 
-                            id="supplier-name"
-                            value={data?.name}
-                            onChange={elem => setData(state => ({...state, name: elem.target.value}))}
-                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
-                            placeholder="Supplier Name"
-                            required
+            </header>*/
+    return (
+        <div className="w-full min-h-screen bg-neutral-50">
+            <SidebarLayout />
+            <main
+                className="absolute top-0 left-admin-sidebar-sm lg:left-admin-sidebar-lg
+                    w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
+                    h-full md:h-screen bg-neutral-100 p-2 sm:p-4 lg:px-6 
+                    flex flex-col overflow-y-auto
+                    [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-100
+                    [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-thumb]:bg-gray-300"
+            >
+                <header className="w-full h-[40px] flex items-center">
+                    <h1 className="font-semibold text-lg px-4">
+                        Update Supplier
+                    </h1>
+                </header>
+                <div className="h-full grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 pt-2">
+                    <section className="bg-white rounded-md p-4">
+                        <ImageUpload 
+                            fileData={[image, setImage]} 
+                            initialImageSrc={`${apiUrl}/fl/suppliers/${currentImage}`} 
+                            className="size-[100px]" 
                         />
-                        <ErrorField message={errorData?.name || ''} />
-                    </div>
-                    <div className="flex flex-col sm:px-4 gap-2">
-                        <label htmlFor="supplier-name" className="font-semibold">Supplier Contact</label>
-                        <input 
-                            id="supplier-name"
-                            value={data?.contact}
-                            onChange={handleContactNumberInput}
-                            className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
-                            placeholder="09XX-XXX-XXXX (Optional)"
-                        />
-                    </div>
-                    <div className="sm:px-4 sm:py-2 flex gap-2">
-                        <Link 
-                            to="/admin/suppliers" 
-                            className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
-                        >
-                            Cancel
-                        </Link>
-                        <button 
-                            onClick={supplier} 
-                            className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800"
-                        >
-                            Update Supplier
-                        </button>
-                    </div>
-                    <ErrorField message={errorData?.default || ''} />
-                </section>
+                    </section>
+                    <section className="lg:col-start-2 lg:col-span-3 bg-white rounded-md p-4 flex flex-col gap-2">
+                        <h3 className="font-bold text-lg">Supplier Details</h3>
+                        <hr />
+                        <div className="flex flex-col sm:px-4 gap-2">
+                            <label htmlFor="supplier-name" className="font-semibold">
+                                Supplier Name
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input 
+                                id="supplier-name"
+                                value={data?.name}
+                                onChange={elem => setData(state => ({...state, name: elem.target.value}))}
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
+                                placeholder="Supplier Name"
+                                required
+                            />
+                            <ErrorField message={errorData?.name || ''} />
+                        </div>
+                        <div className="flex flex-col sm:px-4 gap-2">
+                            <label htmlFor="supplier-name" className="font-semibold">Supplier Contact</label>
+                            <input 
+                                id="supplier-name"
+                                value={data?.contact}
+                                onChange={handleContactNumberInput}
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
+                                placeholder="09XX-XXX-XXXX (Optional)"
+                            />
+                        </div>
+                        <div className="sm:px-4 sm:py-2 flex gap-2">
+                            <Link 
+                                to="/admin/suppliers" 
+                                className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
+                            >
+                                Cancel
+                            </Link>
+                            <button 
+                                onClick={supplier} 
+                                className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800"
+                            >
+                                Update Supplier
+                            </button>
+                        </div>
+                        <ErrorField message={errorData?.default || ''} />
+                    </section>
+                </div>
             </main>
         </div>
     )
