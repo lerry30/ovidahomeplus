@@ -245,7 +245,7 @@ const SoldItems = () => {
                         <span>{item?.paymentMethod}</span>
                     </div>
 
-                    <div className="col-span-3 p-3 text-sm flex justify-between bg-gray-50 rounded-md">
+                    <div className="col-span-3 p-1 text-sm flex justify-between bg-gray-50 rounded-md">
                         <span>Supplier: {item?.supplierName}</span>
                         <span>Batch: {item?.batchNo}</span>
                     </div>

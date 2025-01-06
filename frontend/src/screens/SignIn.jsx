@@ -58,7 +58,7 @@ const SignIn = () => {
                 <img 
                     src={OvidaHomePlus} 
                     alt="Ovida Home Plus" 
-                    className="w-full min-h-screen object-cover rounded-xl p-2"
+                    className="w-full h-screen object-cover rounded-xl p-2"
                 />
             </section>
             <section className="absolute lg:static w-full min-h-screen flex flex-col justify-center items-center bg-neutral-300/25 backdrop-blur-sm">
@@ -100,7 +100,7 @@ const SignIn = () => {
                             <button onClick={ev => {
                                 ev.preventDefault();
                                 setTogglePasswordDisplay(state => !state);
-                            } } className="pr-4" tabIndex="-1">
+                            }} className="pr-4" tabIndex="-1">
                                 { togglePasswordDisplay ? <Eye /> : <EyeOff /> }
                             </button>
                         </div>
