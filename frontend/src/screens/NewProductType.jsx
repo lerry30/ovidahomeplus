@@ -75,7 +75,7 @@ const NewProductType = () => {
                     [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-thumb]:bg-gray-300"
             >
                 <header className="w-full h-[40px] flex items-center">
-                    <h1 className="font-semibold text-lg px-4">
+                    <h1 className="font-semibold text-lg pl-1">
                         Create New Product Type
                     </h1>
                 </header>

@@ -9,6 +9,7 @@ export const reduceImageQuality = (uploadsFolder) => {
         if(req.file) {
             const imageQuality = 4;
             const sharpImageData = await sharp(req.file.buffer)
+                .resize(100, 100, {fit: 'inside'}) // Ensures the image fits within 200x200 without cropping
                 .png({ quality: imageQuality })
                 .toBuffer(); // Reduce file size
             
