@@ -59,7 +59,10 @@ const newItem = requestHandler(async (req, res, database) => {
    access   public
 */
 const getItems = requestHandler(async (req, res, database) => {
-    const [resultItems] = await database.query(itemStmt.items, []);
+    const limit = req.body?.limit ?? 5;
+    const offset = req.body?.offset ?? 1;
+    const nOffset = (offset-1)*limit;
+    const [resultItems] = await database.query(itemStmt.items, [limit, nOffset]);
     const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
     res.status(200).json({results: items});
 });

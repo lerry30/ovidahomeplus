@@ -18,7 +18,7 @@ const router = express.Router();
 
 const uploadMiddleware = [storeFileInMemory, reduceImageQuality('items')]
 router.post('/new', protect, uploadMiddleware, newItem);
-router.get('/get', getItems);
+router.post('/get', getItems); // since I turn it into pagination so it needs to be post
 router.get('/exclude', getExcludedSoldItems);
 router.put('/update', protect, uploadMiddleware, updateItem);
 router.patch('/status/disable', protect, disableItem);
