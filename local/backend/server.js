@@ -30,7 +30,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // routes
-app.post('/local/print/test', (req, res) => res.status(200).json({message: 'Testing'}));
 app.use('/local/api/barcodes', barcodeRoutes);
 
 // fall back when route is not found
