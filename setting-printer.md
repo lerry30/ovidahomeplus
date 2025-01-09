@@ -20,7 +20,7 @@ http://localhost:631
 ```
 
 Go to administration -> add printer.
-If it requires redential(username and password).
+If it requires credential(username and password).
 
 Check if your user is in the lpadmin.
 
