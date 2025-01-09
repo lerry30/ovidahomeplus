@@ -136,7 +136,7 @@ const Inventory = () => {
     }
 
     useLayoutEffect(() => {
-        setTimeout(() => setErrorMessage({header: '', message: ''}), 5000);
+        setTimeout(() => setErrorMessage({header: '', message: ''}), 2000);
     }, [errorMessage]);
 
     useLayoutEffect(() => {

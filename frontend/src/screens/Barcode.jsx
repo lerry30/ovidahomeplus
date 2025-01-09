@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import { ErrorModal } from '@/components/Modal';
 import { Plus, Pencil, Printer } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
@@ -14,24 +15,53 @@ const Barcode = () => {
     const [selectedBatchStatus, setSelectedBatchStatus] = useState('No Batch Selected');
     const [batches, setBatches] = useState([]);
     const [batchItems, setBatchItems] = useState([]);
+    const [printerError, setPrinterError] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const currentSelectedBatchNo = useParams()?.batch;
 
+    const printAllBarcodes = async () => {
+        try {
+            setLoading(true);
+            const dataset = [];
+            for(const item of batchItems) {
+                if(item?.disabledNote) continue;
+                for(const barcodeData of item?.barcodes) {
+                    if(barcodeData?.isSold) continue;
+                    const text = `${item?.productTypeName}-${item?.description}`;
+                    const barcode = barcodeData?.barcode;
+                    dataset.push({barcodeData: barcode, text});
+                }
+            }
+
+            const payload = {dataset};
+            const response = await sendJSON(
+                'http://localhost:8080/local/api/barcodes/printall',
+                payload
+            );
+        } catch(error) {
+            console.log('Printer Error');
+            setPrinterError(true);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const printBarcode = async (barcodeData, text) => {
         try {
+            setLoading(true);
+            if(!barcodeData || !text) throw new Error('Data to print is not defined.');
+
             const payload = {barcodeData, text};
             const response = await sendJSON(
                 'http://localhost:8080/local/api/barcodes/print', 
                 payload
             );
-            if(response) {
-                console.log(response);
-            }
         } catch(error) {
-
+            console.log('Printer Error');
+            setPrinterError(true);
         } finally {
-
+            setLoading(false);
         }
     }
 
@@ -73,6 +103,12 @@ const Barcode = () => {
     }
 
     useLayoutEffect(() => {
+        setTimeout(() => {
+            setPrinterError(false);
+        }, 1000);
+    }, [printerError]);
+
+    useLayoutEffect(() => {
         if(batches.length > 0) {
             const nBatchNo = toNumber(currentSelectedBatchNo);
             if(nBatchNo > 0) {
@@ -85,6 +121,15 @@ const Barcode = () => {
     useLayoutEffect(() => {
         getBatches();
     }, []);
+
+    if(printerError) {
+        return (
+            <ErrorModal
+                header="Printer Error" 
+                message="Printer not found."
+            />
+        )
+    }
 
     if (loading) {
         return (
@@ -148,13 +193,22 @@ const Barcode = () => {
                                 Batch {selectedBatchNo}{selectedBatchDate ? ` - ${selectedBatchDate}` : ''}
                             </span>} */}
                         </div>
-                        <Link
-                            to={`/admin/new-barcode/${selectedBatchNo}`}
-                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
-                        >
-                            <Plus size={20} />
-                            <span className="hidden sm:flex text-nowrap">New Item</span>
-                        </Link>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={printAllBarcodes}
+                                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                            >
+                                <Printer />
+                                <span className="hidden md:flex">Print All Barcodes</span>
+                            </button>
+                            <Link
+                                to={`/admin/new-barcode/${selectedBatchNo}`}
+                                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
+                            >
+                                <Plus size={20} />
+                                <span className="hidden sm:flex text-nowrap">New Item</span>
+                            </Link>
+                        </div>
                     </div>
                     {batchItems?.length <= 0 && (
                         <div className="absolute top-[60px] left-0 right-0 bottom-0 flex justify-center items-center">
@@ -253,16 +307,18 @@ const Barcode = () => {
                                                                     Sold
                                                                 </span>
                                                             :
-                                                                <button
-                                                                    onClick={() => {
-                                                                        const text = `${item?.productTypeName}-${item?.description}`;
-                                                                        printBarcode(barcode?.barcode, text);
-                                                                    }}
-                                                                    className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
-                                                                >
-                                                                    <Printer />
-                                                                    <span className="hidden sm:flex text-nowrap">Print Barcode</span>
-                                                                </button>
+                                                                isActive && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const text = `${item?.productTypeName}-${item?.description}`;
+                                                                            printBarcode(barcode?.barcode, text);
+                                                                        }}
+                                                                        className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                                    >
+                                                                        <Printer />
+                                                                        <span className="hidden sm:flex text-nowrap">Print Barcode</span>
+                                                                    </button>
+                                                                )
                                                             }
                                                         </div>
                                                     </div>

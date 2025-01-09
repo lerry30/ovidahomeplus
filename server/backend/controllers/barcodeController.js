@@ -3,7 +3,6 @@ import { toNumber } from '../utils/number.js';
 import { setBarcodeSequence } from '../helper/barcode.js';
 import { generateBarcode } from '../utils/generateBarcode.js';
 import { parseOneDeep } from '../utils/jsonParse.js';
-import { printBarcodeWithText } from '../utils/printer.js';
 import * as barcodeStmt from '../mysql/barcode.js';
 import * as batchStmt from '../mysql/batch.js';
 
@@ -63,45 +62,6 @@ const newBarcode = requestHandler(async (req, res, database) => {
     }
 });
 
-/*
-   desc     Print barcode
-   route    POST /api/barcodes/print
-   access   private
-*/
-const printBarcode = requestHandler(async (req, res, database) => {
-    const barcodeData = String(req.body?.barcodeData).trim();
-    const text = String(req.body?.text).trim().toUpperCase();
-
-    if(!barcodeData) throw {status: 400, message: 'Barcode is not defined.'}
-    if(!text) throw {status: 400, message: 'Barcode description is not defined.'}
-
-    const listOfText = text?.split('-') ?? [];
-    const nListOfText = [];
-    const offset = 50;
-    for(const nText of listOfText) {
-        for(let i = 0; i < nText.length; i+=offset) {
-            const subText = nText.substring(i, (i+1)*offset);
-            nListOfText.push(subText);
-        }
-    }
-
-    await printBarcodeWithText(
-        barcodeData,
-        nListOfText,
-        {
-            x: 100,
-            y: 40,
-            height: 220,
-            width: 5,
-            textFontHeight: 12,
-            textFontWidth: 8
-        }
-    );
-        
-    res.status(200).json({ message: 'Print successful' });
-});
-
 export {
     newBarcode,
-    printBarcode,
 };
