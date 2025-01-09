@@ -1,6 +1,6 @@
 import { ErrorModal } from '@/components/Modal';
 import { useNavigate } from 'react-router-dom';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, useRef } from 'react';
 import { getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
@@ -17,6 +17,7 @@ const QuaggaScanner = () => {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
+    const scanned = useRef(false);
     const navigate = useNavigate();
 
     const initQuangga = () => {
@@ -114,7 +115,9 @@ const QuaggaScanner = () => {
                 setScannedCode(code); // Set the scanned barcode
 
                 const itemId = barcodes[code];
-                if(itemId) {
+                if(itemId && !scanned.current) {
+                    scanned.current = true;
+
                     const isDiscounted = !!selectedItems[itemId]?.isDiscounted;
                     const selectedBarcodes = selectedItems[itemId]?.barcodes || [];
         
@@ -125,7 +128,8 @@ const QuaggaScanner = () => {
                     Quagga.stop(); // Stop scanning after detection
                     stopCamera();
                     navigate('/admin/cashier');
-                    navigate(0);
+                    //navigate(0); // it resolved my issue of open cam but it also reloads really fast the page causing the localstorage to be empty
+                    setTimeout(() => navigate(0), 500);
                 } else {
                     setBarcodes({...barcodes}); // reset
                 }

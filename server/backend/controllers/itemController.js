@@ -192,6 +192,23 @@ const enableItem = requestHandler(async (req, res, database) => {
     }
 });
 
+/*
+   desc     Search for item
+   route    POST /api/items/search
+   access   private
+*/
+const searchItems = requestHandler(async (req, res, database) => {
+    const input = String(req.body?.input).trim().toLowerCase();
+
+    if(!input) throw {status: 400, message: 'Search input cannot be empty.'};
+
+    const [results] = await database.execute(itemStmt.searchAndExcludeSoldItems, 
+        [input, input, input, input, input, input, input]);
+
+    const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
+    res.status(200).json({results: items});  
+});
+
 export {
     newItem,
     getItems,
@@ -199,4 +216,5 @@ export {
     updateItem,
     disableItem,
     enableItem,
+    searchItems,
 };

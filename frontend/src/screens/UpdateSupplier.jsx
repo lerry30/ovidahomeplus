@@ -5,7 +5,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { zSupplier } from '@/store/supplier';
 import { toNumber } from '@/utils/number';
 
-import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';

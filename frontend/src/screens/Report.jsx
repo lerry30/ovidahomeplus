@@ -1,6 +1,6 @@
 import { Printer } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
-import { sendJSON, getData } from '@/utils/send';
+import { sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { formattedDate, formatDateToLong } from '@/utils/datetime';
 import { toNumber, formattedCurrency } from '@/utils/number';

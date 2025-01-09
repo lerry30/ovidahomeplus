@@ -18,6 +18,20 @@ const Barcode = () => {
 
     const currentSelectedBatchNo = useParams()?.batch;
 
+    const printBarcode = async (barcodeData, text) => {
+        try {
+            const payload = {barcodeData, text};
+            const response = await sendJSON(urls.printbarcode, payload);
+            if(response) {
+                console.log(response);
+            }
+        } catch(error) {
+
+        } finally {
+
+        }
+    }
+
     const selectBatch = async (batchNo, deliveryDate) => {
         try {
             setLoading(true);
@@ -159,94 +173,100 @@ const Barcode = () => {
                                     key={index}
                                     className="flex flex-col gap-2"
                                 >
-                                    {item?.barcodes?.map(barcode => (
-                                        <div key={barcode?.id}>
-                                            <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg 
-                                                ${isActive ? 'border-neutral-300' : 'border-red-600 bg-gray-200/50'}
-                                                ${!!barcode?.isSold ? 'bg-red-200' : 'bg-white'}`}>
-                                                <img 
-                                                    src={`${apiUrl}/fl/items/${item?.image}`}
-                                                    alt="ovida-product" 
-                                                    className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
-                                                    onError={ev => {
-                                                        ev.target.src=`${apiUrl}/image-off.png`
-                                                        ev.onerror=null; // prevents infinite loop
-                                                    }}
-                                                />
-                                                <hr />
-                                                <div className="w-full xl:h-[90px] 
-                                                    grid grid-cols-2 lg:grid-cols-4 gap-4
-                                                    p-2">
-                                                    <div className="w-full flex flex-col md:w-fit 
-                                                        col-start-1">
-                                                        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
-                                                            <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
+                                    {item?.barcodes?.map(barcode => {
+                                        return (
+                                            <div key={barcode?.id}>
+                                                <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg 
+                                                    ${isActive ? 'border-neutral-300' : 'border-red-600 bg-gray-200/50'}
+                                                    ${!!barcode?.isSold ? 'bg-red-200' : 'bg-white'}`}>
+                                                    <img 
+                                                        src={`${apiUrl}/fl/items/${item?.image}`}
+                                                        alt="ovida-product" 
+                                                        className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
+                                                        onError={ev => {
+                                                            ev.target.src=`${apiUrl}/image-off.png`
+                                                            ev.onerror=null; // prevents infinite loop
+                                                        }}
+                                                    />
+                                                    <hr />
+                                                    <div className="w-full xl:h-[90px] 
+                                                        grid grid-cols-2 lg:grid-cols-4 gap-4
+                                                        p-2">
+                                                        <div className="w-full flex flex-col md:w-fit 
+                                                            col-start-1">
+                                                            <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                                                                <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
+                                                            </div>
+                                                            <p className="text-[12px]">{item?.description}</p>
+                                                            <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
+                                                            {/* -------------------------------------------------- */}
+                                                            {/* display only for small screen */}
+                                                            {/* <p className="flex md:hidden text-[12px]">
+                                                                {formattedDateAndTime(new Date(item?.deliveryDate))}
+                                                            </p> */}
+                                                            {!isActive && (
+                                                                <p className="text-red-500 font-semibold italic text-[14px]">
+                                                                    Inactive item: Note - {item?.disabledNote}
+                                                                </p>
+                                                            )}
                                                         </div>
-                                                        <p className="text-[12px]">{item?.description}</p>
-                                                        <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
-                                                        {/* -------------------------------------------------- */}
-                                                        {/* display only for small screen */}
-                                                        {/* <p className="flex md:hidden text-[12px]">
-                                                            {formattedDateAndTime(new Date(item?.deliveryDate))}
-                                                        </p> */}
-                                                        {!isActive && (
-                                                            <p className="text-red-500 font-semibold italic text-[14px]">
-                                                                Inactive item: Note - {item?.disabledNote}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex flex-col text-sm 
-                                                        row-start-3 lg:row-start-1 lg:col-start-2">
-                                                        <article>
-                                                            <span>Supplier:&nbsp;&nbsp;</span>
-                                                            <span className="font-semibold">
-                                                                {item.supplierName}
-                                                            </span>
-                                                        </article>
-                                                        <article>
-                                                            <span>SRP:&nbsp;&nbsp;</span>
-                                                            <span className="font-semibold">
-                                                                ₱ {formattedNumber(item?.srp)}
-                                                            </span>
-                                                        </article>
-                                                        <article>
-                                                            <span>Max discount:&nbsp;&nbsp;</span>
-                                                            <span className="font-semibold">
-                                                                ₱ {formattedNumber(item?.maxDiscount)}
-                                                            </span>
-                                                        </article>
-                                                    </div>
-                                                    <div className="w-full flex lg:justify-center 
-                                                        row-start-2 lg:row-start-1 lg:col-start-3">
-                                                        <img 
-                                                            src={`${apiUrl}/fl/barcodes/${barcode?.barcode}.png`}
-                                                            alt="ovida-product-barcode" 
-                                                            className="w-[124px] h-[50px] object-contain"
-                                                            onError={ev => {
-                                                                ev.target.src=`${apiUrl}/image-off.png`
-                                                                ev.onerror=null; // prevents infinite loop
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col items-end md:justify-start
-                                                        row-start-1 col-start-2 lg:col-start-4">
-                                                        {!!barcode?.isSold ?
-                                                            <span className="bg-red-600 text-white px-2 rounded-lg font-semibold">
-                                                                Sold
-                                                            </span>
-                                                        :
-                                                            <button
-                                                                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
-                                                            >
-                                                                <Printer />
-                                                                <span className="hidden sm:flex text-nowrap">Print Barcode</span>
-                                                            </button>
-                                                        }
+                                                        <div className="flex flex-col text-sm 
+                                                            row-start-3 lg:row-start-1 lg:col-start-2">
+                                                            <article>
+                                                                <span>Supplier:&nbsp;&nbsp;</span>
+                                                                <span className="font-semibold">
+                                                                    {item.supplierName}
+                                                                </span>
+                                                            </article>
+                                                            <article>
+                                                                <span>SRP:&nbsp;&nbsp;</span>
+                                                                <span className="font-semibold">
+                                                                    ₱ {formattedNumber(item?.srp)}
+                                                                </span>
+                                                            </article>
+                                                            <article>
+                                                                <span>Max discount:&nbsp;&nbsp;</span>
+                                                                <span className="font-semibold">
+                                                                    ₱ {formattedNumber(item?.maxDiscount)}
+                                                                </span>
+                                                            </article>
+                                                        </div>
+                                                        <div className="w-full flex lg:justify-center 
+                                                            row-start-2 lg:row-start-1 lg:col-start-3">
+                                                            <img 
+                                                                src={`${apiUrl}/fl/barcodes/${barcode?.barcode}.png`}
+                                                                alt="ovida-product-barcode" 
+                                                                className="w-[124px] h-[50px] object-contain"
+                                                                onError={ev => {
+                                                                    ev.target.src=`${apiUrl}/image-off.png`
+                                                                    ev.onerror=null; // prevents infinite loop
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex flex-col items-end md:justify-start
+                                                            row-start-1 col-start-2 lg:col-start-4">
+                                                            {!!barcode?.isSold ?
+                                                                <span className="bg-red-600 text-white px-2 rounded-lg font-semibold">
+                                                                    Sold
+                                                                </span>
+                                                            :
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const text = `${item?.productTypeName}-${item?.description}`;
+                                                                        printBarcode(barcode?.barcode, text);
+                                                                    }}
+                                                                    className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                                >
+                                                                    <Printer />
+                                                                    <span className="hidden sm:flex text-nowrap">Print Barcode</span>
+                                                                </button>
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )}
+                                    )}
                                 </li>
                             )
                         })}

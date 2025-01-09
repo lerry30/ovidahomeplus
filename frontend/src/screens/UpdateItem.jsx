@@ -1,4 +1,4 @@
-import { ChevronLeft, CircleX } from 'lucide-react';
+import { CircleX } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
@@ -7,7 +7,6 @@ import { toNumber, formattedNumber } from '@/utils/number';
 // import { isValidDate } from '@/utils/datetime';
 import { zItem } from '@/store/item';
 
-import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';

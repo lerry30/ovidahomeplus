@@ -45,7 +45,7 @@ const Inventory = () => {
         setDisplayItems(nItems);
     }
 
-    const search = (ev) => {
+    /* const search = (ev) => {
         try {
             const input = ev.target.value.trim().toLowerCase();
             let tabSelected = 'all';
@@ -53,8 +53,8 @@ const Inventory = () => {
                 tabSelected = tabs[index] ? index : tabSelected;
             }
 
-            if(!input) {
-                tabNavigate(tabSelected);
+            if(!input) { // if input is an empty string due to backspacing
+                tabNavigate(tabSelected); // display items by status
                 return;
             }
 
@@ -87,6 +87,30 @@ const Inventory = () => {
             }
 
             setDisplayItems(searched);
+        } catch(error) {
+            console.log(error);
+        } finally {}
+    }*/
+
+    const search = async (ev) => {
+        try {
+            const input = ev.target.value.trim().toLowerCase();
+            let tabSelected = 'all';
+            for(const index in tabs) {
+                tabSelected = tabs[index] ? index : tabSelected;
+            }
+
+            if(!input) { // if input is an empty string due to backspacing
+                tabNavigate(tabSelected); // display items by status
+                return;
+            }
+
+            const payload = {input};
+            const response = await sendJSON(urls.searchitems, payload);
+            if(response) {
+                console.log(reponse?.results);  
+                setDisplayItems([]);
+            }
         } catch(error) {
             console.log(error);
         } finally {}
@@ -223,7 +247,7 @@ const Inventory = () => {
         >
             <section className="flex justify-between items-center gap-4">
                 <h1 className="hidden sm:flex font-semibold text-lg">Inventory</h1>
-                <Searchbar ref={searchBar} search={search} />
+                <Searchbar ref={searchBar} search={(ev) => search(ev)} />
                 <Link
                     to="/admin/new-item"
                     className="flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:pr-4 hover:bg-green-800"

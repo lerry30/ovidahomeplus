@@ -1,4 +1,3 @@
-import { ChevronLeft } from 'lucide-react';
 import { useState, useLayoutEffect } from 'react';
 import { sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
@@ -6,7 +5,6 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toNumber } from '@/utils/number';
 import { isValidDate, formatDateForHtmlInput } from '@/utils/datetime';
 
-import AppLogo from '@/components/AppLogo';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';

@@ -1,4 +1,4 @@
-import { ChevronLeft, CircleX } from 'lucide-react';
+import { CircleX } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';

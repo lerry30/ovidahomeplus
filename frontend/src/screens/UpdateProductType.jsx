@@ -2,10 +2,8 @@ import { useLayoutEffect, useState } from 'react';
 import { sendForm } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 import { zProductType } from '@/store/productType';
 
-import AppLogo from '@/components/AppLogo';
 import ImageUpload from '@/components/ImageUpload';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';

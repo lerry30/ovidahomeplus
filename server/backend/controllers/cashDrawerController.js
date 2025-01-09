@@ -11,17 +11,15 @@ import * as denominationStmt from '../mysql/denomination.js';
 */
 const getCashDrawerContents = requestHandler(async (req, res, database) => {
     const [drawer] = await database.query(cashDrawerStmt.cashDrawer, []);
-    const todaysDrawerCashDenom = drawer[0];
-    if(todaysDrawerCashDenom) {
-        // get the cash drawer denom in denomination table
-        const denomId = todaysDrawerCashDenom?.cashDenominationId;
+    const todaysDrawerCashDenom = drawer[0] ?? {};
+    // get the cash drawer denom in denomination table
+    const denomId = todaysDrawerCashDenom?.cashDenominationId;
+    if(denomId) {
         const [cashDrawerDenom] = await database.execute(denominationStmt.denomination, [denomId]);
         const currentCashCont = cashDrawerDenom[0] ?? {};
 
-        if(currentCashCont) {
-            res.status(200).json({cashDenominations: currentCashCont});
-            return;
-        }
+        res.status(200).json({cashDenominations: currentCashCont});
+        return;
     }
 
     throw {status: 400, message: 'There\'s something wrong. Cash Drawer data not found or no sold items yet.'}
