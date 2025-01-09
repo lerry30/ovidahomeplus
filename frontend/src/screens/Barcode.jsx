@@ -23,6 +23,7 @@ const Barcode = () => {
     const printAllBarcodes = async () => {
         try {
             setLoading(true);
+            if(batchItems?.length === 0) throw new Error('Print All: Data to print is not defined.');
             const dataset = [];
             for(const item of batchItems) {
                 if(item?.disabledNote) continue;

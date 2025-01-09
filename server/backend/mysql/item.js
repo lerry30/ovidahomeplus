@@ -34,8 +34,10 @@ export const items = `
     LEFT JOIN disabled_items ON disabled_items.item_id = items.id
     LEFT JOIN barcodes ON barcodes.item_id = items.id
     LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN sold_items ON sold_items.barcode = barcodes.barcode
     WHERE suppliers.status = 'active'
         AND product_types.status = 'active'
+        AND sold_items.barcode IS NULL
     GROUP BY 
         items.id, suppliers.name, suppliers.contact, suppliers.status,
         product_types.id, product_types.name, items.description,

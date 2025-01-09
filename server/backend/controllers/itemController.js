@@ -54,38 +54,18 @@ const newItem = requestHandler(async (req, res, database) => {
 });
 
 /*
-   desc     Get items
+   desc     Get items. Sold items are excluded
    route    GET /api/items/get
    access   public
 */
 const getItems = requestHandler(async (req, res, database) => {
-    const [resultSoldItems] = await database.query(soldItemStmt.soldItems, []);
-    const soldBarcodesObject = resultSoldItems?.reduce((codes, details) => ({...codes, [details?.barcode]: true}), {});
-
     const [resultItems] = await database.query(itemStmt.items, []);
     const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
-
-    // just to get rid of sold items
-    const nItems = [];
-    for(const item of items) {
-        const itemContents = {...item, quantity: 0, barcodes: []};
-        const barcodes = item?.barcodes ?? [];
-        for(const barcode of barcodes) {
-            const code = barcode?.barcode;
-            if(!code) continue;
-            if(!soldBarcodesObject[code]) {
-                itemContents.barcodes.push(barcode);
-                itemContents.quantity++;
-            }
-        }
-        nItems.push(itemContents);
-    }
-    
-    res.status(200).json({results: nItems});
+    res.status(200).json({results: items});
 });
 
 /*
-   desc     Get items
+   desc     Get items. Sold items and disabled items are excluded
    route    GET /api/items/excluded
    access   public
 */

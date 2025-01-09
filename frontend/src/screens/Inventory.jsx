@@ -45,55 +45,9 @@ const Inventory = () => {
         setDisplayItems(nItems);
     }
 
-    /* const search = (ev) => {
-        try {
-            const input = ev.target.value.trim().toLowerCase();
-            let tabSelected = 'all';
-            for(const index in tabs) {
-                tabSelected = tabs[index] ? index : tabSelected;
-            }
-
-            if(!input) { // if input is an empty string due to backspacing
-                tabNavigate(tabSelected); // display items by status
-                return;
-            }
-
-            const searched = [];
-            const isTabAll = tabs?.all;
-            for(let i = 0; i < items.length; i++) {
-                const item = items[i];
-                const productTypeName = String(item?.productTypeName).trim().toLowerCase();
-                const description = String(item?.description).trim().toLocaleLowerCase();
-                const itemCode = String(item?.itemCode).trim().toLowerCase();
-                const maxDiscount = String(item?.maxDiscount);
-                const srp = String(item?.srp);
-                const supplierName = String(item?.supplierName).trim().toLowerCase();
-                const unit = String(item?.unit).trim().toLocaleLowerCase();
-
-                const isActive = !item?.disabledNote;
-                if(
-                    productTypeName?.match(input) ||
-                    description?.match(input) ||
-                    itemCode?.match(input) ||
-                    maxDiscount?.match(input) ||
-                    srp?.match(input) ||
-                    supplierName?.match(input) ||
-                    unit?.match(input)
-                ) {
-                    if(isActive || isTabAll){
-                        searched.push(item);
-                    }
-                }
-            }
-
-            setDisplayItems(searched);
-        } catch(error) {
-            console.log(error);
-        } finally {}
-    }*/
-
     const search = async (ev) => {
         try {
+            setLoading(true);
             const input = ev.target.value.trim().toLowerCase();
             let tabSelected = 'all';
             for(const index in tabs) {
@@ -108,18 +62,39 @@ const Inventory = () => {
             const payload = {input};
             const response = await sendJSON(urls.searchitems, payload);
             if(response) {
-                console.log(reponse?.results);  
-                setDisplayItems([]);
+                //console.log(response?.results);
+                const data = response?.results;
+                if(tabSelected==='all') {
+                    setDisplayItems(data);
+                } else {
+                    const allActive = [];
+                    const allInactive = [];
+                    for(const item of data) {
+                        if(!item?.disabledNote) {
+                            allActive.push(item);
+                        } else {
+                            allInactive.push(item);
+                        }
+                    }
+
+                    if(tabSelected==='active') {
+                        setDisplayItems(allActive);
+                    } else {
+                        setDisplayItems(allInactive);
+                    }
+                }
             }
         } catch(error) {
             console.log(error);
-        } finally {}
+        } finally {
+            setLoading(false);
+        }
     }
 
     const getItems = async () => {
         try {
             setLoading(true);
-
+            // excluded sold items but disabled are included with zero quantity
             const response = await getData(urls?.getitems);
             if(response) {
                 // console.log(response?.results);
@@ -283,7 +258,7 @@ const Inventory = () => {
                                         const isActive = !item?.disabledNote;
                                         const status = isActive ? 'active' : 'inactive';
                                         return (
-                                            <li key={item?.id}>
+                                            <li key={index}>
                                                 <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg ${isActive?'border-neutral-300':'border-red-600 bg-gray-200/50'}`}>
                                                     <img 
                                                         src={`${apiUrl}/fl/items/${item?.image}`}
@@ -431,3 +406,51 @@ const Inventory = () => {
 }
 
 export default Inventory;
+
+
+/* const search = (ev) => {
+    try {
+        const input = ev.target.value.trim().toLowerCase();
+        let tabSelected = 'all';
+        for(const index in tabs) {
+            tabSelected = tabs[index] ? index : tabSelected;
+        }
+
+        if(!input) { // if input is an empty string due to backspacing
+            tabNavigate(tabSelected); // display items by status
+            return;
+        }
+
+        const searched = [];
+        const isTabAll = tabs?.all;
+        for(let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const productTypeName = String(item?.productTypeName).trim().toLowerCase();
+            const description = String(item?.description).trim().toLocaleLowerCase();
+            const itemCode = String(item?.itemCode).trim().toLowerCase();
+            const maxDiscount = String(item?.maxDiscount);
+            const srp = String(item?.srp);
+            const supplierName = String(item?.supplierName).trim().toLowerCase();
+            const unit = String(item?.unit).trim().toLocaleLowerCase();
+
+            const isActive = !item?.disabledNote;
+            if(
+                productTypeName?.match(input) ||
+                description?.match(input) ||
+                itemCode?.match(input) ||
+                maxDiscount?.match(input) ||
+                srp?.match(input) ||
+                supplierName?.match(input) ||
+                unit?.match(input)
+            ) {
+                if(isActive || isTabAll){
+                    searched.push(item);
+                }
+            }
+        }
+
+        setDisplayItems(searched);
+    } catch(error) {
+        console.log(error);
+    } finally {}
+}*/
