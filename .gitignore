@@ -11,7 +11,7 @@ frontend/dist-ssr
 frontend/*.local
 
 # Local Backend
-server/node_modules
-server/.env
-server/*.local
-server/backend/uploads
+local/node_modules
+local/.env
+local/*.local
+local/backend/uploads
