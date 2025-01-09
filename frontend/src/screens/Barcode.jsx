@@ -21,7 +21,10 @@ const Barcode = () => {
     const printBarcode = async (barcodeData, text) => {
         try {
             const payload = {barcodeData, text};
-            const response = await sendJSON(urls.printbarcode, payload);
+            const response = await sendJSON(
+                'http://localhost:8080/local/api/barcodes/print', 
+                payload
+            );
             if(response) {
                 console.log(response);
             }
