@@ -12,6 +12,7 @@ export const urls = {
     getproducttypes: `${apiUrl}/api/producttypes/get`,
     updateproducttypestatus: `${apiUrl}/api/producttypes/status`,
     updateproducttype: `${apiUrl}/api/producttypes/update`,
+    getproducttypesbystatus: `${apiUrl}/api/producttypes/status`,
     newitem: `${apiUrl}/api/items/new`,
     getitems: `${apiUrl}/api/items/get`,
     getexclude: `${apiUrl}/api/items/exclude`,

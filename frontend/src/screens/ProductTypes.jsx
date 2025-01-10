@@ -24,6 +24,30 @@ const ProductTypes = () => {
     const pageOffset = useRef(1);
     const navigate = useNavigate();
 
+    const getTabSelected = () => {
+        let tab = 'all';
+        for(const index in tabs)
+            tab = tabs[index] ? index : tab;
+        return tab;
+    }
+
+    const activateStatus = async (offset, tab) => {
+        try {
+            setLoading(true);
+            const query = `limit=5&offset=${offset}&status=${tab}`;
+            const response = await getData(`${urls?.getproducttypesbystatus}?${query}`);
+            if(response) {
+                const data = response?.results;
+                //console.log(response);
+                setDisplayProductTypes(data);
+            }
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const tabNavigate = (tab) => {
         if(searchBar.current) searchBar.current.value = '';
         setTabs({all: false, active: false, inactive: false, [tab]: true});
@@ -32,23 +56,13 @@ const ProductTypes = () => {
             setDisplayProductTypes(productTypes);
             return;
         }
-
-        const nProductTypes = [];
-        for(let i = 0; i < productTypes.length; i++) {
-            const productType = productTypes[i];
-            if(productType?.status===tab) nProductTypes.push(productType);
-        }
-
-        setDisplayProductTypes(nProductTypes);
+        activateStatus(pageOffset.current, tab);
     }
 
     const search = (ev) => {
         try {
             const input = ev.target.value.trim().toLowerCase();
-            let tabSelected = 'all';
-            for(const index in tabs) {
-                tabSelected = tabs[index] ? index : tabSelected;
-            }
+            let tabSelected = getTabSelected();
 
             if(!input) {
                 tabNavigate(tabSelected);
@@ -114,6 +128,15 @@ const ProductTypes = () => {
             setLoading(false);
         }
     }
+
+    useLayoutEffect(() => {
+        const tabSelected = getTabSelected();
+        if(tabSelected === 'all') {
+            getProductTypes(pageOffset.current);
+        } else {
+            activateStatus(pageOffset.current, tabSelected);
+        }
+    }, [pageOffset.current]);
 
     useLayoutEffect(() => {
         let tabSelected = 'all';
@@ -193,13 +216,13 @@ const ProductTypes = () => {
                         </div>
                         <div className="h-[40px] flex md:gap-2">
                             <button
-                                onClick={() => getProductTypes(Math.max(pageOffset.current-1, 1))}
+                                onClick={() => pageOffset.current = Math.max(pageOffset.current-1, 1)}
                                 className="flex">
                                 <ChevronLeft />
                             </button>
                             <span>{pageOffset.current}</span>
                             <button 
-                                onClick={() => getProductTypes(pageOffset.current+1)}
+                                onClick={() => pageOffset.current = pageOffset.current+1}
                                 className="flex">
                                 <ChevronRight />
                             </button>

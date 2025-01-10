@@ -1,9 +1,8 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber, roundToTwo } from '../utils/number.js';
 import { parseOneDeep } from '../utils/jsonParse.js';
-import { checkDescription, setPaginate } from '../helper/items.js';
-// import { generateBarcode } from '../utils/generateBarcode.js';
-// import { setBarcodeSequence } from '../helper/item.js';
+import { checkDescription } from '../helper/items.js';
+import { setPaginate } from '../utils/pagination.js';
 import { getDir, fileExists } from '../utils/fileDir.js';
 import { unlink } from 'fs/promises';
 import * as itemStmt from '../mysql/item.js';

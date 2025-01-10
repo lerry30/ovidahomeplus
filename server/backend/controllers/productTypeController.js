@@ -2,6 +2,7 @@ import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
 import { getDir, fileExists } from '../utils/fileDir.js';
 import { unlink } from 'fs/promises';
+import { setPaginate } from '../utils/pagination.js';
 import * as productTypeStmt from '../mysql/productType.js';
 
 /*
@@ -34,22 +35,8 @@ const newProductType = requestHandler(async (req, res, database) => {
 const getProductTypes = requestHandler(async (req, res, database) => {
     const limit = toNumber(req.query?.limit) || null;
     const offset = toNumber(req.query?.offset) || null;
-    let nOffset = null;
 
-    if (limit && offset) nOffset = (offset - 1) * limit;
-
-    // Add LIMIT and OFFSET dynamically
-    let sqlQuery = productTypeStmt.productTypes;
-    if (limit) {
-        sqlQuery += ` LIMIT ?`;
-        if (nOffset !== null) {
-            sqlQuery += ` OFFSET ?`;
-        }
-    }
-    // Prepare query parameters
-    const queryParams = [];
-    if (limit) queryParams.push(limit);
-    if (nOffset !== null) queryParams.push(nOffset);
+    const {sqlQuery, queryParams} = setPaginate(limit, offset, productTypeStmt.productTypes);
 
     const [results] = await database.query(sqlQuery, queryParams);
     res.status(200).json({results});
@@ -105,9 +92,30 @@ const updateProductType = requestHandler(async (req, res, database) => {
     }
 });
 
+/*
+   desc     Get items either active or inactive
+   route    GET /api/items/status
+   access   public
+*/
+const getProductTypesByStatus = requestHandler(async (req, res, database) => {
+    const limit = toNumber(req.query?.limit) || null;
+    const offset = toNumber(req.query?.offset) || null;
+    const status = String(req.query?.status).trim();
+
+    if(!(status === 'active' || status === 'inactive')) throw {status: 400, message: 'Undefined status.'};
+
+    const {sqlQuery, queryParams} = setPaginate(limit, offset, productTypeStmt.productTypesByStatus);
+    const [resultItems] = await database.query(sqlQuery, [status, ...queryParams]);
+
+    console.log(resultItems);
+
+    res.status(200).json({ results: resultItems });
+});
+
 export {
     newProductType,
     getProductTypes,
     changeProductTypeStatus,
     updateProductType,
+    getProductTypesByStatus,
 };

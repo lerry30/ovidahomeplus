@@ -8,6 +8,7 @@ import {
     getProductTypes,
     changeProductTypeStatus,
     updateProductType,
+    getProductTypesByStatus,
 } from '../controllers/productTypeController.js';
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.post('/new', protect, uploadMiddleware, newProductType);
 router.get('/get', getProductTypes);
 router.patch('/status', protect, changeProductTypeStatus);
 router.put('/update', protect, uploadMiddleware, updateProductType);
+router.get('/status', getProductTypesByStatus);
 
 export default router;

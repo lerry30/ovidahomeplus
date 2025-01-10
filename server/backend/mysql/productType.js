@@ -1,5 +1,4 @@
-// I didn't add semicolon at the end since
-// it could have pagination dynamically
+// it could paginate dynamically
 export const productTypes = `
     SELECT 
         id,
@@ -8,7 +7,19 @@ export const productTypes = `
         status,
         updated_at AS updatedAt
     FROM product_types
-    ORDER BY updated_at DESC
+    ORDER BY updated_at DESC;
+`;
+
+export const productTypesByStatus = `
+    SELECT 
+        id,
+        name,
+        image,
+        status,
+        updated_at AS updatedAt
+    FROM product_types
+    WHERE status = ?
+    ORDER BY updated_at DESC;
 `;
 
 export const productType = `
