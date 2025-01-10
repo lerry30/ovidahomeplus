@@ -48,7 +48,6 @@ const Inventory = () => {
 
     const search = async (ev) => {
         try {
-            setLoading(true);
             const input = ev.target.value.trim().toLowerCase();
             let tabSelected = 'all';
             for(const index in tabs) {
@@ -87,8 +86,6 @@ const Inventory = () => {
             }
         } catch(error) {
             console.log(error);
-        } finally {
-            setLoading(false);
         }
     }
 
