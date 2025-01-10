@@ -10,7 +10,8 @@ import {
     updateItem,
     disableItem,
     enableItem,
-    searchItems
+    searchItems,
+    getItemsByStatus,
 } from '../controllers/itemController.js';
 
 const router = express.Router();
@@ -23,5 +24,6 @@ router.put('/update', protect, uploadMiddleware, updateItem);
 router.patch('/status/disable', protect, disableItem);
 router.patch('/status/enable/', protect, enableItem);
 router.post('/search', protect, searchItems);
+router.get('/status', getItemsByStatus);
 
 export default router;

@@ -26,6 +26,30 @@ const Inventory = () => {
     const pageOffset = useRef(1);
     const navigate = useNavigate();
 
+    const getTabSelected = () => {
+        let tab = 'all';
+        for(const index in tabs)
+            tab = tabs[index] ? index : tab;
+        return tab;
+    }
+
+    const activateStatus = async (offset, tab) => {
+        try {
+            setLoading(true);
+            const query = `limit=5&offset=${offset}&status=${tab}`;
+            const response = await getData(`${urls?.getitemsbystatus}?${query}`);
+            if(response) {
+                const data = response?.results;
+                //console.log(response);
+                setDisplayItems(data);
+            }
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const tabNavigate = (tab) => {
         if(searchBar.current) searchBar.current.value = '';
         setTabs({all: false, active: false, inactive: false, [tab]: true});
@@ -34,25 +58,13 @@ const Inventory = () => {
             setDisplayItems(items);
             return;
         }
-
-        const nItems = [];
-        for(let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const isActive = !item?.disabledNote;
-            if(isActive && tab==='active') nItems.push(item);
-            if(!isActive && tab==='inactive') nItems.push(item);
-        }
-
-        setDisplayItems(nItems);
+        activateStatus(pageOffset.current, tab);
     }
 
     const search = async (ev) => {
         try {
             const input = ev.target.value.trim().toLowerCase();
-            let tabSelected = 'all';
-            for(const index in tabs) {
-                tabSelected = tabs[index] ? index : tabSelected;
-            }
+            const tabSelected = getTabSelected();
 
             if(!input) { // if input is an empty string due to backspacing
                 tabNavigate(tabSelected); // display items by status
@@ -109,6 +121,15 @@ const Inventory = () => {
             setLoading(false);
         }
     }
+
+    useLayoutEffect(() => {
+        const tabSelected = getTabSelected();
+        if(tabSelected === 'all') {
+            getItems(pageOffset.current);
+        } else {
+            activateStatus(pageOffset.current, tabSelected);
+        }
+    }, [pageOffset.current]);
 
     useLayoutEffect(() => {
         setTimeout(() => setErrorMessage({header: '', message: ''}), 2000);
@@ -244,13 +265,13 @@ const Inventory = () => {
                         </div>
                         <div className="h-[40px] flex md:gap-2">
                             <button
-                                onClick={() => getItems(Math.max(pageOffset.current-1, 1))}
+                                onClick={() => pageOffset.current = Math.max(pageOffset.current-1, 1)}
                                 className="flex">
                                 <ChevronLeft />
                             </button>
                             <span>{pageOffset.current}</span>
                             <button 
-                                onClick={() => getItems(pageOffset.current+1)}
+                                onClick={() => pageOffset.current = pageOffset.current+1}
                                 className="flex">
                                 <ChevronRight />
                             </button>

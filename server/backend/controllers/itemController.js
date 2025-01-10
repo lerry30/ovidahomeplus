@@ -197,6 +197,49 @@ const searchItems = requestHandler(async (req, res, database) => {
     res.status(200).json({results: items});  
 });
 
+/*
+   desc     Get items either active or inactive
+   route    GET /api/items/status
+   access   public
+*/
+const getItemsByStatus = requestHandler(async (req, res, database) => {
+    const limit = toNumber(req.query?.limit) || null;
+    const offset = toNumber(req.query?.offset) || null;
+    const status = String(req.query?.status).trim();
+
+    let items;
+    if(status==='active') {
+        const {sqlQuery, queryParams} = setPaginate(limit, offset, itemStmt.items);
+        const [resultItems] = await database.query(sqlQuery, queryParams);
+        const nList = [];
+        for(const item of resultItems) {
+            if(item?.disabledNote) continue;
+            nList.push(item);
+        }
+        items = nList;
+    } else if(status==='inactive') {
+        const [resultItems] = await database.query(itemStmt.items, []);
+        const dList = [];
+        const nList = [];
+        for(const item of resultItems) {
+            if(!item?.disabledNote) continue;
+            dList.push(item);
+        }
+        const nLimit = Math.min(limit * offset, resultItems?.length);
+        const nOffset = (offset - 1) * limit;
+        for(let i = nOffset; i < nLimit; i++) {
+            const item = dList[i];
+            if(item) nList.push(item);
+        }
+        items = nList;
+    } else {
+        throw {status: 400, message: 'Status is required.'}
+    }
+
+    const nItems = items?.length > 0 ? parseOneDeep(items, ['barcodes']) : [];
+    res.status(200).json({ results: nItems });
+});
+
 export {
     newItem,
     getItems,
@@ -205,4 +248,5 @@ export {
     disableItem,
     enableItem,
     searchItems,
+    getItemsByStatus,
 };

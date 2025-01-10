@@ -19,6 +19,7 @@ export const urls = {
     disableitem: `${apiUrl}/api/items/status/disable`,
     enableitem: `${apiUrl}/api/items/status/enable`,
     searchitems: `${apiUrl}/api/items/search`,
+    getitemsbystatus: `${apiUrl}/api/items/status`,
     getbatches: `${apiUrl}/api/batches/get`,
     newbatch: `${apiUrl}/api/batches/new`,
     getbatch: `${apiUrl}/api/batches/batch`,
