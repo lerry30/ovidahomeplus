@@ -242,7 +242,7 @@ const Inventory = () => {
                             <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
                             <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
                         </div>
-                        <div className="h-[40px] flex gap-2">
+                        <div className="h-[40px] flex md:gap-2">
                             <button
                                 onClick={() => getItems(Math.max(pageOffset.current-1, 1))}
                                 className="flex">

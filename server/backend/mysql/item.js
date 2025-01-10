@@ -44,7 +44,7 @@ export const items = `
         items.item_code, items.delivery_price, items.srp,
         items.max_discount, items.unit, items.image,
         items.created_at, items.updated_at, disabled_items.note
-    ORDER BY items.updated_at DESC
+    ORDER BY items.updated_at DESC;
 `;
 
 export const excludedSoldItems = `

@@ -215,7 +215,7 @@ const NewBarcode = () => {
                             <div className="h-[50px] border-b p-2 flex items-center justify-between">
                                 <h1 className="hidden sm:flex font-semibold text-lg">Select an Item</h1>
                                 <Searchbar ref={searchBar} search={(ev) => search(ev)} />
-                                <div className="flex gap-2">
+                                <div className="flex md:gap-2">
                                     <button
                                         onClick={() => getItems(Math.max(pageOffset.current-1, 1))}
                                         className="flex">

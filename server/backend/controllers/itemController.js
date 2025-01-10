@@ -1,7 +1,7 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber, roundToTwo } from '../utils/number.js';
 import { parseOneDeep } from '../utils/jsonParse.js';
-import { checkDescription } from '../helper/items.js';
+import { checkDescription, setPaginate } from '../helper/items.js';
 // import { generateBarcode } from '../utils/generateBarcode.js';
 // import { setBarcodeSequence } from '../helper/item.js';
 import { getDir, fileExists } from '../utils/fileDir.js';
@@ -61,23 +61,7 @@ const newItem = requestHandler(async (req, res, database) => {
 const getItems = requestHandler(async (req, res, database) => {
     const limit = toNumber(req.query?.limit) || null;
     const offset = toNumber(req.query?.offset) || null;
-    let nOffset = null;
-
-    // Calculate offset
-    if (limit && offset) nOffset = (offset - 1) * limit;
-
-    // Add LIMIT and OFFSET dynamically
-    let sqlQuery = itemStmt.items;
-    if (limit) {
-        sqlQuery += ` LIMIT ?`;
-        if (nOffset !== null) {
-            sqlQuery += ` OFFSET ?`;
-        }
-    }
-    // Prepare query parameters
-    const queryParams = [];
-    if (limit) queryParams.push(limit);
-    if (nOffset !== null) queryParams.push(nOffset);
+    const {sqlQuery, queryParams} = setPaginate(limit, offset, itemStmt.items);
 
     const [resultItems] = await database.query(sqlQuery, queryParams);
     const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
@@ -85,12 +69,16 @@ const getItems = requestHandler(async (req, res, database) => {
 });
 
 /*
-   desc     Get items. Sold items and disabled items are excluded
+   desc     Get items. Sold items and disabled items are excluded and even empty stock
    route    GET /api/items/excluded
    access   public
 */
 const getExcludedSoldItems = requestHandler(async (req, res, database) => {
-    const [results] = await database.query(itemStmt.excludedSoldItems, []);
+    const limit = toNumber(req.query?.limit) || null;
+    const offset = toNumber(req.query?.offset) || null;
+    const {sqlQuery, queryParams} = setPaginate(limit, offset, itemStmt.excludedSoldItems);
+
+    const [results] = await database.query(sqlQuery, queryParams);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});
 });

@@ -1,6 +1,5 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
-import { upload } from '../utils/multerConfig.js';
 import { storeFileInMemory } from '../middleware/storeFileInMemory.js';
 import { reduceImageQuality } from '../middleware/reduceQuality.js';
 
