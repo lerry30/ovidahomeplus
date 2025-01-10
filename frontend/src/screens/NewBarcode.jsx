@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ErrorModal } from '@/components/Modal';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef } from 'react';
@@ -23,6 +23,7 @@ const NewBarcode = () => {
 
     const searchBar = useRef(null);
     const navigate = useNavigate();
+    const pageOffset = useRef(1);
     const selectedBatchNo = useParams()?.batch;
 
     const handleNewBarcode = async () => {
@@ -71,7 +72,7 @@ const NewBarcode = () => {
         });
     }
 
-    const search = (ev) => {
+    const search = async (ev) => {
         try {
             const input = ev.target.value.trim().toLowerCase();
             if(!input) {
@@ -79,49 +80,33 @@ const NewBarcode = () => {
                 return;
             }
 
-            const searched = [];
-            for(let i = 0; i < items.length; i++) {
-                const item = items[i];
-                const productTypeName = String(item?.productTypeName).trim().toLowerCase();
-                const description = String(item?.description).trim().toLocaleLowerCase();
-                const itemCode = String(item?.itemCode).trim().toLowerCase();
-                const maxDiscount = String(item?.maxDiscount);
-                const srp = String(item?.srp);
-                const supplierName = String(item?.supplierName).trim().toLowerCase();
-                const unit = String(item?.unit).trim().toLocaleLowerCase();
-                const barcode = String(item?.barcode).trim();
-
-                const isActive = !item?.disabledNote;
-                if(
-                    productTypeName?.match(input) ||
-                    description?.match(input) ||
-                    itemCode?.match(input) ||
-                    maxDiscount?.match(input) ||
-                    srp?.match(input) ||
-                    supplierName?.match(input) ||
-                    unit?.match(input) ||
-                    barcode?.match(input)
-                ) {
-                    if(isActive){
-                        searched.push(item);
-                    }
+            const payload = {input};
+            const response = await sendJSON(urls.searchitems, payload);
+            if(response) {
+                //console.log(response?.results);
+                const data = response?.results;
+                const searched = [];
+                for(const searchedItem of data) {
+                    if(searchedItem?.disabledNote) continue;
+                    searched.push(searchedItem);
                 }
+                setDisplayItems(searched);
             }
-
-            setDisplayItems(searched);
         } catch(error) {
             console.log(error);
-        } finally {}
+        }
     }
 
-    const getItems = async () => {
+    // I don't want to get the items with excluded sold items since
+    // since the page needs to add quantity and generate new barcode
+    // so it means it needs to display items even they have zero quantity.
+    const getItems = async (offset) => {
         try {
             setLoading(true);
-
-            // I don't want to get the items with excluded sold items since
-            // since the page needs to add quantity and generate new barcode
-            // so it means it needs to display items even they have zero quantity.
-            const response = await getData(urls?.getitems);
+            pageOffset.current = offset;
+            const payload = {limit: 4, offset};
+            // excluded sold items but disabled are included with zero quantity
+            const response = await sendJSON(urls?.getitems, payload);
             if(response) {
                 // console.log(response?.results);
                 // filter data if it has 
@@ -148,7 +133,7 @@ const NewBarcode = () => {
     }, [errorMessage]);
 
     useLayoutEffect(() => {
-        getItems();
+        getItems(pageOffset.current);
     }, []);
 
     if(errorMessage?.header || errorMessage?.message) {
@@ -227,9 +212,22 @@ const NewBarcode = () => {
                     <section className="grow w-full h-full relative">
                         {/* container with scroll bar */}
                         <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-1 rounded-lg shadow-md overflow-hidden">
-                            <div className="h-[50px] border-b p-2 flex items-center gap-10">
+                            <div className="h-[50px] border-b p-2 flex items-center justify-between">
                                 <h1 className="hidden sm:flex font-semibold text-lg">Select an Item</h1>
-                                <Searchbar ref={searchBar} search={search} />
+                                <Searchbar ref={searchBar} search={(ev) => search(ev)} />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => getItems(Math.max(pageOffset.current-1, 1))}
+                                        className="flex">
+                                        <ChevronLeft />
+                                    </button>
+                                    <span>{pageOffset.current}</span>
+                                    <button 
+                                        onClick={() => getItems(pageOffset.current+1)}
+                                        className="flex">
+                                        <ChevronRight />
+                                    </button>
+                                </div>
                             </div>
                             {
                                 items?.length > 0 ? (
@@ -348,3 +346,47 @@ const NewBarcode = () => {
 }
 
 export default NewBarcode;
+
+
+//const search = (ev) => {
+//    try {
+//        const input = ev.target.value.trim().toLowerCase();
+//        if(!input) {
+//            setDisplayItems(items);
+//            return;
+//        }
+
+//        const searched = [];
+//        for(let i = 0; i < items.length; i++) {
+//            const item = items[i];
+//            const productTypeName = String(item?.productTypeName).trim().toLowerCase();
+//            const description = String(item?.description).trim().toLocaleLowerCase();
+//            const itemCode = String(item?.itemCode).trim().toLowerCase();
+//            const maxDiscount = String(item?.maxDiscount);
+//            const srp = String(item?.srp);
+//            const supplierName = String(item?.supplierName).trim().toLowerCase();
+//            const unit = String(item?.unit).trim().toLocaleLowerCase();
+//            const barcode = String(item?.barcode).trim();
+
+//            const isActive = !item?.disabledNote;
+//            if(
+//                productTypeName?.match(input) ||
+//                description?.match(input) ||
+//                itemCode?.match(input) ||
+//                maxDiscount?.match(input) ||
+//                srp?.match(input) ||
+//                supplierName?.match(input) ||
+//                unit?.match(input) ||
+//                barcode?.match(input)
+//            ) {
+//                if(isActive){
+//                    searched.push(item);
+//                }
+//            }
+//        }
+
+//        setDisplayItems(searched);
+//    } catch(error) {
+//        console.log(error);
+//    } finally {}
+//}
