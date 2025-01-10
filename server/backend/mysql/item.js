@@ -45,7 +45,6 @@ export const items = `
         items.max_discount, items.unit, items.image,
         items.created_at, items.updated_at, disabled_items.note
     ORDER BY items.updated_at DESC
-    LIMIT ? OFFSET ?;
 `;
 
 export const excludedSoldItems = `

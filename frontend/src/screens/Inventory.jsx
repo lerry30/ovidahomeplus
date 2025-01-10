@@ -93,9 +93,9 @@ const Inventory = () => {
         try {
             pageOffset.current = offset;
             setLoading(true);
-            const payload = {limit: 5, offset};
             // excluded sold items but disabled are included with zero quantity
-            const response = await sendJSON(urls?.getitems, payload);
+            const query = `limit=5&offset=${offset}`;
+            const response = await getData(`${urls?.getitems}?${query}`);
             if(response) {
                 // console.log(response?.results);
                 const data = response?.results;

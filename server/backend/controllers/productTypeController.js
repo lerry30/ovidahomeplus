@@ -32,7 +32,26 @@ const newProductType = requestHandler(async (req, res, database) => {
    access   public
 */
 const getProductTypes = requestHandler(async (req, res, database) => {
-    const [results] = await database.query(productTypeStmt.productTypes, []);
+    const limit = toNumber(req.query?.limit) || null;
+    const offset = toNumber(req.query?.offset) || null;
+    let nOffset = null;
+
+    if (limit && offset) nOffset = (offset - 1) * limit;
+
+    // Add LIMIT and OFFSET dynamically
+    let sqlQuery = productTypeStmt.productTypes;
+    if (limit) {
+        sqlQuery += ` LIMIT ?`;
+        if (nOffset !== null) {
+            sqlQuery += ` OFFSET ?`;
+        }
+    }
+    // Prepare query parameters
+    const queryParams = [];
+    if (limit) queryParams.push(limit);
+    if (nOffset !== null) queryParams.push(nOffset);
+
+    const [results] = await database.query(sqlQuery, queryParams);
     res.status(200).json({results});
 });
 

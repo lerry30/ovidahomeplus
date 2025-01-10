@@ -1,4 +1,4 @@
-import { Plus, Ellipsis } from 'lucide-react';
+import { Plus, Ellipsis, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Prompt } from '@/components/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef, act } from 'react';
@@ -21,6 +21,7 @@ const ProductTypes = () => {
 
     const actionId = useRef(null);
     const searchBar = useRef(null);
+    const pageOffset = useRef(1);
     const navigate = useNavigate();
 
     const tabNavigate = (tab) => {
@@ -95,10 +96,12 @@ const ProductTypes = () => {
         }
     }
 
-    const getProductTypes = async () => {
+    const getProductTypes = async (offset) => {
         try {
             setLoading(true);
-            const response = await getData(urls?.getproducttypes);
+            pageOffset.current = offset;
+            const query = `limit=6&offset=${offset}`;
+            const response = await getData(`${urls?.getproducttypes}?${query}`);
             if(response) {
                 // console.log(response);
                 const data = response?.results || [];
@@ -122,7 +125,7 @@ const ProductTypes = () => {
     }, [productTypes]);
 
     useLayoutEffect(() => {
-        getProductTypes();
+        getProductTypes(pageOffset.current);
 
         const closeActions = () => setProductTypeActions(state => state.map(item => false));
         addEventListener('click', closeActions);
@@ -182,10 +185,25 @@ const ProductTypes = () => {
             </section>
             <section className="grow w-full h-full relative">
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
-                    <div className="h-[40px] border-b p-2 flex gap-2">
-                        <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
-                        <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
-                        <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
+                    <div className="h-[40px] flex justify-between gap-2 border-b p-2">
+                        <div className="flex gap-2">
+                            <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
+                            <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
+                            <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
+                        </div>
+                        <div className="h-[40px] flex gap-2">
+                            <button
+                                onClick={() => getProductTypes(Math.max(pageOffset.current-1, 1))}
+                                className="flex">
+                                <ChevronLeft />
+                            </button>
+                            <span>{pageOffset.current}</span>
+                            <button 
+                                onClick={() => getProductTypes(pageOffset.current+1)}
+                                className="flex">
+                                <ChevronRight />
+                            </button>
+                        </div>
                     </div>
                     {/* container with scroll bar */}
                     {

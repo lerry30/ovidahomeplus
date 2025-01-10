@@ -59,12 +59,29 @@ const newItem = requestHandler(async (req, res, database) => {
    access   public
 */
 const getItems = requestHandler(async (req, res, database) => {
-    const limit = req.body?.limit ?? 5;
-    const offset = req.body?.offset ?? 1;
-    const nOffset = (offset-1)*limit;
-    const [resultItems] = await database.query(itemStmt.items, [limit, nOffset]);
+    const limit = toNumber(req.query?.limit) || null;
+    const offset = toNumber(req.query?.offset) || null;
+    let nOffset = null;
+
+    // Calculate offset
+    if (limit && offset) nOffset = (offset - 1) * limit;
+
+    // Add LIMIT and OFFSET dynamically
+    let sqlQuery = itemStmt.items;
+    if (limit) {
+        sqlQuery += ` LIMIT ?`;
+        if (nOffset !== null) {
+            sqlQuery += ` OFFSET ?`;
+        }
+    }
+    // Prepare query parameters
+    const queryParams = [];
+    if (limit) queryParams.push(limit);
+    if (nOffset !== null) queryParams.push(nOffset);
+
+    const [resultItems] = await database.query(sqlQuery, queryParams);
     const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
-    res.status(200).json({results: items});
+    res.status(200).json({ results: items });
 });
 
 /*

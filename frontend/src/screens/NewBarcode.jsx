@@ -104,9 +104,9 @@ const NewBarcode = () => {
         try {
             setLoading(true);
             pageOffset.current = offset;
-            const payload = {limit: 4, offset};
             // excluded sold items but disabled are included with zero quantity
-            const response = await sendJSON(urls?.getitems, payload);
+            const query = `limit=4&offset=${offset}`;
+            const response = await getData(`${urls?.getitems}?${query}`);
             if(response) {
                 // console.log(response?.results);
                 // filter data if it has 
