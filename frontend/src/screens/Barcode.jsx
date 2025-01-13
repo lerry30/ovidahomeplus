@@ -16,6 +16,7 @@ const Barcode = () => {
     const [selectedBatchDate, setSelectedBatchDate] = useState(null);
     const [selectedBatchStatus, setSelectedBatchStatus] = useState('No Batch Selected');
     const [batches, setBatches] = useState([]);
+    const [displayedBatches, setDisplayedBatches] = useState([]);
     const [batchItems, setBatchItems] = useState([]);
     const [printerError, setPrinterError] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -90,13 +91,23 @@ const Barcode = () => {
         }
     }
 
+    const selectDate = (date) => {
+        const nBatches = [];
+        for(const batch of batches) {
+            if(batch?.deliveryDate === date) {
+                nBatches.push(batch);
+            }
+        }
+        setDisplayedBatches(nBatches);
+    }
+
     const getBatches = async () => {
         try {
             setLoading(true);
             const response = await getData(urls.getbatches);
             if(response) {
                 const data = response?.results?.reverse();
-                console.log(data);
+                //console.log(data);
                 setBatches(data);
             }
         } catch(error) {
@@ -125,6 +136,25 @@ const Barcode = () => {
     useLayoutEffect(() => {
         getBatches();
     }, []);
+
+    const PrintNAddItemButtons = ({className}) => (
+        <div className={`flex gap-2 ${className}`}>
+            <button
+                onClick={printAllBarcodes}
+                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+            >
+                <Printer />
+                <span className="hidden md:flex">Print All Barcodes</span>
+            </button>
+            <Link
+                to={`/admin/new-barcode/${selectedBatchNo}`}
+                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
+            >
+                <Plus size={20} />
+                <span className="hidden sm:flex text-nowrap">New Item</span>
+            </Link>
+        </div>
+    );
 
     if(printerError) {
         return (
@@ -166,17 +196,19 @@ const Barcode = () => {
                         <span className="hidden sm:flex text-nowrap">New Batch</span>
                     </Link>
                 </div>
+                {/* buttons for print all and add item for responsiveness */}
+                <PrintNAddItemButtons className="flex sm:hidden" />
             </section>
             <section>
                 <h1 className="flex sm:hidden font-semibold text-lg">Barcodes</h1>
             </section>
             <section className="grow w-full h-full relative">
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
-                    <div className="h-[60px] border-b p-2 flex justify-between items-center">
-                        <div className="flex items-center gap-2">
+                    <div className="h-[110px] sm:h-[60px] border-b p-2 flex justify-between items-center">
+                        <div className="flex flex-wrap items-center gap-2">
                             <Select 
                                 name={`${selectedYear ? selectedYear : 'Select Year'}`}
-                                className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
+                                className="h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
                                 {
                                     Array(2025-today.getFullYear()+1).fill(0).map((_, index) => {
                                         const text = index + 2025;
@@ -195,52 +227,48 @@ const Barcode = () => {
                             {selectedYear && (
                                 <Calendar 
                                     year={selectedYear}
-                                    callback={() => {}} 
-                                    highlight={{'1-1-2025': 'test'}} 
+                                    callback={selectDate} 
+                                    highlight={
+                                        batches.reduce((object, batch) => {
+                                            if(!batch) return object;
+                                            const nBatch = `Batch ${batch?.batchNo}`;
+                                            const prevBatch = object[batch?.deliveryDate] || [];
+                                            const nArray = [...prevBatch, nBatch];
+                                            return {...object, [batch?.deliveryDate]: nArray};
+                                        }, {})
+                                    }
                                 />
                             )}
-                            <Select 
-                                name={`${selectedBatchNo ? 
-                                        `Batch ${selectedBatchNo}${selectedBatchDate ? ` - ${selectedBatchDate}` : ''}` 
-                                    : 'Select Batch Number'}`} 
-                                className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
-                                {
-                                    batches.map((item, index) => {
-                                        return (
-                                            <button
-                                                key={index}
-                                                onClick={() => selectBatch(item?.batchNo, item?.deliveryDate)}
-                                                className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                            >
-                                                Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
-                                            </button>
-                                        )
-                                    })
-                                }
-                            </Select>
+                            {displayedBatches?.length > 0 && (
+                                <Select
+                                    name={`${selectedBatchNo ? 
+                                            `Batch ${selectedBatchNo}${selectedBatchDate ? ` - ${selectedBatchDate}` : ''}` 
+                                        : 'Select Batch Number'}`} 
+                                    className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
+                                    {
+                                        displayedBatches.map((item, index) => {
+                                            return (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => selectBatch(item?.batchNo, item?.deliveryDate)}
+                                                    className="text-nowrap text-[16px] p-2 sm:px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                                >
+                                                    Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
+                                                </button>
+                                            )
+                                        })
+                                    }
+                                </Select>
+                            )}
                             {/* {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">
                                 Batch {selectedBatchNo}{selectedBatchDate ? ` - ${selectedBatchDate}` : ''}
                             </span>} */}
                         </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={printAllBarcodes}
-                                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
-                            >
-                                <Printer />
-                                <span className="hidden md:flex">Print All Barcodes</span>
-                            </button>
-                            <Link
-                                to={`/admin/new-barcode/${selectedBatchNo}`}
-                                className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
-                            >
-                                <Plus size={20} />
-                                <span className="hidden sm:flex text-nowrap">New Item</span>
-                            </Link>
-                        </div>
+                        {/* buttons for print all and add item for responsiveness */}
+                        <PrintNAddItemButtons className="hidden sm:flex" />
                     </div>
                     {batchItems?.length <= 0 && (
-                        <div className="absolute top-[60px] left-0 right-0 bottom-0 flex justify-center items-center">
+                        <div className="absolute top-[60px] left-0 right-0 bottom-0 z-[0] flex justify-center items-center">
                             <h3>{selectedBatchStatus}</h3>
                         </div>
                     )}
