@@ -13,7 +13,7 @@ export const splitNWrapText = (text, offset=50) => {
 
 export const barcodeConfig = {
     x: 100,
-    y: 40,
+    y: 30,
     height: 200,
     width: 5,
     textFontHeight: 12,

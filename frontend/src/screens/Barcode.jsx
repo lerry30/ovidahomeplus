@@ -24,6 +24,14 @@ const Barcode = () => {
     const currentSelectedBatchNo = useParams()?.batch;
     const today = new Date();
 
+    const textToPrint = (item) => {
+        const itemCodeText = `ITEM CODE: ${item?.itemCode}`;
+        const supplierText = `SUPPLIER: ${item?.supplierName}`;
+        const srpText = `SRP: ${formattedNumber(item?.srp)}`;
+        const batchInfo = `Batch ${selectedBatchNo} - ${selectedBatchDate}`;
+        return `${item?.productTypeName}>${item?.description}>${itemCodeText}>${supplierText}>${srpText}>${batchInfo}`;
+    }
+
     const printAllBarcodes = async () => {
         try {
             setLoading(true);
@@ -33,7 +41,7 @@ const Barcode = () => {
                 if(item?.disabledNote) continue;
                 for(const barcodeData of item?.barcodes) {
                     if(barcodeData?.isSold) continue;
-                    const text = `${item?.productTypeName}-${item?.description}`;
+                    const text = textToPrint(item);
                     const barcode = barcodeData?.barcode;
                     dataset.push({barcodeData: barcode, text});
                 }
@@ -367,10 +375,7 @@ const Barcode = () => {
                                                                 isActive && (
                                                                     <button
                                                                         onClick={() => {
-                                                                            const itemCodeText = `ITEM CODE: ${item?.itemCode}`;
-                                                                            const supplierText = `SUPPLIER: ${item?.supplierName}`;
-                                                                            const srpText = `SRP: ${formattedNumber(item?.srp)}`;
-                                                                            const text = `${item?.productTypeName}>${item?.description}>${itemCodeText}>${supplierText}>${srpText}`;
+                                                                            const text = textToPrint(item);
                                                                             printBarcode(barcode?.barcode, text);
                                                                         }}
                                                                         className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}

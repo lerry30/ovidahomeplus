@@ -36,7 +36,7 @@ const ProductTypes = () => {
     const activateStatus = async (offset, tab) => {
         try {
             setLoading(true);
-            const query = `limit=5&offset=${offset}&status=${tab}`;
+            const query = `limit=${PAGINATE_NO}&offset=${offset}&status=${tab}`;
             const response = await getData(`${urls?.getproducttypesbystatus}?${query}`);
             if(response) {
                 const data = response?.results;
