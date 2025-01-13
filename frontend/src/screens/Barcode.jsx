@@ -367,7 +367,10 @@ const Barcode = () => {
                                                                 isActive && (
                                                                     <button
                                                                         onClick={() => {
-                                                                            const text = `${item?.productTypeName}-${item?.description}`;
+                                                                            const itemCodeText = `ITEM CODE: ${item?.itemCode}`;
+                                                                            const supplierText = `SUPPLIER: ${item?.supplierName}`;
+                                                                            const srpText = `SRP: ${formattedNumber(item?.srp)}`;
+                                                                            const text = `${item?.productTypeName}>${item?.description}>${itemCodeText}>${supplierText}>${srpText}`;
                                                                             printBarcode(barcode?.barcode, text);
                                                                         }}
                                                                         className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}

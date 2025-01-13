@@ -1,5 +1,5 @@
 export const splitNWrapText = (text, offset=50) => {
-    const listOfText = text?.split('-') ?? [];
+    const listOfText = text?.split('>') ?? [];
     const nListOfText = [];
     for(const nText of listOfText) {
         for(let i = 0; i < nText.length; i+=offset) {
@@ -14,7 +14,7 @@ export const splitNWrapText = (text, offset=50) => {
 export const barcodeConfig = {
     x: 100,
     y: 40,
-    height: 220,
+    height: 200,
     width: 5,
     textFontHeight: 12,
     textFontWidth: 8
