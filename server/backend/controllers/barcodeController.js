@@ -14,6 +14,7 @@ import * as batchStmt from '../mysql/batch.js';
 const newBarcode = requestHandler(async (req, res, database) => {
     const itemId = toNumber(req.body?.itemId);
     const batchNo = toNumber(req.body?.batchNo);
+    const batchDate = String(req.body?.batchDate).trim();
     let quantity = toNumber(req.body?.quantity);
 
     if(itemId <= 0) throw {status: 400, message: 'No item selected.'};
@@ -36,7 +37,7 @@ const newBarcode = requestHandler(async (req, res, database) => {
     while(quantity > 0) {
         nForMultiInsertStmt = nForMultiInsertStmt + '(?, ?, ?),';
 
-        const itemBarcode = setBarcodeSequence(itemId, batchNo, barcodes);
+        const itemBarcode = setBarcodeSequence(itemId, batchNo, batchDate, barcodes);
         const barcodePromise = generateBarcode(itemBarcode);
         barcodePromiseAll.push(barcodePromise);
         barcodes.push(itemBarcode);

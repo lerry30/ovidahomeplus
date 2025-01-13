@@ -1,11 +1,11 @@
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ErrorModal } from '@/components/Modal';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
-import { formattedNumber } from '@/utils/number';
-import { toNumber } from '@/utils/number';
+import { toNumber, formattedNumber } from '@/utils/number';
+import { isValidDate, formattedDate } from '@/utils/datetime';
 
 import Searchbar from '@/components/Searchbar';
 import SidebarLayout from '@/components/Sidebar';
@@ -21,22 +21,35 @@ const NewBarcode = () => {
     const [errorData, setErrorData] = useState({quantity: ''});
     const [loading, setLoading] = useState(false);
 
-    const searchBar = useRef(null);
+    const [batchInfoParams] = useSearchParams();
+    const selectedBatchNo = batchInfoParams.get('batch');
+    const selectedBatchDate = toNumber(batchInfoParams.get('date'));
+
     const navigate = useNavigate();
+    const searchBar = useRef(null);
     const pageOffset = useRef(1);
-    const selectedBatchNo = useParams()?.batch;
 
     const PAGINATE_NO = 4;
 
     const handleNewBarcode = async () => {
         try{
             setLoading(true);
+            const batchDate = formattedDate(new Date(selectedBatchDate));
+
             if(!selectedBatchNo) {
                 setErrorMessage({
-                    header: 'Undefined batch number.',
+                    header: 'Undefined Batch.',
                     message: 'Batch number is required.'
                 });
                 throw new Error('Batch number is required.');
+            }
+
+            if(!isValidDate(batchDate)) {
+                setErrorMessage({
+                    header: 'Date Error.',
+                    message: 'Batch date is required.'
+                });
+                throw new Error('Batch date is required.');
             }
 
             if(!selectedItem) {
@@ -52,7 +65,7 @@ const NewBarcode = () => {
                 throw new Error('Quantity must be greater than zero.');
             }
 
-            const payload = {batchNo: selectedBatchNo, itemId: selectedItem, quantity};
+            const payload = {batchNo: selectedBatchNo, batchDate, itemId: selectedItem, quantity};
             const response = await sendJSON(urls.newbarcode, payload);
 
             if(response) {

@@ -1,9 +1,9 @@
 import { toNumber } from '../utils/number.js';
 
-export const setBarcodeSequence = (itemId, batchNo, barcodesDetails) => {
-    // create barcode
+export const setBarcodeSequence = (itemId, batchNo, batchDate, barcodesDetails) => {
     const fCode =  String(itemId).padStart(3, '0');
-    const sCode = String(batchNo).padStart(10, '0');
+    const sCode = String(batchNo).padStart(2, '0');
+    const tCode = String(batchDate).split('-').join('');
 
     // const lastItemBarcode = items?.length > 0 ? items[0]?.barcode?.substring(3) : ''; // get the last item so new barcode will be increment for uniqueness
     // let itemBarcode = fCode + String(toNumber(lastItemBarcode)+1).padStart(11, '0');
@@ -15,7 +15,7 @@ export const setBarcodeSequence = (itemId, batchNo, barcodesDetails) => {
         largeItemNo = Math.max(largeItemNo, barcodeNo);
     }
 
-    const tCode = String(largeItemNo+1).padStart(3, '0')
+    const fthCode = String(largeItemNo+1).padStart(3, '0')
 
-    return `${fCode}${sCode}${tCode}`;
+    return `${fCode}${sCode}${tCode}${fthCode}`;
 }

@@ -1,5 +1,5 @@
 [Unit]
-Description=Barcode Printer Daemon File
+Description=Daemon File for Local Server
 After=network.target multi-user.target
 
 [Service]
@@ -9,7 +9,7 @@ ExecStart=/usr/bin/npm run start
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=barcodeprinterserver
+SyslogIdentifier=localserver
 
 [Install]
 WantedBy=multi-user.target

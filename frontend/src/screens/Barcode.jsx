@@ -155,7 +155,7 @@ const Barcode = () => {
                 <span className="hidden md:flex">Print All Barcodes</span>
             </button>
             <Link
-                to={`/admin/new-barcode/${selectedBatchNo}`}
+                to={`/admin/new-barcode?batch=${selectedBatchNo}&date=${new Date(selectedBatchDate).getTime()}`}
                 className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
             >
                 <Plus size={20} />
