@@ -4,7 +4,7 @@ import { getData, sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
 import { useNavigate, Link } from 'react-router-dom';
 import { toNumber } from '@/utils/number';
-import { isValidDate } from '@/utils/datetime';
+import { isValidDate, formattedDate } from '@/utils/datetime';
 import { quickSort } from '@/utils/sort';
 
 import AppLogo from '@/components/AppLogo';
@@ -18,6 +18,7 @@ const NewBatch = () => {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const today = new Date();
 
     const batch = async () => {
         try {
@@ -29,6 +30,11 @@ const NewBatch = () => {
 
             if(!batchNo) {
                 setErrorData(state => ({...state, batchNo: 'Batch number is required.'}));
+                throw new Error('All fields are required.');
+            }
+
+            if(!deliveryDate) {
+                setErrorData(state => ({...state, deliveryDate: 'Delivery date is required.'}));
                 throw new Error('All fields are required.');
             }
 
@@ -61,7 +67,12 @@ const NewBatch = () => {
                 // console.log(data);
                 const batchesNo = data.map(item => item?.batchNo);
                 const sortedNo = quickSort(batchesNo);
-                const suggestedBatchNo = sortedNo?.length > 0 ? sortedNo[sortedNo.length-1] + 1 : 1;
+                let suggestedBatchNo = sortedNo?.length > 0 ? sortedNo[sortedNo.length-1] + 1 : 1;
+                
+                const lastBatchDate = data.find(item => item?.batchNo === sortedNo[sortedNo.length-1]);
+                const month = new Date(lastBatchDate?.deliveryDate).getMonth();
+
+                suggestedBatchNo = month === today.getMonth() ? suggestedBatchNo : 1;
                 setData(state => ({...state, batchNo: suggestedBatchNo}));
             }
         } catch(error) {
@@ -74,6 +85,7 @@ const NewBatch = () => {
 
     useLayoutEffect(() => {
         getBatches();
+        setData(state => ({...state, deliveryDate: formattedDate(today)}));
     }, []);
 
     if(loading) {

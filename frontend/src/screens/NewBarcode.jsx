@@ -26,6 +26,8 @@ const NewBarcode = () => {
     const pageOffset = useRef(1);
     const selectedBatchNo = useParams()?.batch;
 
+    const PAGINATE_NO = 4;
+
     const handleNewBarcode = async () => {
         try{
             setLoading(true);
@@ -105,7 +107,7 @@ const NewBarcode = () => {
             setLoading(true);
             pageOffset.current = offset;
             // excluded sold items but disabled are included with zero quantity
-            const query = `limit=4&offset=${offset}`;
+            const query = `limit=${PAGINATE_NO}&offset=${offset}`;
             const response = await getData(`${urls?.getitems}?${query}`);
             if(response) {
                 // console.log(response?.results);

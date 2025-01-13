@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { toNumber } from '@/utils/number';
 
-const AnimateNumber = ({ number = 0, size=24 }) => {
+const AnimateNumber = ({ number= 0, size=24 }) => {
     const displayNumber = useMemo(() => {
         const noOfArray = toNumber(number);
         const height = size * noOfArray;

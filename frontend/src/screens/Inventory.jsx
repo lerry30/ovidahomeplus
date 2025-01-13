@@ -26,6 +26,8 @@ const Inventory = () => {
     const pageOffset = useRef(1);
     const navigate = useNavigate();
 
+    const PAGINATE_NO = 5;
+
     const getTabSelected = () => {
         let tab = 'all';
         for(const index in tabs)
@@ -106,7 +108,7 @@ const Inventory = () => {
             pageOffset.current = offset;
             setLoading(true);
             // excluded sold items but disabled are included with zero quantity
-            const query = `limit=5&offset=${offset}`;
+            const query = `limit=${PAGINATE_NO}&offset=${offset}`;
             const response = await getData(`${urls?.getitems}?${query}`);
             if(response) {
                 // console.log(response?.results);

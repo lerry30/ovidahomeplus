@@ -96,7 +96,7 @@ const Barcode = () => {
             const response = await getData(urls.getbatches);
             if(response) {
                 const data = response?.results?.reverse();
-                console.log(data);
+                // console.log(data);
                 setBatches(data);
             }
         } catch(error) {

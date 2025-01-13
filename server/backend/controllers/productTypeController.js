@@ -107,8 +107,6 @@ const getProductTypesByStatus = requestHandler(async (req, res, database) => {
     const {sqlQuery, queryParams} = setPaginate(limit, offset, productTypeStmt.productTypesByStatus);
     const [resultItems] = await database.query(sqlQuery, [status, ...queryParams]);
 
-    console.log(resultItems);
-
     res.status(200).json({ results: resultItems });
 });
 

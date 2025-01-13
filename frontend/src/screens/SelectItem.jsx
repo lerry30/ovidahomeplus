@@ -26,6 +26,8 @@ const SelectItem = () => {
     const pageOffset = useRef(1);
     const navigate = useNavigate();
 
+    const PAGINATE_NO = 5;
+
     const handleSelectedItems = () => {
         if(Object.keys(selectedItems).length > 0) {
             // with additional data
@@ -87,7 +89,7 @@ const SelectItem = () => {
             pageOffset.current = offset;
             setLoading(true);
 
-            const query = `limit=5&offset=${offset}`;
+            const query = `limit=${PAGINATE_NO}&offset=${offset}`;
             const response = await getData(`${urls?.getexclude}?${query}`);
             if(response) {
                 // console.log(response?.results);

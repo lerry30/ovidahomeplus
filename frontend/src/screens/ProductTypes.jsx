@@ -24,6 +24,8 @@ const ProductTypes = () => {
     const pageOffset = useRef(1);
     const navigate = useNavigate();
 
+    const PAGINATE_NO = 6;
+
     const getTabSelected = () => {
         let tab = 'all';
         for(const index in tabs)
@@ -114,7 +116,7 @@ const ProductTypes = () => {
         try {
             setLoading(true);
             pageOffset.current = offset;
-            const query = `limit=6&offset=${offset}`;
+            const query = `limit=${PAGINATE_NO}&offset=${offset}`;
             const response = await getData(`${urls?.getproducttypes}?${query}`);
             if(response) {
                 // console.log(response);
