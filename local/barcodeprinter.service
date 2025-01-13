@@ -1,0 +1,16 @@
+[Unit]
+Description=Barcode Printer Daemon File
+After=network.target multi-user.target
+
+[Service]
+User=ovida
+WorkingDirectory=/home/ovida/Desktop
+ExecStart=/usr/bin/npm run start
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=barcodeprinterserver
+
+[Install]
+WantedBy=multi-user.target
+
