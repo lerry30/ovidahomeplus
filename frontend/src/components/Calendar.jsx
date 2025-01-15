@@ -45,7 +45,7 @@ const Calendar = ({year=2025, callback=(date)=>{}, highlight={}}) => {
                         bg-neutral-100 flex justify-center items-center" 
                     style={{zIndex: 51}}>
                     <main 
-                        className="w-[600px] h-[500px] 
+                        className="w-[700px] h-[500px] 
                             bg-white rounded-lg shadow-lg border flex flex-col p-2">
                         <header className="flex justify-between p-2 pb-4">
                             <span

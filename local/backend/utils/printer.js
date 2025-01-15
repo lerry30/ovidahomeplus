@@ -28,7 +28,7 @@ const printBarcodeWithText = async (barcodeData, textLines = [], options = {}) =
         printerName = 'Honeywell_Thermal',
         textFontHeight = 12,
         textFontWidth = 8,
-        lineSpacing = 26  // Space between lines
+        lineSpacing = 24  // Space between lines
     } = options;
 
     // Start with barcode ZPL

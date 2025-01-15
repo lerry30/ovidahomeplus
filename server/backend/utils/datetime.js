@@ -18,7 +18,7 @@ export const currentTime = () => {
 export const formattedDate = (date) => {
     const nDate = new Date(date).toLocaleString('en-US', {timeZone: process.env.TIMEZONE});
     const [month, day, year] = nDate.split(',')[0].split('/');
-    return `${year}-${month}-${day}`;
+    return `${year}-${String(month).padStart(2, 0)}-${String(day).padStart(2, 0)}`;
 };
 
 export const isValidDate = (dateString) => {

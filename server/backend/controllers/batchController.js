@@ -1,6 +1,6 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
-import { isValidDate } from '../utils/datetime.js';
+import { isValidDate, formattedDate } from '../utils/datetime.js';
 import { parseOneDeep } from '../utils/jsonParse.js';
 import * as batchStmt from '../mysql/batch.js';
 
@@ -10,25 +10,23 @@ import * as batchStmt from '../mysql/batch.js';
    access   private
 */
 const newBatch = requestHandler(async (req, res, database) => {
+    const supplierId = toNumber(req.body?.supplierId);
     const batchNo = toNumber(req.body?.batchNo);
-    const deliveryRecieptNo = String(req.body?.deliveryRecieptNo).trim().replace(/[^0-9]+/g, '');
+    const deliveryReceiptNo = String(req.body?.deliveryReceiptNo).trim().replace(/[^0-9]+/g, '');
     let deliveryDate = String(req.body?.deliveryDate)?.trim();
 
+    if(supplierId < 1) throw new Error('Supplier is required.');
     if(batchNo < 1) throw new Error('Batch number is invalid.');
-    if(deliveryDate) {
-        if(!isValidDate(deliveryDate)) {
-            throw {status: 400, message: 'Invalid Date'}
-        }
-    } else {
-        deliveryDate = null;
-    }
+    if(!deliveryDate) throw {status: 400, message: 'Date is required.'};
+    if(!isValidDate(deliveryDate)) throw {status: 400, message: 'Invalid Date,'};
 
-    const [selectBatch] = await database.execute(batchStmt.batch, [batchNo]);
+    const nDeliveryDate = formattedDate(deliveryDate);
+    const [selectBatch] = await database.execute(batchStmt.getBatch, [supplierId, batchNo, nDeliveryDate, deliveryReceiptNo]);
     if(selectBatch && selectBatch?.length > 0) throw {status: 400, message: `Batch ${batchNo} already exists.`}
 
-    const [batch] = await database.execute(batchStmt.newBatch, [batchNo, deliveryRecieptNo, deliveryDate]);
+    const [batch] = await database.execute(batchStmt.newBatch, [supplierId, batchNo, deliveryReceiptNo, nDeliveryDate]);
     if(batch?.insertId > 0) {
-        res.status(200).json({batchNo, deliveryRecieptNo, deliveryDate});
+        res.status(200).json({batchNo, deliveryReceiptNo, nDeliveryDate});
     }
 });
 
@@ -48,8 +46,8 @@ const getBatches = requestHandler(async (req, res, database) => {
    access   public
 */
 const getBatch = requestHandler(async (req, res, database) => {
-    const batchNo = toNumber(req.body?.batchNo);
-    const [results] = await database.execute(batchStmt.batch, [batchNo]);
+    const batchId = toNumber(req.body?.batchId);
+    const [results] = await database.execute(batchStmt.batch, [batchId]);
     const data = results?.length > 0 ? results[0] : {};
     res.status(200).json({results: data});
 });
@@ -60,22 +58,26 @@ const getBatch = requestHandler(async (req, res, database) => {
    access   private
 */
 const updateBatch = requestHandler(async (req, res, database) => {
+    const batchId = toNumber(req.body?.batchId);
+    const supplierId = toNumber(req.body?.supplierId);
     const batchNo = toNumber(req.body?.batchNo);
-    const deliveryRecieptNo = String(req.body?.deliveryRecieptNo).trim().replace(/[^0-9]+/g, '');
+    const deliveryReceiptNo = String(req.body?.deliveryReceiptNo).trim().replace(/[^0-9]+/g, '');
     let deliveryDate = String(req.body?.deliveryDate)?.trim();
 
+    if(batchId < 1) throw new Error('Undefined batch.');
+    if(supplierId < 1) throw new Error('Supplier is required.');
     if(batchNo < 1) throw new Error('Batch number is invalid.');
-    if(deliveryDate) {
-        if(!isValidDate(deliveryDate)) {
-            throw {status: 400, message: 'Invalid Date'}
-        }
-    } else {
-        deliveryDate = null;
-    }
+    if(!deliveryDate) throw {status: 400, message: 'Date is required.'};
+    if(!isValidDate(deliveryDate)) throw {status: 400, message: 'Invalid Date,'};
 
-    const [batch] = await database.execute(batchStmt.updateBatch, [deliveryRecieptNo, deliveryDate, batchNo]);
+    const nDeliveryDate = formattedDate(deliveryDate);
+
+    const [selectBatch] = await database.execute(batchStmt.getBatch, [supplierId, batchNo, nDeliveryDate, deliveryReceiptNo]);
+    if(selectBatch && selectBatch?.length > 0) throw {status: 400, message: `Batch already exists.`}
+
+    const [batch] = await database.execute(batchStmt.updateBatch, [supplierId, batchNo, deliveryReceiptNo, nDeliveryDate, batchId]);
     if(batch?.affectedRows > 0) {
-        res.status(200).json({batchNo, deliveryRecieptNo, deliveryDate});
+        res.status(200).json({batchId, batchNo, deliveryReceiptNo, nDeliveryDate});
     }
 });
 
@@ -85,10 +87,21 @@ const updateBatch = requestHandler(async (req, res, database) => {
    access   private
 */
 const getBatchWithData = requestHandler(async (req, res, database) => {
-    const batchNo = toNumber(req.body?.batchNo);
-    const [results] = await database.execute(batchStmt.getAssociatedToBatch, [batchNo]);
+    const batchId = toNumber(req.body?.batchId);
+    const [results] = await database.execute(batchStmt.getAssociatedToBatch, [batchId]);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});
+});
+
+/*
+   desc     Get batches by supplier
+   route    POST /api/batches/supplier-based
+   access   private
+*/
+const getBatchesBySupplier = requestHandler(async (req, res, database) => {
+    const supplierId = toNumber(req.body?.supplierId);
+    const [results] = await database.execute(batchStmt.getBatchesBySupplier, [supplierId]);
+    res.status(200).json({results});
 });
 
 export {
@@ -97,4 +110,5 @@ export {
     getBatch,
     updateBatch,
     getBatchWithData,
+    getBatchesBySupplier,
 };

@@ -12,6 +12,7 @@ import Calendar from '@/components/Calendar';
 
 const Barcode = () => {
     const [selectedYear, setSelectedYear] = useState(null);
+    const [selectedBatchId, setSelectedBatchId] = useState(null);
     const [selectedBatchNo, setSelectedBatchNo] = useState(null);
     const [selectedBatchDate, setSelectedBatchDate] = useState(null);
     const [selectedBatchStatus, setSelectedBatchStatus] = useState('No Batch Selected');
@@ -26,10 +27,9 @@ const Barcode = () => {
 
     const textToPrint = (item) => {
         const itemCodeText = `ITEM CODE: ${item?.itemCode}`;
-        const supplierText = `SUPPLIER: ${item?.supplierName}`;
         const srpText = `SRP: ${formattedNumber(item?.srp)}`;
-        const batchInfo = `Batch ${selectedBatchNo} - ${selectedBatchDate}`;
-        return `${item?.productTypeName}>${item?.description}>${itemCodeText}>${supplierText}>${srpText}>${batchInfo}`;
+        const deliveryInfo = `SUPPLIER ${item?.supplierName} - Batch #${selectedBatchNo} - ${selectedBatchDate}`;
+        return `${item?.productTypeName}>${item?.description}>${itemCodeText}>${deliveryInfo}>${srpText}`;
     }
 
     const printAllBarcodes = async () => {
@@ -78,13 +78,19 @@ const Barcode = () => {
         }
     }
 
-    const selectBatch = async (batchNo, deliveryDate) => {
+    const selectBatch = async (batch) => {
         try {
             setLoading(true);
+            
+            const batchId = batch?.batchId;
+            const batchNo = batch?.batchNo;
+            const deliveryDate = batch?.deliveryDate;
+
+            setSelectedBatchId(batchId);
             setSelectedBatchNo(batchNo);
             setSelectedBatchDate(deliveryDate);
 
-            const payload = {batchNo};
+            const payload = {batchId};
             const response = await sendJSON(urls.batchdata, payload);
             if(response) {
                 const data = response?.results;
@@ -131,12 +137,13 @@ const Barcode = () => {
         }, 1000);
     }, [printerError]);
 
+    // redisplay items on load
     useLayoutEffect(() => {
         if(batches.length > 0) {
             const nBatchNo = toNumber(currentSelectedBatchNo);
             if(nBatchNo > 0) {
                 const batch = batches.find(item => item.batchNo===nBatchNo);
-                selectBatch(batch?.batchNo, batch.deliveryDate);
+                selectBatch(batch);
             }
         }
     }, [batches]);
@@ -155,7 +162,7 @@ const Barcode = () => {
                 <span className="hidden md:flex">Print All Barcodes</span>
             </button>
             <Link
-                to={`/admin/new-barcode?batch=${selectedBatchNo}&date=${new Date(selectedBatchDate).getTime()}`}
+                to={`/admin/new-barcode?batch=${selectedBatchId}&batchNo=${selectedBatchNo}&date=${new Date(selectedBatchDate).getTime()}`}
                 className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
             >
                 <Plus size={20} />
@@ -190,7 +197,7 @@ const Barcode = () => {
                 <h1 className="hidden sm:flex font-semibold text-lg">Barcodes</h1>
                 <div className="flex gap-2">
                     <Link
-                        to={`/admin/update-batch/${selectedBatchNo}`}
+                        to={`/admin/update-batch/${selectedBatchId}`}
                         className={`flex gap-2 items-center justify-center leading-none bg-[#e37400] text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-[#d37506] ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
                     >
                         <Pencil size={20} />
@@ -235,11 +242,11 @@ const Barcode = () => {
                             {selectedYear && (
                                 <Calendar 
                                     year={selectedYear}
-                                    callback={selectDate} 
+                                    callback={selectDate}
                                     highlight={
                                         batches.reduce((object, batch) => {
                                             if(!batch) return object;
-                                            const nBatch = `Batch ${batch?.batchNo}`;
+                                            const nBatch = `${batch?.supplierName} Batch ${batch?.batchNo}`;
                                             const prevBatch = object[batch?.deliveryDate] || [];
                                             const nArray = [...prevBatch, nBatch];
                                             return {...object, [batch?.deliveryDate]: nArray};
@@ -250,7 +257,7 @@ const Barcode = () => {
                             {displayedBatches?.length > 0 && (
                                 <Select
                                     name={`${selectedBatchNo ? 
-                                            `Batch ${selectedBatchNo}${selectedBatchDate ? ` - ${selectedBatchDate}` : ''}` 
+                                            `Batch ${selectedBatchNo}` 
                                         : 'Select Batch Number'}`} 
                                     className="w-fit h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
                                     {
@@ -258,10 +265,10 @@ const Barcode = () => {
                                             return (
                                                 <button
                                                     key={index}
-                                                    onClick={() => selectBatch(item?.batchNo, item?.deliveryDate)}
+                                                    onClick={() => selectBatch(item)}
                                                     className="text-nowrap text-[16px] p-2 sm:px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
                                                 >
-                                                    Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
+                                                    {item?.supplierName} Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
                                                 </button>
                                             )
                                         })

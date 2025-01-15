@@ -22,7 +22,8 @@ const NewBarcode = () => {
     const [loading, setLoading] = useState(false);
 
     const [batchInfoParams] = useSearchParams();
-    const selectedBatchNo = batchInfoParams.get('batch');
+    const selectedBatchId = batchInfoParams.get('batch');
+    const selectedBatchNo = batchInfoParams.get('batchNo');
     const selectedBatchDate = toNumber(batchInfoParams.get('date'));
 
     const navigate = useNavigate();

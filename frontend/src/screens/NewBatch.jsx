@@ -11,10 +11,13 @@ import AppLogo from '@/components/AppLogo';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
+import Select from '@/components/DropDown';
 
 const NewBatch = () => {
-    const [data, setData] = useState({batchNo: 0, deliveryRecieptNo: '', deliveryDate: ''});
-    const [errorData, setErrorData] = useState({batchNo: '', deliveryRecieptNo: '', deliveryDate: '', default: ''});
+    const [data, setData] = useState({supplierId: 0, batchNo: 0, deliveryReceiptNo: '', deliveryDate: ''});
+    const [errorData, setErrorData] = useState({supplier: '', batchNo: '', deliveryReceiptNo: '', deliveryDate: '', default: ''});
+    const [selectedSupplier, setSelectedSupplier] = useState('');
+    const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -24,9 +27,15 @@ const NewBatch = () => {
         try {
             setLoading(true);
 
+            const supplierId = toNumber(data?.supplierId);
             const batchNo = toNumber(data?.batchNo);
-            const deliveryRecieptNo = String(data?.deliveryRecieptNo).trim();
+            const deliveryReceiptNo = String(data?.deliveryReceiptNo).trim();
             const deliveryDate = String(data?.deliveryDate).trim();
+
+            if(!supplierId) {
+                setErrorData(state => ({...state, supplier: 'Supplier is required. Please select a supplier from the dropdown.'}));
+                throw new Error('All fields are required.');
+            }
 
             if(!batchNo) {
                 setErrorData(state => ({...state, batchNo: 'Batch number is required.'}));
@@ -45,7 +54,7 @@ const NewBatch = () => {
                 }
             }
 
-            const payload = {batchNo, deliveryRecieptNo, deliveryDate};
+            const payload = {supplierId, batchNo, deliveryReceiptNo, deliveryDate};
             const response = await sendJSON(urls.newbatch, payload);
             if(response) {
                 navigate(`/admin/barcodes/${batchNo}`);
@@ -58,13 +67,33 @@ const NewBatch = () => {
         }
     }
 
+    const getSuppliers = async () => {
+        try {
+            setLoading(true);
+            const response = await getData(urls?.getsuppliers);
+            if(response) {
+                //console.log(response?.result);
+                const data = response?.results || [];
+                setSuppliers(data);
+            }
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const getBatches = async () => {
         try {
             setLoading(true);
-            const response = await getData(urls.getbatches);
+            const supplierId = data?.supplierId;
+
+            if(!supplierId) return;
+
+            const payload = {supplierId};
+            const response = await sendJSON(urls.getbatchesbysupplier, payload);
             if(response) {
                 const data = response?.results;
-                // console.log(data);
                 const batchesNo = data.map(item => item?.batchNo);
                 const sortedNo = quickSort(batchesNo);
                 let suggestedBatchNo = sortedNo?.length > 0 ? sortedNo[sortedNo.length-1] + 1 : 1;
@@ -85,6 +114,10 @@ const NewBatch = () => {
 
     useLayoutEffect(() => {
         getBatches();
+    }, [data?.supplierId]);
+
+    useLayoutEffect(() => {
+        getSuppliers();
         setData(state => ({...state, deliveryDate: formattedDate(today)}));
     }, []);
 
@@ -126,6 +159,46 @@ const NewBatch = () => {
                         <h3 className="font-bold text-lg">Batch Details</h3>
                         <hr />
                         <div className="flex flex-col sm:px-4 gap-2">
+                            <h3 className="font-semibold">
+                                Supplier
+                                <span className="text-red-500">*</span>
+                            </h3>
+                            <div className="flex items-center gap-4">
+                                <Select 
+                                    name={`${selectedSupplier ? selectedSupplier : 'Select Supplier'}`}
+                                    className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
+                                >
+                                    {
+                                        suppliers.map((item, index) => {
+                                            if(item?.status !== 'active') return null;
+                                            return (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setData(state => ({...state, supplierId: item?.id}));
+                                                        setSelectedSupplier(item?.name);
+                                                    }}
+                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
+                                                >
+                                                    {item?.name}
+                                                </button>
+                                            )
+                                        })
+                                    }
+                                </Select>
+                                {/* Dropdown output */}
+                                {selectedSupplier && (
+                                    <span 
+                                        className="hidden sm:flex 
+                                        bg-green-400/50 p-2 rounded-md"
+                                    >
+                                        {selectedSupplier}
+                                    </span>
+                                )}
+                            </div>
+                            <ErrorField message={errorData?.supplier || ''} />
+                        </div>
+                        <div className="flex flex-col sm:px-4 gap-2">
                             <label htmlFor="batch-number" className="font-semibold">
                                 Batch Number
                                 <span className="text-red-500">*</span>
@@ -141,17 +214,17 @@ const NewBatch = () => {
                             <ErrorField message={errorData?.batchNo || ''} />
                         </div>
                         <div className="flex flex-col sm:px-4 gap-2">
-                            <label htmlFor="delivery-reciept_no" className="font-semibold">Delivery Reciept Number</label>
+                            <label htmlFor="delivery-receipt_no" className="font-semibold">Delivery Receipt Number</label>
                             <input 
-                                id="delivery-reciept_no"
-                                value={data?.deliveryRecieptNo}
+                                id="delivery-receipt_no"
+                                value={data?.deliveryReceiptNo ?? ''}
                                 onChange={elem => {
                                     const input = elem.target.value;
                                     const nInput = input.replace(/[^0-9]+/g, '');
-                                    setData(state => ({...state, deliveryRecieptNo: nInput}));
+                                    setData(state => ({...state, deliveryReceiptNo: nInput}));
                                 }}
                                 className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
-                                placeholder="Delivery Reciept Number"
+                                placeholder="Delivery Receipt Number"
                             />
                         </div>
                         <div className="w-1/2 flex flex-col sm:px-4 gap-2">

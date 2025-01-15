@@ -62,7 +62,7 @@ const getItems = requestHandler(async (req, res, database) => {
     const offset = toNumber(req.query?.offset) || null;
     const {sqlQuery, queryParams} = setPaginate(limit, offset, itemStmt.items);
 
-    const [resultItems] = await database.query(sqlQuery, queryParams);
+    const [resultItems] = await database.execute(sqlQuery, queryParams);
     const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
     res.status(200).json({ results: items });
 });
@@ -77,7 +77,7 @@ const getExcludedSoldItems = requestHandler(async (req, res, database) => {
     const offset = toNumber(req.query?.offset) || null;
     const {sqlQuery, queryParams} = setPaginate(limit, offset, itemStmt.excludedSoldItems);
 
-    const [results] = await database.query(sqlQuery, queryParams);
+    const [results] = await database.execute(sqlQuery, queryParams);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});
 });

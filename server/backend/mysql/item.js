@@ -33,7 +33,7 @@ export const items = `
     INNER JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN disabled_items ON disabled_items.item_id = items.id
     LEFT JOIN barcodes ON barcodes.item_id = items.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     LEFT JOIN sold_items ON sold_items.barcode = barcodes.barcode
     WHERE suppliers.status = 'active'
         AND product_types.status = 'active'
@@ -82,7 +82,7 @@ export const excludedSoldItems = `
     INNER JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN disabled_items ON disabled_items.item_id = items.id
     LEFT JOIN barcodes ON barcodes.item_id = items.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     LEFT JOIN sold_items ON sold_items.barcode = barcodes.barcode
     WHERE suppliers.status = 'active'
         AND product_types.status = 'active'
@@ -151,7 +151,7 @@ export const item = `
     INNER JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN disabled_items ON disabled_items.item_id = items.id
     LEFT JOIN barcodes ON barcodes.item_id = items.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     WHERE suppliers.status = 'active'
         AND product_types.status = 'active'
         AND items.id = ?
@@ -198,7 +198,7 @@ export const searchAndExcludeSoldItems = `
     INNER JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN disabled_items ON disabled_items.item_id = items.id
     LEFT JOIN barcodes ON barcodes.item_id = items.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     LEFT JOIN sold_items ON sold_items.barcode = barcodes.barcode
     WHERE suppliers.status = 'active'
         AND product_types.status = 'active'
@@ -218,7 +218,6 @@ export const searchAndExcludeSoldItems = `
         items.item_code, items.delivery_price, items.srp,
         items.max_discount, items.unit, items.image,
         items.created_at, items.updated_at, disabled_items.note
-    HAVING quantity > 0
     ORDER BY items.updated_at DESC;
 `;
 

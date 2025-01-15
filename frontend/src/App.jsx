@@ -97,7 +97,6 @@ const App = () => {
 
 	return (
 		<Routes>
-            {/*<Route path="/signup" element={<SignUp />} />*/}
 			<Route path="/signin" element={<SignIn />} />
 			<Route path="/admin/new-supplier" element={<NewSupplier />} />
 			<Route path="/admin/update-supplier" element={<UpdateSupplier />} />

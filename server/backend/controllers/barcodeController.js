@@ -13,17 +13,17 @@ import * as batchStmt from '../mysql/batch.js';
 */
 const newBarcode = requestHandler(async (req, res, database) => {
     const itemId = toNumber(req.body?.itemId);
-    const batchNo = toNumber(req.body?.batchNo);
+    const batchId = toNumber(req.body?.batchId);
     const batchDate = String(req.body?.batchDate).trim();
     let quantity = toNumber(req.body?.quantity);
 
     if(itemId <= 0) throw {status: 400, message: 'No item selected.'};
-    if(batchNo <= 0) throw {status: 400, message: 'No batch number provided.'};
+    if(batchId <= 0) throw {status: 400, message: 'No batch number provided.'};
     if(quantity <= 0) throw {status: 400, message: 'Quantity must be greater than zero.'};
 
     // create barcode
     // get items to verify barcode uniqueness
-    const [itemData] = await database.execute(batchStmt.getAssociatedToBatch, [batchNo]);
+    const [itemData] = await database.execute(batchStmt.getAssociatedToBatch, [batchId]);
     // console.log(JSON.stringify(itemData, null, 4));
     // console.log(JSON.stringify({no: itemData?.length, one: itemData[0], two: itemData[1]}, null, 4));
     const barcodes = itemData?.length > 0 ? 
@@ -37,13 +37,13 @@ const newBarcode = requestHandler(async (req, res, database) => {
     while(quantity > 0) {
         nForMultiInsertStmt = nForMultiInsertStmt + '(?, ?, ?),';
 
-        const itemBarcode = setBarcodeSequence(itemId, batchNo, batchDate, barcodes);
+        const itemBarcode = setBarcodeSequence(itemId, batchId, batchDate, barcodes);
         const barcodePromise = generateBarcode(itemBarcode);
         barcodePromiseAll.push(barcodePromise);
         barcodes.push(itemBarcode);
 
         dataToInsert.push(itemId);
-        dataToInsert.push(batchNo);
+        dataToInsert.push(batchId);
         dataToInsert.push(itemBarcode);
 
         quantity--;
@@ -57,7 +57,7 @@ const newBarcode = requestHandler(async (req, res, database) => {
     if(result?.insertId > 0) {
         res.status(200).json({
             itemId,
-            batchNo,
+            batchId,
             quantity
         });
     }
