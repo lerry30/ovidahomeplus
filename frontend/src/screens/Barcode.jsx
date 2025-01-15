@@ -1,10 +1,11 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ErrorModal } from '@/components/Modal';
 import { Plus, Pencil, Printer } from 'lucide-react';
 import { useLayoutEffect, useState } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
 import { formattedNumber, toNumber } from '@/utils/number';
+import { zBatch } from '@/store/batch';
 
 import Loading from '@/components/Loading';
 import Select from '@/components/DropDown';
@@ -13,6 +14,8 @@ import Calendar from '@/components/Calendar';
 const Barcode = () => {
     const [selectedYear, setSelectedYear] = useState(null);
     const [selectedBatchId, setSelectedBatchId] = useState(null);
+    const [supplierId, setSupplierId] = useState(null);
+    const [supplierName, setSupplierName] = useState('');
     const [selectedBatchNo, setSelectedBatchNo] = useState(null);
     const [selectedBatchDate, setSelectedBatchDate] = useState(null);
     const [selectedBatchStatus, setSelectedBatchStatus] = useState('No Batch Selected');
@@ -22,6 +25,7 @@ const Barcode = () => {
     const [printerError, setPrinterError] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const navigate = useNavigate();
     const currentSelectedBatchNo = useParams()?.batch;
     const today = new Date();
 
@@ -78,6 +82,17 @@ const Barcode = () => {
         }
     }
 
+    const addItemForBatch = () => {
+        zBatch.getState()?.saveBatchData(
+            selectedBatchId, 
+            supplierId, 
+            supplierName, 
+            selectedBatchNo, 
+            selectedBatchDate
+        );
+        navigate('/admin/new-barcode');
+    }
+
     const selectBatch = async (batch) => {
         try {
             setLoading(true);
@@ -89,6 +104,8 @@ const Barcode = () => {
             setSelectedBatchId(batchId);
             setSelectedBatchNo(batchNo);
             setSelectedBatchDate(deliveryDate);
+            setSupplierId(batch?.supplierId);
+            setSupplierName(batch?.supplierName);
 
             const payload = {batchId};
             const response = await sendJSON(urls.batchdata, payload);
@@ -161,13 +178,13 @@ const Barcode = () => {
                 <Printer />
                 <span className="hidden md:flex">Print All Barcodes</span>
             </button>
-            <Link
-                to={`/admin/new-barcode?batch=${selectedBatchId}&batchNo=${selectedBatchNo}&date=${new Date(selectedBatchDate).getTime()}`}
+            <button
+                onClick={addItemForBatch}
                 className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
             >
                 <Plus size={20} />
                 <span className="hidden sm:flex text-nowrap">New Item</span>
-            </Link>
+            </button>
         </div>
     );
 

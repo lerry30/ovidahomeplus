@@ -186,11 +186,36 @@ const enableItem = requestHandler(async (req, res, database) => {
 */
 const searchItems = requestHandler(async (req, res, database) => {
     const input = String(req.body?.input).trim().toLowerCase();
-
+    
     if(!input) throw {status: 400, message: 'Search input cannot be empty.'};
 
-    const [results] = await database.execute(itemStmt.searchAndExcludeSoldItems, 
-        [input, input, input, input, input, input, input]);
+    const terms = input?.split(' ');
+    const conditions = terms.map(() => `
+        (
+            product_types.name LIKE CONCAT('%', ?, '%')
+            OR items.description LIKE CONCAT('%', ?, '%')
+            OR items.item_code LIKE CONCAT('%', ?, '%')
+            OR items.max_discount LIKE CONCAT('%', ?, '%')
+            OR items.srp LIKE CONCAT('%', ?, '%')
+            OR suppliers.name LIKE CONCAT('%', ?, '%')
+            OR items.unit LIKE CONCAT('%', ?, '%')
+        )
+    `).join(" AND ");
+
+    const sqlStatement = `
+        ${itemStmt.multiSearchTerms} 
+        AND (${conditions})
+        GROUP BY 
+            items.id, suppliers.name, suppliers.contact, suppliers.status,
+            product_types.id, product_types.name, items.description,
+            items.item_code, items.delivery_price, items.srp,
+            items.max_discount, items.unit, items.image,
+            items.created_at, items.updated_at, disabled_items.note
+        ORDER BY items.updated_at DESC;
+    `;
+
+    const params = terms.flatMap(term => Array(7).fill(term));
+    const [results] = await database.execute(sqlStatement, params);
 
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});  
@@ -239,6 +264,24 @@ const getItemsByStatus = requestHandler(async (req, res, database) => {
     res.status(200).json({ results: nItems });
 });
 
+/*
+   desc     Get items for new barcode selection, it is based on supplier
+   route    POST /api/items/supplier-based
+   access   private
+*/
+const getItemsBySupplier = requestHandler(async (req, res, database) => {
+    const supplierId = toNumber(req.body?.supplierId);
+    const limit = toNumber(req.body?.limit) || null;
+    const offset = toNumber(req.body?.offset) || null;
+    const {sqlQuery, queryParams} = setPaginate(limit, offset, itemStmt.itemsBySupplier);
+
+    if(!supplierId) throw {status: 400, message: 'Undefined supplier'};
+
+    const [resultItems] = await database.execute(sqlQuery, [supplierId, ...queryParams]);
+    const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
+    res.status(200).json({ results: items });
+});
+
 export {
     newItem,
     getItems,
@@ -248,4 +291,5 @@ export {
     enableItem,
     searchItems,
     getItemsByStatus,
+    getItemsBySupplier,
 };

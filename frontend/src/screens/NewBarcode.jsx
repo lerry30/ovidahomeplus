@@ -6,6 +6,7 @@ import { getData, sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { toNumber, formattedNumber } from '@/utils/number';
 import { isValidDate, formattedDate } from '@/utils/datetime';
+import { zBatch } from '@/store/batch';
 
 import Searchbar from '@/components/Searchbar';
 import SidebarLayout from '@/components/Sidebar';
@@ -13,6 +14,12 @@ import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
 
 const NewBarcode = () => {
+    const batchId = zBatch(state => state?.id);
+    const supplierId = zBatch(state => state?.supplierId);
+    const supplierName = zBatch(state => state?.supplierName);
+    const selectedBatchNo = zBatch(state => state?.batchNo);
+    const selectedBatchDate = zBatch(state => state?.date);
+
     const [items, setItems] = useState([]);
     const [displayItems, setDisplayItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -20,11 +27,6 @@ const NewBarcode = () => {
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
     const [errorData, setErrorData] = useState({quantity: ''});
     const [loading, setLoading] = useState(false);
-
-    const [batchInfoParams] = useSearchParams();
-    const selectedBatchId = batchInfoParams.get('batch');
-    const selectedBatchNo = batchInfoParams.get('batchNo');
-    const selectedBatchDate = toNumber(batchInfoParams.get('date'));
 
     const navigate = useNavigate();
     const searchBar = useRef(null);
@@ -36,6 +38,14 @@ const NewBarcode = () => {
         try{
             setLoading(true);
             const batchDate = formattedDate(new Date(selectedBatchDate));
+
+            if(!batchId) {
+                setErrorMessage({
+                    header: 'Undefined Batch.',
+                    message: 'Batch is not found.'
+                });
+                throw new Error('Batch is not found.');
+            }
 
             if(!selectedBatchNo) {
                 setErrorMessage({
@@ -66,7 +76,7 @@ const NewBarcode = () => {
                 throw new Error('Quantity must be greater than zero.');
             }
 
-            const payload = {batchNo: selectedBatchNo, batchDate, itemId: selectedItem, quantity};
+            const payload = {batchId, itemId: selectedItem, quantity};
             const response = await sendJSON(urls.newbarcode, payload);
 
             if(response) {
@@ -96,7 +106,7 @@ const NewBarcode = () => {
                 return;
             }
 
-            const payload = {input};
+            const payload = {input: `${supplierName} ${input}`};
             const response = await sendJSON(urls.searchitems, payload);
             if(response) {
                 //console.log(response?.results);
@@ -121,8 +131,8 @@ const NewBarcode = () => {
             setLoading(true);
             pageOffset.current = offset;
             // excluded sold items but disabled are included with zero quantity
-            const query = `limit=${PAGINATE_NO}&offset=${offset}`;
-            const response = await getData(`${urls?.getitems}?${query}`);
+            const payload = {supplierId, limit: PAGINATE_NO, offset};
+            const response = await sendJSON(urls?.getitemsbysupplier, payload);
             if(response) {
                 // console.log(response?.results);
                 // filter data if it has 
@@ -150,6 +160,8 @@ const NewBarcode = () => {
 
     useLayoutEffect(() => {
         getItems(pageOffset.current);
+
+        zBatch.getState()?.reloadBatchData();
     }, []);
 
     if(errorMessage?.header || errorMessage?.message) {
@@ -185,7 +197,7 @@ const NewBarcode = () => {
             >
                 <header className="w-full h-[40px] flex items-center">
                     <h1 className="font-semibold text-lg px-4">
-                        Add Item
+                        Add Item for {supplierName}
                     </h1>
                 </header>
                 <div className="h-full flex flex-col bg-neutral-100 pt-2">
@@ -218,7 +230,7 @@ const NewBarcode = () => {
                                 <span className="hidden sm:flex text-nowrap">Create Item</span>
                             </button>
                             <Link 
-                                to={`/admin/barcodes/${selectedBatchNo}`}
+                                to={`/admin/barcodes/${batchId}`}
                                 className="max-w-96 h-[40px] flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
                             >
                                 Cancel

@@ -7,6 +7,7 @@ const breadcrumbsOrder = 'breadcrumbs-order-status';
 const customerInfo = 'customer-info';
 const expense = 'expense';
 const payment = 'payment';
+const batch = 'batch';
 
 export { 
     user,
@@ -18,4 +19,5 @@ export {
     customerInfo,
     expense,
     payment,
+    batch,
 };

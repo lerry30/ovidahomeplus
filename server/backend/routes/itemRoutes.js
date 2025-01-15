@@ -12,6 +12,7 @@ import {
     enableItem,
     searchItems,
     getItemsByStatus,
+    getItemsBySupplier,
 } from '../controllers/itemController.js';
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.patch('/status/disable', protect, disableItem);
 router.patch('/status/enable/', protect, enableItem);
 router.post('/search', protect, searchItems);
 router.get('/status', getItemsByStatus);
+router.post('/supplier-based', protect, getItemsBySupplier);
 
 export default router;

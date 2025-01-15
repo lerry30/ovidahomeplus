@@ -14,7 +14,6 @@ import * as batchStmt from '../mysql/batch.js';
 const newBarcode = requestHandler(async (req, res, database) => {
     const itemId = toNumber(req.body?.itemId);
     const batchId = toNumber(req.body?.batchId);
-    const batchDate = String(req.body?.batchDate).trim();
     let quantity = toNumber(req.body?.quantity);
 
     if(itemId <= 0) throw {status: 400, message: 'No item selected.'};
@@ -27,7 +26,9 @@ const newBarcode = requestHandler(async (req, res, database) => {
     // console.log(JSON.stringify(itemData, null, 4));
     // console.log(JSON.stringify({no: itemData?.length, one: itemData[0], two: itemData[1]}, null, 4));
     const barcodes = itemData?.length > 0 ? 
-        parseOneDeep(itemData, ['barcodes'])?.map(item => item.barcodes.map(barcode => barcode?.barcode))?.flat(1) 
+        parseOneDeep(itemData, ['barcodes'])
+            ?.map(item => item.barcodes.map(barcode => barcode?.barcode))
+            ?.flat(1)
         : [];
 
     // make it multi insert
@@ -37,7 +38,7 @@ const newBarcode = requestHandler(async (req, res, database) => {
     while(quantity > 0) {
         nForMultiInsertStmt = nForMultiInsertStmt + '(?, ?, ?),';
 
-        const itemBarcode = setBarcodeSequence(itemId, batchId, batchDate, barcodes);
+        const itemBarcode = setBarcodeSequence(itemId, batchId, barcodes);
         const barcodePromise = generateBarcode(itemBarcode);
         barcodePromiseAll.push(barcodePromise);
         barcodes.push(itemBarcode);
