@@ -82,7 +82,7 @@ const NewBarcode = () => {
             if(response) {
                 const data = response?.results;
                 //console.log(data);
-                navigate(`/admin/barcodes/${selectedBatchNo}`);
+                navigate('/admin/barcodes');
             }
         } catch(error) {
             console.log(error?.message);

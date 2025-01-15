@@ -25,8 +25,9 @@ const newBatch = requestHandler(async (req, res, database) => {
     if(selectBatch && selectBatch?.length > 0) throw {status: 400, message: `Batch ${batchNo} already exists.`}
 
     const [batch] = await database.execute(batchStmt.newBatch, [supplierId, batchNo, deliveryReceiptNo, nDeliveryDate]);
-    if(batch?.insertId > 0) {
-        res.status(200).json({batchNo, deliveryReceiptNo, nDeliveryDate});
+    const batchId = batch?.insertId;
+    if(batchId > 0) {
+        res.status(200).json({batchId, supplierId, batchNo, deliveryReceiptNo, deliveryDate: nDeliveryDate});
     }
 });
 
@@ -77,7 +78,7 @@ const updateBatch = requestHandler(async (req, res, database) => {
 
     const [batch] = await database.execute(batchStmt.updateBatch, [supplierId, batchNo, deliveryReceiptNo, nDeliveryDate, batchId]);
     if(batch?.affectedRows > 0) {
-        res.status(200).json({batchId, batchNo, deliveryReceiptNo, nDeliveryDate});
+        res.status(200).json({batchId, supplierId, batchNo, deliveryReceiptNo, deliveryDate: nDeliveryDate});
     }
 });
 

@@ -6,6 +6,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toNumber } from '@/utils/number';
 import { isValidDate, formattedDate } from '@/utils/datetime';
 import { quickSort } from '@/utils/sort';
+import { zBatch } from '@/store/batch';
 
 import AppLogo from '@/components/AppLogo';
 import SidebarLayout from '@/components/Sidebar';
@@ -59,7 +60,14 @@ const UpdateBatch = () => {
             const payload = {batchId, supplierId, batchNo, deliveryReceiptNo, deliveryDate};
             const response = await sendJSON(urls.updatebatch, payload, 'PUT');
             if(response) {
-                navigate(`/admin/barcodes/${batchNo}`);
+                zBatch.getState()?.saveBatchData(
+                    response?.batchId,
+                    response?.supplierId,
+                    selectedSupplier,
+                    response?.batchNo,
+                    response?.deliveryDate
+                );
+                navigate('/admin/barcodes');
             }
         } catch(error) {
             console.log(error);

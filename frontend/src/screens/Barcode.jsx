@@ -157,6 +157,7 @@ const Barcode = () => {
     // redisplay items on load
     useLayoutEffect(() => {
         if(batches.length > 0) {
+            console.log(batches);
             const nBatchNo = toNumber(currentSelectedBatchNo);
             if(nBatchNo > 0) {
                 const batch = batches.find(item => item.batchNo===nBatchNo);

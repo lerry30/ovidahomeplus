@@ -22,7 +22,7 @@ const SidebarRoute = () => {
                 <Route path="/cash-denominations" element={<CashDenomination />} />
                 <Route path="/expenses" element={<Expense />}/>
                 <Route path="/sold-items" element={<SoldItems />}/>
-                <Route path="/barcodes/:batch" element={<Barcode />}/>
+                <Route path="/barcodes" element={<Barcode />}/>
                 <Route path="/inventory" element={<Inventory />}/>
                 <Route path="/product-types" element={<ProductTypes />} />
                 <Route path="/suppliers" element={<Supplier />}/>
