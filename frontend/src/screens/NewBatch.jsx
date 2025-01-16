@@ -255,7 +255,7 @@ const NewBatch = () => {
                         </div>
                         <div className="sm:px-4 sm:py-2 flex gap-2">
                             <Link 
-                                to="/admin/barcodes/0"
+                                to="/admin/barcodes"
                                 className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
                             >
                                 Cancel
