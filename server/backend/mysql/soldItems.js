@@ -38,8 +38,8 @@ export const getSoldItemsToday = `
         product_types.name AS productTypeName,
         product_types.status AS productTypeStatus,
 
-        barcodes.batch_no AS batchNo,
-        batches.delivery_reciept_no AS deliveryReceiptNo,
+        batches.batch_no AS batchNo,
+        batches.delivery_receipt_no AS deliveryReceiptNo,
         batches.delivery_date AS deliveryDate
     FROM sold_items
     JOIN barcodes ON sold_items.barcode = barcodes.barcode
@@ -47,7 +47,7 @@ export const getSoldItemsToday = `
     JOIN customers ON sold_items.customer_id = customers.id
     LEFT JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN product_types ON items.product_type_id = product_types.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     WHERE DATE(sold_items.created_at) = CURDATE()
     ORDER BY sold_items.created_at DESC;
 `;
@@ -82,8 +82,8 @@ export const getSoldItemsByDate = `
         product_types.name AS productTypeName,
         product_types.status AS productTypeStatus,
 
-        barcodes.batch_no AS batchNo,
-        batches.delivery_reciept_no AS deliveryReceiptNo,
+        batches.batch_no AS batchNo,
+        batches.delivery_receipt_no AS deliveryReceiptNo,
         batches.delivery_date AS deliveryDate
     FROM sold_items
     JOIN barcodes ON sold_items.barcode = barcodes.barcode
@@ -91,7 +91,7 @@ export const getSoldItemsByDate = `
     JOIN customers ON sold_items.customer_id = customers.id
     LEFT JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN product_types ON items.product_type_id = product_types.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     WHERE DATE(sold_items.created_at) = ?
     ORDER BY sold_items.created_at DESC;
 `;
@@ -126,8 +126,8 @@ export const getSoldItemsBetweenDates = `
         product_types.name AS productTypeName,
         product_types.status AS productTypeStatus,
 
-        barcodes.batch_no AS batchNo,
-        batches.delivery_reciept_no AS deliveryReceiptNo,
+        batches.batch_no AS batchNo,
+        batches.delivery_receipt_no AS deliveryReceiptNo,
         batches.delivery_date AS deliveryDate
     FROM sold_items
     JOIN barcodes ON sold_items.barcode = barcodes.barcode
@@ -135,7 +135,7 @@ export const getSoldItemsBetweenDates = `
     JOIN customers ON sold_items.customer_id = customers.id
     LEFT JOIN suppliers ON items.supplier_id = suppliers.id
     LEFT JOIN product_types ON items.product_type_id = product_types.id
-    LEFT JOIN batches ON batches.id = barcodes.batch_no
+    LEFT JOIN batches ON batches.id = barcodes.batch_id
     WHERE DATE(sold_items.created_at) BETWEEN ? AND ?
     ORDER BY sold_items.created_at DESC;
 `;

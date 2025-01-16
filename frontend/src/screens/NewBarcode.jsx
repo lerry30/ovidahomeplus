@@ -159,8 +159,11 @@ const NewBarcode = () => {
     }, [errorMessage]);
 
     useLayoutEffect(() => {
-        getItems(pageOffset.current);
+        if(supplierId)
+            getItems(pageOffset.current);
+    }, [supplierId]);
 
+    useLayoutEffect(() => {
         zBatch.getState()?.reloadBatchData();
     }, []);
 

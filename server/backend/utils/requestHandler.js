@@ -16,6 +16,7 @@ export const requestHandler = (controller, origin='not set') => {
             let status = error?.status || 500;
             console.log('Error: ', message);
             console.log('Origin: ', origin);
+            console.log('');
             if(error instanceof Error) message = 'There\'s something wrong.';
 
             if(database)

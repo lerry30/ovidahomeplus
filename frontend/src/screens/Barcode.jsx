@@ -1,7 +1,7 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ErrorModal } from '@/components/Modal';
 import { Plus, Pencil, Printer } from 'lucide-react';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, useRef } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
 import { formattedNumber, toNumber } from '@/utils/number';
@@ -12,6 +12,9 @@ import Select from '@/components/DropDown';
 import Calendar from '@/components/Calendar';
 
 const Barcode = () => {
+    const batchId = zBatch(state => state?.id);
+    const batchDate = zBatch(state => state?.date);
+
     const [selectedYear, setSelectedYear] = useState(null);
     const [selectedBatchId, setSelectedBatchId] = useState(null);
     const [supplierId, setSupplierId] = useState(null);
@@ -25,8 +28,9 @@ const Barcode = () => {
     const [printerError, setPrinterError] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const batchTrigger = useRef(false);
+
     const navigate = useNavigate();
-    const currentSelectedBatchNo = useParams()?.batch;
     const today = new Date();
 
     const textToPrint = (item) => {
@@ -82,7 +86,7 @@ const Barcode = () => {
         }
     }
 
-    const addItemForBatch = () => {
+    const saveBatchInfo = () => {
         zBatch.getState()?.saveBatchData(
             selectedBatchId, 
             supplierId, 
@@ -90,7 +94,6 @@ const Barcode = () => {
             selectedBatchNo, 
             selectedBatchDate
         );
-        navigate('/admin/new-barcode');
     }
 
     const selectBatch = async (batch) => {
@@ -130,6 +133,7 @@ const Barcode = () => {
             }
         }
         setDisplayedBatches(nBatches);
+        setBatchItems([]);
     }
 
     const getBatches = async () => {
@@ -154,20 +158,24 @@ const Barcode = () => {
         }, 1000);
     }, [printerError]);
 
+    useLayoutEffect(() => {
+        if(batchTrigger.current)
+            saveBatchInfo();
+    }, [batchTrigger.current]);
+
     // redisplay items on load
     useLayoutEffect(() => {
         if(batches.length > 0) {
-            console.log(batches);
-            const nBatchNo = toNumber(currentSelectedBatchNo);
-            if(nBatchNo > 0) {
-                const batch = batches.find(item => item.batchNo===nBatchNo);
-                selectBatch(batch);
-            }
+            const batchSelected = batches.find(item => item.batchId===batchId);
+            const listOfBatches = batches.filter(item => item.deliveryDate===batchDate);
+            selectBatch(batchSelected);
+            setDisplayedBatches(listOfBatches);
         }
     }, [batches]);
 
     useLayoutEffect(() => {
         getBatches();
+        zBatch.getState().reloadBatchData();
     }, []);
 
     const PrintNAddItemButtons = ({className}) => (
@@ -180,7 +188,10 @@ const Barcode = () => {
                 <span className="hidden md:flex">Print All Barcodes</span>
             </button>
             <button
-                onClick={addItemForBatch}
+                onClick={() => {
+                    saveBatchInfo();
+                    navigate('/admin/new-barcode');
+                }}
                 className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-70' : ''}`}
             >
                 <Plus size={20} />
@@ -283,7 +294,10 @@ const Barcode = () => {
                                             return (
                                                 <button
                                                     key={index}
-                                                    onClick={() => selectBatch(item)}
+                                                    onClick={() => {
+                                                        selectBatch(item);
+                                                        batchTrigger.current = true;
+                                                    }}
                                                     className="text-nowrap text-[16px] p-2 sm:px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
                                                 >
                                                     {item?.supplierName} Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
