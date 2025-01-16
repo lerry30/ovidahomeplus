@@ -36,7 +36,7 @@ const Barcode = () => {
     const textToPrint = (item) => {
         const itemCodeText = `ITEM CODE: ${item?.itemCode}`;
         const srpText = `SRP: ${formattedNumber(item?.srp)}`;
-        const deliveryInfo = `SUPPLIER ${item?.supplierName} - Batch #${selectedBatchNo} - ${selectedBatchDate}`;
+        const deliveryInfo = `SUPPLIER: ${item?.supplierName} - Batch #${selectedBatchNo} - ${selectedBatchDate}`;
         return `${item?.productTypeName}>${item?.description}>${itemCodeText}>${deliveryInfo}>${srpText}`;
     }
 
