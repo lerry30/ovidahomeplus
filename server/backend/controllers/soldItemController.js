@@ -10,7 +10,7 @@ import * as soldItemStmt from '../mysql/soldItems.js';
 const getSoldItemsToday = requestHandler(async (req, res, database) => {
     const [results] = await database.query(soldItemStmt.getSoldItemsToday, []);
     res.status(200).json({results});
-});
+}, 'SoldItem: getSoldItemsToday');
 
 /*
    desc     Get sold items by date
@@ -25,7 +25,7 @@ const getSoldItemsByDate = requestHandler(async (req, res, database) => {
     const nDate = formattedDate(date);
     const [results] = await database.execute(soldItemStmt.getSoldItemsByDate, [nDate]);
     res.status(200).json({results});
-});
+}, 'SoldItem: getSoldItemsByDate');
 
 export {
     getSoldItemsToday,

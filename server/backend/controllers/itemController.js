@@ -50,7 +50,7 @@ const newItem = requestHandler(async (req, res, database) => {
     }
 
     throw {status: 401, message: 'New item failed to insert.'};
-});
+}, 'Item: newItem');
 
 /*
    desc     Get items. Sold items are excluded
@@ -65,7 +65,7 @@ const getItems = requestHandler(async (req, res, database) => {
     const [resultItems] = await database.execute(sqlQuery, queryParams);
     const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
     res.status(200).json({ results: items });
-});
+}, 'Item: getItems');
 
 /*
    desc     Get items. Sold items and disabled items are excluded and even empty stock
@@ -80,7 +80,7 @@ const getExcludedSoldItems = requestHandler(async (req, res, database) => {
     const [results] = await database.execute(sqlQuery, queryParams);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});
-});
+}, 'Item: getExcludedSoldItems');
 
 /*
    desc     Update items
@@ -140,7 +140,7 @@ const updateItem = requestHandler(async (req, res, database) => {
     }
 
     throw {status: 401, message: 'Updating item failed.'};
-});
+}, 'Item: updateItem');
 
 /*
    desc     Update Status of Item
@@ -160,7 +160,7 @@ const disableItem = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 400, message: 'Updating item status failed.'}
     }
-});
+}, 'Item: disableItem');
 
 /*
    desc     Update Status of Item
@@ -177,7 +177,7 @@ const enableItem = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 400, message: 'Updating item status failed.'}
     }
-});
+}, 'Item: enableItem');
 
 /*
    desc     Search for item
@@ -219,7 +219,7 @@ const searchItems = requestHandler(async (req, res, database) => {
 
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});  
-});
+}, 'Item: searchItems');
 
 /*
    desc     Get items either active or inactive
@@ -262,7 +262,7 @@ const getItemsByStatus = requestHandler(async (req, res, database) => {
 
     const nItems = items?.length > 0 ? parseOneDeep(items, ['barcodes']) : [];
     res.status(200).json({ results: nItems });
-});
+}, 'Item: getItemsByStatus');
 
 /*
    desc     Get items for new barcode selection, it is based on supplier
@@ -280,7 +280,7 @@ const getItemsBySupplier = requestHandler(async (req, res, database) => {
     const [resultItems] = await database.execute(sqlQuery, [supplierId, ...queryParams]);
     const items = resultItems?.length > 0 ? parseOneDeep(resultItems, ['barcodes']) : [];
     res.status(200).json({ results: items });
-});
+}, 'Item: getItemsBySupplier');
 
 export {
     newItem,

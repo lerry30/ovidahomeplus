@@ -29,7 +29,7 @@ const newBatch = requestHandler(async (req, res, database) => {
     if(batchId > 0) {
         res.status(200).json({batchId, supplierId, batchNo, deliveryReceiptNo, deliveryDate: nDeliveryDate});
     }
-});
+}, 'Batch: newBatch');
 
 /*
    desc     Get batches
@@ -39,7 +39,7 @@ const newBatch = requestHandler(async (req, res, database) => {
 const getBatches = requestHandler(async (req, res, database) => {
     const [results] = await database.execute(batchStmt.batches, []);
     res.status(200).json({results});
-});
+}, 'Batch: getBatches');
 
 /*
    desc     Get specific batch
@@ -51,7 +51,7 @@ const getBatch = requestHandler(async (req, res, database) => {
     const [results] = await database.execute(batchStmt.batch, [batchId]);
     const data = results?.length > 0 ? results[0] : {};
     res.status(200).json({results: data});
-});
+}, 'Batch: getBatch');
 
 /*
    desc     Get batches
@@ -80,7 +80,7 @@ const updateBatch = requestHandler(async (req, res, database) => {
     if(batch?.affectedRows > 0) {
         res.status(200).json({batchId, supplierId, batchNo, deliveryReceiptNo, deliveryDate: nDeliveryDate});
     }
-});
+}, 'Batch: updateBatch');
 
 /*
    desc     Get specific batch with data associated with it
@@ -92,7 +92,7 @@ const getBatchWithData = requestHandler(async (req, res, database) => {
     const [results] = await database.execute(batchStmt.getAssociatedToBatch, [batchId]);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
     res.status(200).json({results: items});
-});
+}, 'Batch getBatchWithData');
 
 /*
    desc     Get batches by supplier
@@ -103,7 +103,7 @@ const getBatchesBySupplier = requestHandler(async (req, res, database) => {
     const supplierId = toNumber(req.body?.supplierId);
     const [results] = await database.execute(batchStmt.getBatchesBySupplier, [supplierId]);
     res.status(200).json({results});
-});
+}, 'Batch: getBatchesBySupplier');
 
 export {
     newBatch,

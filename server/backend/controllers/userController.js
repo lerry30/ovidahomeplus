@@ -30,7 +30,7 @@ const authUser = requestHandler(async (req, res, database) => {
     }
 
     throw {status: 401, message: 'Wrong username or password'};
-});
+}, 'User: authUser');
 
 /*
    desc     Register user/set token
@@ -78,7 +78,7 @@ const registerUser = requestHandler(async (req, res, database) => {
     }
 
     throw {status: 400, message: 'Invalid user data'};
-});
+}, 'User: registerUser');
 
 /*
    desc     Just to get user details
@@ -92,7 +92,7 @@ const getUser = requestHandler(async (req, res) => {
     } else {
         throw {status: 404, message: 'User not found'}
     }
-});
+}, 'User: getUser');
 
 export { 
     authUser, 

@@ -144,7 +144,7 @@ const newOrder = requestHandler(async (req, res, database) => {
     }
 
     throw new Error('There\'s something wrong.');
-});
+}, 'Order: newOrder');
 
 export {
     newOrder,

@@ -22,7 +22,7 @@ const newSupplier = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 401, message: 'New supplier failed to insert.'};
     }
-});
+}, 'Supplier: newSupplier');
 
 /*
    desc     Get Supplier
@@ -32,7 +32,7 @@ const newSupplier = requestHandler(async (req, res, database) => {
 const getSuppliers = requestHandler(async (req, res, database) => {
     const [results] = await database.query(supplierStmt.suppliers, []);
     res.status(200).json({results});
-});
+}, 'Supplier: getSuppliers');
 
 /*
    desc     Update Status of Supplier
@@ -52,7 +52,7 @@ const changeSupplierStatus = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 400, message: 'Updating supplier status failed.'}
     }
-});
+}, 'Supplier: changeSupplierStatus');
 
 /*
    desc     Update Supplier
@@ -83,7 +83,7 @@ const updateSupplier = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 400, message: 'Updating supplier failed.'}
     }
-});
+}, 'Supplier: updateSupplier');
 
 export {
     newSupplier,

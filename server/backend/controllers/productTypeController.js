@@ -25,7 +25,7 @@ const newProductType = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 401, message: 'New product type failed to insert.'};
     }
-});
+}, 'ProductType: newProductType');
 
 /*
    desc     Get Product Types
@@ -40,7 +40,7 @@ const getProductTypes = requestHandler(async (req, res, database) => {
 
     const [results] = await database.query(sqlQuery, queryParams);
     res.status(200).json({results});
-});
+}, 'ProductType: getProductTypes');
 
 /*
    desc     Update Status of Product Type
@@ -60,7 +60,7 @@ const changeProductTypeStatus = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 400, message: 'Updating product type status failed.'}
     }
-});
+}, 'ProductType: changeProductTypeStatus');
 
 /*
    desc     Update Product Type
@@ -90,7 +90,7 @@ const updateProductType = requestHandler(async (req, res, database) => {
     } else {
         throw {status: 400, message: 'Updating product type failed.'}
     }
-});
+}, 'ProductType: updateProductType');
 
 /*
    desc     Get items either active or inactive
@@ -108,7 +108,7 @@ const getProductTypesByStatus = requestHandler(async (req, res, database) => {
     const [resultItems] = await database.query(sqlQuery, [status, ...queryParams]);
 
     res.status(200).json({ results: resultItems });
-});
+}, 'ProductType: getProductTypesByStatus');
 
 export {
     newProductType,

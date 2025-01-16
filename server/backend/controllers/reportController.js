@@ -83,7 +83,7 @@ const getReportByDate = requestHandler(async (req, res, database) => {
 
     //console.log(results);
     res.status(200).json({ results });
-});
+}, 'Report: getReportByDate');
 
 /*
    desc     Get report by month
@@ -175,7 +175,7 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
     }
 
     res.status(200).json({ results: items });
-});
+}, 'Report: getReportByMonth');
 
 /*
    desc     Get report by months in a year
@@ -267,7 +267,7 @@ const getReportByYear = requestHandler(async (req, res, database) => {
     }
 
     res.status(200).json({ results: items });
-});
+}, 'Report: getReportByYear');
 
 
 /*
@@ -298,7 +298,7 @@ const generatePDF = requestHandler(async (req, res, database) => {
     await browser.close();
 
     res.status(200).json({ fileName: `${fileName}.pdf` });
-});
+}, 'Report: generatePDF');
 
 export {
     getReportByDate,

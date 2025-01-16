@@ -22,7 +22,7 @@ const newExpense = requestHandler(async (req, res, database) => {
             expenseAmount,
         });
     }
-});
+}, 'Expense: newExpense');
 
 /*
    desc     Get expenses
@@ -32,7 +32,7 @@ const newExpense = requestHandler(async (req, res, database) => {
 const getExpensesToday = requestHandler(async (req, res, database) => {
     const [results] = await database.query(expenseStmt.getExpensesToday, []);
     res.status(200).json({results});
-});
+}, 'Expense: getExpensesToday');
 
 /*
    desc     Update expense
@@ -55,7 +55,7 @@ const updateExpense = requestHandler(async (req, res, database) => {
             expenseAmount,
         });
     }
-});
+}, 'Expense: updateExpense');
 
 /*
    desc     Delete expense
@@ -70,7 +70,7 @@ const deleteExpense = requestHandler(async (req, res, database) => {
     if(result?.affectedRows > 0) {
         res.status(200).json({id});
     }
-});
+}, 'Expense: deleteExpense');
 
 /*
    desc     Get expenses by date
@@ -85,7 +85,7 @@ const getExpensesByDate = requestHandler(async (req, res, database) => {
     const nDate = formattedDate(date);
     const [results] = await database.execute(expenseStmt.getExpensesByDate, [nDate]);
     res.status(200).json({results});
-});
+}, 'Expense: getExpensesByDate');
 
 
 export {

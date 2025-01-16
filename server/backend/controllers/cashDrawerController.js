@@ -23,7 +23,7 @@ const getCashDrawerContents = requestHandler(async (req, res, database) => {
     }
 
     throw {status: 400, message: 'There\'s something wrong. Cash Drawer data not found or no sold items yet.'}
-});
+}, 'CashDrawer: getCashDrawerContents');
 
 /*
    desc     Update the cash drawer contents
@@ -73,7 +73,7 @@ const updateCashDrawer = requestHandler(async (req, res, database) => {
     }
 
     throw new Error('Updating the cash denomination error.');
-});
+}, 'CashDrawer: UpdateCashDrawer');
 
 /*
    desc     Get the contents of cash drawer with the specific amount
@@ -99,7 +99,7 @@ const getCashDrawerByDate = requestHandler(async (req, res, database) => {
         }
     }
     throw new Error('Getting cash denominations by date error.');
-});
+}, 'CashDrawer: getCashDrawerByDate');
 
 export {
     getCashDrawerContents,

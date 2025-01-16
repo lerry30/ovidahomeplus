@@ -66,7 +66,7 @@ const getData = requestHandler(async (req, res, database) => {
         noOfCustomersThisYear,
         rankedSoldItems,
     });
-});
+}, 'Dashboard: getData');
 
 export {
     getData,

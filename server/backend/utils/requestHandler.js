@@ -1,6 +1,6 @@
 import connectToDB from '../config/db.js';
 
-export const requestHandler = (controller) => {
+export const requestHandler = (controller, origin='not set') => {
     return async (req, res, next) => {
         let database = null;
 
@@ -8,13 +8,14 @@ export const requestHandler = (controller) => {
             const pool = await connectToDB();
             database = await pool.getConnection();
             await database.beginTransaction();
-            await controller(req, res, database, next); 
+            await controller(req, res, database, next);
 
             await database.commit();
         } catch(error) {
             let message = error?.message;
             let status = error?.status || 500;
             console.log('Error: ', message);
+            console.log('Origin: ', origin);
             if(error instanceof Error) message = 'There\'s something wrong.';
 
             if(database)

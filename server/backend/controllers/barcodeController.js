@@ -62,7 +62,7 @@ const newBarcode = requestHandler(async (req, res, database) => {
             quantity
         });
     }
-});
+}, 'Barcode: newBarcode');
 
 export {
     newBarcode,
