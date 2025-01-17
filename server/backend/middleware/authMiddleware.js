@@ -27,6 +27,6 @@ const protect = requestHandler(async (req, res, database, next) => {
         res.status(401);
         throw new Error('Not authorized, no token');
     }
-});
+}, 'Middleware: protect');
 
 export { protect };

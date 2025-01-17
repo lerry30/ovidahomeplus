@@ -232,10 +232,10 @@ const UpdateItem = () => {
         setIdle();
     }, [productTypes, suppliers]);
 
-    useLayoutEffect(() => {
-        const profitMargin = toNumber(data?.deliveryPrice) * PROFIT_MARGIN + toNumber(data?.deliveryPrice);
-        setData(state => ({...state, srp: profitMargin}));
-    }, [data?.deliveryPrice]);
+    //useLayoutEffect(() => {
+    //    const profitMargin = toNumber(data?.deliveryPrice) * PROFIT_MARGIN + toNumber(data?.deliveryPrice);
+    //    setData(state => ({...state, srp: profitMargin}));
+    //}, [data?.deliveryPrice]);
 
     useLayoutEffect(() => {
         getSuppliers();
@@ -408,7 +408,6 @@ const UpdateItem = () => {
                                     value={formattedNumber(data?.deliveryPrice)}
                                     onChange={elem => {
                                         const input = Math.max(0, toNumber(elem.target.value));
-                                        console.log(typeof input);
                                         setData(state => ({...state, deliveryPrice: input}))
                                     }}
                                     className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"

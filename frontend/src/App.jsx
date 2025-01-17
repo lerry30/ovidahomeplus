@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useState } from 'react';
 
+import { zBatch } from '@/store/batch';
 import { zCashierSelectedItem } from '@/store/cashierSelectedItem';
 import { zCustomerInfo } from '@/store/customerInfo';
 import { zExpense } from '@/store/expense';
@@ -54,6 +55,7 @@ const App = () => {
 				} catch(error) {
 					console.log('Error 29884714398', error);
 
+                    zBatch.getState().wipeOutData();
                     zCashierSelectedItem.getState().wipeOutData();
                     zCustomerInfo.getState().wipeOutData();
                     zExpense.getState().wipeOutData();

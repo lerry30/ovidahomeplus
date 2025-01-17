@@ -22,7 +22,7 @@ const getCashDrawerContents = requestHandler(async (req, res, database) => {
         return;
     }
 
-    throw {status: 400, message: 'There\'s something wrong. Cash Drawer data not found or no sold items yet.'}
+    //throw {status: 400, message: 'There\'s something wrong. Cash Drawer data not found or no sold items yet.'}
 }, 'CashDrawer: getCashDrawerContents');
 
 /*
