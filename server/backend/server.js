@@ -55,6 +55,7 @@ app.use('/fl/producttypes', allowResourceAccess, express.static(getDir('uploads/
 app.use('/fl/items', allowResourceAccess, express.static(getDir('uploads/items')));
 app.use('/fl/barcodes', allowResourceAccess, express.static(getDir('uploads/barcodes')));
 app.use('/fl/reports', allowResourceAccess, express.static(getDir('uploads/pdfs')));
+app.use('/fl/101/logs', allowResourceAccess, express.static(getDir('uploads/logs')));
 
 // routes
 app.use('/api/test', (req, res) => res.status(200).json({message: 'Hi! Lerry'}));
