@@ -21,6 +21,8 @@ const Inventory = () => {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
 
+    const [itemStateAction, setItemStateAction] = useState(false);
+
     const actionId = useRef(null);
     const searchBar = useRef(null);
     const pageOffset = useRef(1);
@@ -42,7 +44,7 @@ const Inventory = () => {
             const response = await getData(`${urls?.getitemsbystatus}?${query}`);
             if(response) {
                 const data = response?.results;
-                //console.log(response);
+                //console.log(data);
                 setDisplayItems(data);
             }
         } catch(error) {
@@ -140,12 +142,63 @@ const Inventory = () => {
     useLayoutEffect(() => {
         getItems(pageOffset.current);
 
-        const closeActions = () => setItemActions(state => state.map(item => false));
+        const closeActions = () => {
+            setItemActions(state => state.map(item => false));
+            setItemStateAction(false);
+        }
         addEventListener('click', closeActions);
         return () => {
             removeEventListener('click', closeActions);
         }
     }, []);
+
+    const ItemStateView = () => {
+        return (
+            <div className="flex gap-2">
+                <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
+                <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
+                <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
+            </div>
+        )
+    }
+
+    const SmallItemStateView = () => {
+        return (
+            <div className="relative size-[26px] rounded-lg hover:cursor-pointer hover:bg-gray-200">
+                <button 
+                    onClick={(ev) => {
+                        ev.stopPropagation();
+                        setItemStateAction(true);
+                    }}
+                    className="z-0"
+                >
+                    <Ellipsis />
+                </button>
+                {itemStateAction && (
+                    <article className="absolute left-0 z-10 text-sm bg-white rounded-lg border shadow-lg p-1">
+                        <button
+                            onClick={() => tabNavigate('all')}
+                            className="w-full text-start hover:bg-gray-100 p-1 rounded-lg"
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => tabNavigate('active')}
+                            className="w-full text-start hover:bg-gray-100 p-1 rounded-lg"
+                        >
+                            Active
+                        </button>
+                        <button
+                            onClick={() => tabNavigate('inactive')}
+                            className="w-full text-start hover:bg-gray-100 p-1 rounded-lg"
+                        >
+                            Inactive
+                        </button>
+                    </article>
+                )}
+            </div>
+        )
+    }
 
     if(disablePrompt) {
         return (
@@ -260,10 +313,11 @@ const Inventory = () => {
             <section className="grow w-full h-full relative">
                 <div className="w-full absolute top-0 left-0 right-0 bottom-0 bg-white mt-2 rounded-lg shadow-md overflow-hidden">
                     <div className="h-[40px] flex justify-between gap-2 border-b p-2">
-                        <div className="flex gap-2">
-                            <button onClick={() => tabNavigate('all')} className={`rounded-lg px-2 ${tabs.all&&'bg-green-600 text-white'}`}>All</button>
-                            <button onClick={() => tabNavigate('active')} className={`rounded-lg px-2 ${tabs.active&&'bg-green-600 text-white'}`}>Active</button>
-                            <button onClick={() => tabNavigate('inactive')} className={`rounded-lg px-2 ${tabs.inactive&&'bg-green-600 text-white'}`}>Inactive</button>
+                        <div className="hidden sm:flex">
+                            <ItemStateView />
+                        </div>
+                        <div className="flex sm:hidden">
+                            <SmallItemStateView />
                         </div>
                         <div className="h-[40px] flex md:gap-2">
                             <button
