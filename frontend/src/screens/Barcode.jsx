@@ -254,8 +254,8 @@ const Barcode = () => {
                                 name={`${selectedYear ? selectedYear : 'Select Year'}`}
                                 className="h-full py-2 rounded-lg border-2 border-neutral-400 z-50">
                                 {
-                                    Array(2025-today.getFullYear()+1).fill(0).map((_, index) => {
-                                        const text = index + 2025;
+                                    Array(today.getFullYear()-2024+1).fill(0).map((_, index) => {
+                                        const text = index + 2024;
                                         return (
                                             <button
                                                 key={index}

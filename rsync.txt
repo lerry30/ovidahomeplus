@@ -5,6 +5,7 @@ rsync -avP \
 --exclude server/database-diagram.pdf \
 --exclude server/docker-commands.md \
 --exclude server/mysql.txt \
+--exclude server/auto-start-docker.md \
 --exclude frontend/node_modules \
 --exclude frontend/src/constants/urls.js \
 --exclude frontend/Dockerfile \

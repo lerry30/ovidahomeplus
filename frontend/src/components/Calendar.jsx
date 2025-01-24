@@ -19,7 +19,7 @@ const Calendar = ({year=2025, callback=(date)=>{}, highlight={}}) => {
 
     const jumpMonth = (moveNo) => {
         const nMonth = month + moveNo;
-        if(nMonth < 0) return;
+        if(nMonth < 0 || nMonth > 11) return;
         setMonth(nMonth);
     }
 
