@@ -15,7 +15,7 @@ import Select from '@/components/DropDown';
 
 const UpdateItem = () => {
     const currentSupplierName = zItem(state => state?.supplierName);
-    const currentDeliveryPrice = zItem(state => state?.deliveryPrice);
+    //const currentDeliveryPrice = zItem(state => state?.deliveryPrice);
     const currentProductTypeName = zItem(state => state?.productTypeName);
     const currentDescription = zItem(state => state?.description);
     const currentItemCode = zItem(state => state?.itemCode);
@@ -29,7 +29,7 @@ const UpdateItem = () => {
         description: [], // ------------------------------------
         supplier: currentSupplierName,  // to display
         supplierId: 0, // to send ------------------------------
-        deliveryPrice: currentDeliveryPrice,
+        //deliveryPrice: currentDeliveryPrice,
         itemCode: currentItemCode,
         srp: currentSrp,
         units: currentUnit,
@@ -38,7 +38,7 @@ const UpdateItem = () => {
         productType: '',
         description: '',
         supplier: '',
-        deliveryPrice: '',
+        //deliveryPrice: '',
         itemCode: '',
         srp: '',
         units: '',
@@ -52,7 +52,7 @@ const UpdateItem = () => {
     const navigate = useNavigate();
     const descriptionInputRef = useRef(null);
 
-    const PROFIT_MARGIN = 0.4576;
+    //const PROFIT_MARGIN = 0.4576;
 
     const enterNewDescription = (ev) => {
         const input = ev.key;
@@ -80,7 +80,7 @@ const UpdateItem = () => {
 
             const supplier = data?.supplier?.trim();
             const supplierId = toNumber(data?.supplierId);
-            const deliveryPrice = toNumber(data?.deliveryPrice);
+            //const deliveryPrice = toNumber(data?.deliveryPrice);
 
             const itemCode = data?.itemCode?.trim();
             const srp = toNumber(data?.srp);
@@ -104,10 +104,10 @@ const UpdateItem = () => {
                 hasError = true;
             }
 
-            if(deliveryPrice <= 0) {
-                setErrorData(state => ({...state, deliveryPrice: 'Delivery price must be greater than zero.'}));
-                hasError = true;
-            }
+            //if(deliveryPrice <= 0) {
+            //    setErrorData(state => ({...state, deliveryPrice: 'Delivery price must be greater than zero.'}));
+            //    hasError = true;
+            //}
 
             if(!itemCode) {
                 setErrorData(state => ({...state, itemCode: 'Please provide an item code.'}));
@@ -131,7 +131,7 @@ const UpdateItem = () => {
             form.append('productTypeId', productTypeId);
             form.append('description', description);
             form.append('supplierId', supplierId);
-            form.append('deliveryPrice', deliveryPrice);
+            //form.append('deliveryPrice', deliveryPrice);
             form.append('itemCode', itemCode);
             form.append('srp', srp);
             form.append('unit', unit);
@@ -398,7 +398,7 @@ const UpdateItem = () => {
                                 </div>
                                 <ErrorField message={errorData?.supplier || ''} />
                             </div>
-                            <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                            {/*<div className="w-1/2 flex flex-col sm:px-4 gap-2">
                                 <label htmlFor="delivery-price" className="font-semibold">
                                     Delivery Price
                                     <span className="text-red-500">*</span>
@@ -414,7 +414,7 @@ const UpdateItem = () => {
                                     required
                                 />
                                 <ErrorField message={errorData?.deliveryPrice || ''} />
-                            </div>
+                            </div>*/}
                             {/* <div className="w-1/2 flex flex-col sm:px-4 gap-2">
                                 <label htmlFor="delivery-date" className="font-semibold">
                                     Delivery Date

@@ -20,7 +20,7 @@ const NewItem = () => {
         description: [],
         supplier: '',  // to display
         supplierId: 0, // to send
-        deliveryPrice: 0,
+        //deliveryPrice: 0,
         itemCode: '',
         srp: 0,
         units: 'pcs',
@@ -29,7 +29,7 @@ const NewItem = () => {
         productType: '',
         description: '',
         supplier: '',
-        deliveryPrice: '',
+        //deliveryPrice: '',
         itemCode: '',
         srp: '',
         units: '',
@@ -71,7 +71,7 @@ const NewItem = () => {
 
             const supplier = data?.supplier?.trim();
             const supplierId = toNumber(data?.supplierId);
-            const deliveryPrice = toNumber(data?.deliveryPrice);
+            //const deliveryPrice = toNumber(data?.deliveryPrice);
 
             const itemCode = data?.itemCode?.trim();
             const srp = toNumber(data?.srp);
@@ -93,10 +93,10 @@ const NewItem = () => {
                 hasError = true;
             }
 
-            if(deliveryPrice <= 0) {
-                setErrorData(state => ({...state, deliveryPrice: 'Delivery price must be greater than zero.'}));
-                hasError = true;
-            }
+            //if(deliveryPrice <= 0) {
+            //    setErrorData(state => ({...state, deliveryPrice: 'Delivery price must be greater than zero.'}));
+            //    hasError = true;
+            //}
 
             if(!itemCode) {
                 setErrorData(state => ({...state, itemCode: 'Please provide an item code.'}));
@@ -119,7 +119,7 @@ const NewItem = () => {
             form.append('productTypeId', productTypeId);
             form.append('description', description);
             form.append('supplierId', supplierId);
-            form.append('deliveryPrice', deliveryPrice);
+            //form.append('deliveryPrice', deliveryPrice);
             form.append('itemCode', itemCode);
             form.append('srp', srp);
             form.append('unit', unit);
@@ -230,7 +230,7 @@ const NewItem = () => {
             >
                 <header className="w-full h-[40px] flex items-center">
                     <h1 className="font-semibold text-lg pl-1">
-                        Update Item
+                        New Item
                     </h1>
                 </header>
                 <div className="h-full grid grid-cols-1 lg:grid-cols-4 gap-2 bg-neutral-100 pt-2">
@@ -358,7 +358,7 @@ const NewItem = () => {
                                 </div>
                                 <ErrorField message={errorData?.supplier || ''} />
                             </div>
-                            <div className="w-1/2 flex flex-col sm:px-4 gap-2">
+                            {/*<div className="w-1/2 flex flex-col sm:px-4 gap-2">
                                 <label htmlFor="delivery-price" className="font-semibold">
                                     Delivery Price
                                     <span className="text-red-500">*</span>
@@ -374,7 +374,7 @@ const NewItem = () => {
                                     required
                                 />
                                 <ErrorField message={errorData?.deliveryPrice || ''} />
-                            </div>
+                            </div>*/}
                             {/* <div className="w-1/2 flex flex-col sm:px-4 gap-2">
                                 <label htmlFor="delivery-date" className="font-semibold">
                                     Delivery Date

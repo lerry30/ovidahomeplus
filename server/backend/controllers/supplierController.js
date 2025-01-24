@@ -73,9 +73,11 @@ const updateSupplier = requestHandler(async (req, res, database) => {
     let newImage = currentImage;
     if(image) {
         newImage = image;
-        const filePath = `uploads/suppliers/${currentImage}`;
-        const isFileExists = await fileExists(filePath);
-        if(isFileExists) await unlink(getDir(filePath));
+        if(currentImage) {
+            const filePath = `uploads/suppliers/${currentImage}`;
+            const isFileExists = await fileExists(filePath);
+            if(isFileExists) await unlink(getDir(filePath));
+        }
     }
     const [update] = await database.execute(supplierStmt.updateSupplier, [name, contact, newImage, id]);
     if(update?.affectedRows > 0) {

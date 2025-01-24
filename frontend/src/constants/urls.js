@@ -1,4 +1,5 @@
 export const apiUrl = 'http://192.168.1.24:4000';
+//export const apiUrl = 'https://ovida.store';
 
 export const urls = {
     signup: `${apiUrl}/api/users/`,

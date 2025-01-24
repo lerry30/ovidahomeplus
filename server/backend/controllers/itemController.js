@@ -19,7 +19,8 @@ const newItem = requestHandler(async (req, res, database) => {
     const description = req.body?.description?.trim();
 
     const supplierId = toNumber(req.body?.supplierId);
-    const deliveryPrice = toNumber(req.body?.deliveryPrice);
+    //const deliveryPrice = toNumber(req.body?.deliveryPrice);
+    const deliveryPrice = 0;
 
     const itemCode = req.body?.itemCode?.trim();
     const srp = roundToTwo(toNumber(req.body?.srp));
@@ -30,7 +31,7 @@ const newItem = requestHandler(async (req, res, database) => {
     if(!productTypeId) throw {status: 400, message: 'Please select a product type from the dropdown menu.'};
     if(!description) throw {status: 400, message: 'Please include the product description to highlight its unique features.'};
     if(!supplierId) throw {status: 400, message: 'Please select a supplier from the dropdown menu.'};
-    if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
+    //if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
     if(!itemCode) throw {status: 400, message: 'Please provide an item code.'};
     if(srp <= 0) throw {status: 400, message: 'SRP must be greater than zero.'};
     if(!unit) throw {status: 400, message: 'Please select units from the dropdown menu.'};
@@ -93,7 +94,8 @@ const updateItem = requestHandler(async (req, res, database) => {
     const description = req.body?.description?.trim();
 
     const supplierId = toNumber(req.body?.supplierId);
-    const deliveryPrice = toNumber(req.body?.deliveryPrice);
+    //const deliveryPrice = toNumber(req.body?.deliveryPrice);
+    const deliveryPrice = 0;
 
     const itemCode = req.body?.itemCode?.trim();
     const srp = roundToTwo(toNumber(req.body?.srp));
@@ -104,7 +106,7 @@ const updateItem = requestHandler(async (req, res, database) => {
     if(!productTypeId) throw {status: 400, message: 'Please select a product type from the dropdown menu.'};
     if(!description) throw {status: 400, message: 'Please include the product description to highlight its unique features.'};
     if(!supplierId) throw {status: 400, message: 'Please select a supplier from the dropdown menu.'};
-    if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
+    //if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
     if(!itemCode) throw {status: 400, message: 'Please provide an item code.'};
     if(srp <= 0) throw {status: 400, message: 'SRP must be greater than zero.'};
     if(!unit) throw {status: 400, message: 'Please select units from the dropdown menu.'};
@@ -119,9 +121,11 @@ const updateItem = requestHandler(async (req, res, database) => {
     let newImage = currentImage;
     if(image) {
         newImage = image;
-        const filePath = `uploads/items/${currentImage}`;
-        const isFileExists = await fileExists(filePath);
-        if(isFileExists) await unlink(getDir(filePath)); // delete existing file for updates
+        if(currentImage) {
+            const filePath = `uploads/items/${currentImage}`;
+            const isFileExists = await fileExists(filePath);
+            if(isFileExists) await unlink(getDir(filePath)); // delete existing file for updates
+        }
     }
 
     // to make sure that product description is unique

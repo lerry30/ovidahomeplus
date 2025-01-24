@@ -14,14 +14,13 @@ const getCashDrawerContents = requestHandler(async (req, res, database) => {
     const todaysDrawerCashDenom = drawer[0] ?? {};
     // get the cash drawer denom in denomination table
     const denomId = todaysDrawerCashDenom?.cashDenominationId;
+    let drawerCont = {oneThousand: 0, fiveHundred: 0, twoHundred: 0, oneHundred: 0, fifty: 0, twenty: 0, ten: 0, five: 0, one: 0};
     if(denomId) {
         const [cashDrawerDenom] = await database.execute(denominationStmt.denomination, [denomId]);
-        const currentCashCont = cashDrawerDenom[0] ?? {};
-
-        res.status(200).json({cashDenominations: currentCashCont});
-        return;
+        drawerCont = cashDrawerDenom[0] ? cashDrawerDenom[0] : drawerCont;
     }
 
+    res.status(200).json({cashDenominations: drawerCont});
     //throw {status: 400, message: 'Cash Drawer data not found or no sold items yet.'}
 }, 'CashDrawer: getCashDrawerContents');
 
