@@ -31,6 +31,7 @@ export const urls = {
     batchdata: `${apiUrl}/api/batches/batch-data`,
     newbarcode: `${apiUrl}/api/barcodes/new`,
     printbarcode: `${apiUrl}/api/barcodes/print`,
+    deletebarcode: `${apiUrl}/api/barcodes/delete`,
     neworder: `${apiUrl}/api/orders/new`,
     solditemstoday: `${apiUrl}/api/solditems/today`,
     dateofsolditems: `${apiUrl}/api/solditems/date`,

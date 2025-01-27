@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ErrorModal } from '@/components/Modal';
-import { Plus, Pencil, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ErrorModal, Prompt } from '@/components/Modal';
+import { Plus, Pencil, Printer, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
@@ -27,9 +27,11 @@ const Barcode = () => {
     const [batchItems, setBatchItems] = useState([]);
     const [printerError, setPrinterError] = useState(false);
     const [pageOffset, setPageOffset] = useState(1);
+    const [deletePrompt, setDeletePrompt] = useState({header: '', message: ''});
     const [loading, setLoading] = useState(false);
 
     const batchTrigger = useRef(false);
+    const barcodeIdToDelete = useRef(null);
 
     const navigate = useNavigate();
     const today = new Date();
@@ -84,6 +86,24 @@ const Barcode = () => {
         } catch(error) {
             console.log('Printer Error');
             setPrinterError(true);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const deleteItem = async () => {
+        try {
+            setLoading(true);
+
+            const payload = {id: barcodeIdToDelete.current};
+            const response = await sendJSON(urls.deletebarcode, payload, 'DELETE');
+            if(response) {
+                setDeletePrompt({header: '', message: ''});
+                const batchSelected = batches.find(item => item.batchId===selectedBatchId);
+                selectBatch(batchSelected);
+            }
+        } catch(error) {
+            console.log(error);
         } finally {
             setLoading(false);
         }
@@ -210,6 +230,17 @@ const Barcode = () => {
         </div>
     );
 
+    if(deletePrompt?.header || deletePrompt?.message) {
+        return (
+            <Prompt 
+                header={deletePrompt?.header}
+                message={deletePrompt?.message} 
+                callback={deleteItem} 
+                onClose={() => setDeletePrompt({header: '', message: ''})} 
+            />
+        )
+    }
+
     if(printerError) {
         return (
             <ErrorModal
@@ -324,7 +355,7 @@ const Barcode = () => {
                         {/* buttons for print all and add item for responsiveness */}
                         <PrintNAddItemButtons className="hidden sm:flex" />
                     </div>
-                    <div className="h-[40px] flex justify-between border-b p-2">
+                    <div className="h-[40px] flex justify-end border-b p-2">
                         <div className="h-[40px] flex md:gap-2">
                             <button
                                 onClick={() => setPageOffset(Math.max(pageOffset-1, 1))}
@@ -429,7 +460,7 @@ const Barcode = () => {
                                                                 }}
                                                             />
                                                         </div>
-                                                        <div className="flex flex-col items-end md:justify-start
+                                                        <div className="flex flex-col items-end gap-1 md:justify-start
                                                             row-start-1 col-start-2 lg:col-start-4">
                                                             {!!barcode?.isSold ?
                                                                 <span className="bg-red-600 text-white px-2 rounded-lg font-semibold">
@@ -449,6 +480,18 @@ const Barcode = () => {
                                                                     </button>
                                                                 )
                                                             }
+                                                            {!barcode?.isSold && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        barcodeIdToDelete.current = barcode?.id;
+                                                                        setDeletePrompt({header: 'Remove Item', message: 'Are you sure you want to remove the item?'});
+                                                                    }}
+                                                                    className={`flex gap-2 items-center justify-center leading-none bg-red-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-red-700 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                                >
+                                                                    <Trash2 />
+                                                                    <span className="hidden sm:flex text-nowrap">Remove</span>
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>

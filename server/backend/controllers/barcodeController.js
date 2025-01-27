@@ -64,6 +64,17 @@ const newBarcode = requestHandler(async (req, res, database) => {
     }
 }, 'Barcode: newBarcode');
 
+const deleteBarcode = requestHandler(async (req, res, database) => {
+    const id = toNumber(req.body?.id);
+    if(!id) throw {status: 400, message: 'Undefined item.'};
+    
+    const [result] = await database.execute(barcodeStmt.deleteBarcode, [id]);
+    if(result?.affectedRows) {
+        res.status(200).json({message: 'Successfully Deleted.'});
+    }
+}, 'Barcode: deleteBarcode');
+
 export {
     newBarcode,
+    deleteBarcode,
 };
