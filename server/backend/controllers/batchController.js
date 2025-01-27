@@ -2,6 +2,8 @@ import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber } from '../utils/number.js';
 import { isValidDate, formattedDate } from '../utils/datetime.js';
 import { parseOneDeep } from '../utils/jsonParse.js';
+import { setPaginate } from '../utils/pagination.js';
+import { quickSortObj } from '../utils/sort.js';
 import * as batchStmt from '../mysql/batch.js';
 
 /*
@@ -89,9 +91,58 @@ const updateBatch = requestHandler(async (req, res, database) => {
 */
 const getBatchWithData = requestHandler(async (req, res, database) => {
     const batchId = toNumber(req.body?.batchId);
+    const limit = toNumber(req.body?.limit) || null;
+    const offset = toNumber(req.body?.offset) || null;
+
     const [results] = await database.execute(batchStmt.getAssociatedToBatch, [batchId]);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
-    res.status(200).json({results: items});
+
+    if(!limit && !offset) {
+        res.status(200).json({results: items});
+        return;
+    }
+
+    // first extract all barcodes from items
+    const nBarcodes = [];
+    for(const item of items) {
+        for(const barcode of item.barcodes) {
+            nBarcodes.push({
+                itemId: item?.id, 
+                ...barcode, 
+                timeCreated: new Date(barcode?.updatedAt).getTime()
+            })
+        }
+    }
+
+    // sort barcodes then reverse it to get the latest inserted
+    const sBarcodes = quickSortObj(nBarcodes, 'timeCreated').reverse();
+
+    const start = (offset-1)*limit;
+    const end = Math.min(offset*limit, sBarcodes.length);
+
+    // cut the barcode's length for pagination
+    const mBarcodes = [];
+    for(let i = start; i < end; i++) {
+        mBarcodes.push(sBarcodes[i]);
+    }
+
+    // reconstruct items by inserting back the barcodes with limited number
+    const objItems = {};
+    for(const item of items) {
+        item.timeCreated = new Date(item?.updatedAt).getTime();
+        for(const barcode of mBarcodes) {
+            if(barcode.itemId === item.id) {
+                const prevBarcodes = objItems[item.id]?.barcodes || [];
+                objItems[item.id] = {...item, barcodes: [...prevBarcodes, barcode]};
+            }
+        }
+    }
+
+    // sort the items
+    const nItems = Object.values(objItems);
+    const sItems = quickSortObj(nItems, 'timeCreated').reverse();
+
+    res.status(200).json({results: sItems});
 }, 'Batch getBatchWithData');
 
 /*

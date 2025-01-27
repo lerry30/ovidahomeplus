@@ -4,23 +4,23 @@ Verify these things first
 
 1. Check Docker path
 ```bash
-    which docker
+which docker
 ```
 
 2. Check Docker socket permissions
 ```bash
-    ls -l /var/run/docker.sock
+ls -l /var/run/docker.sock
 ```
 
 3. Verify Docker service status
 ```bash
-    systemctl status docker.service
+systemctl status docker.service
 ```
 
 4. Verify user and permissions
 ```bash
-    whoami
-    groups
+whoami
+groups
 ```
 
 Create daemon file
@@ -31,21 +31,21 @@ Create daemon file
 Set the user from the output of 'whoami', to User and WorkingDirectory
 
 ```bash
-    [Unit]
-    Description=Docker Containers Startup
-    After=docker.service network.target
-    Requires=docker.service
+[Unit]
+Description=Docker Containers Startup
+After=docker.service network.target
+Requires=docker.service
 
-    [Service]
-    Type=oneshot
-    RemainAfterExit=yes
-    User=ovida
-    Group=docker
-    WorkingDirectory=/home/ovida
-    ExecStart=/bin/bash -c '/usr/bin/docker start $(/usr/bin/docker ps -aq --filter "status=exited")'
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=ovida
+Group=docker
+WorkingDirectory=/home/ovida
+ExecStart=/bin/bash -c '/usr/bin/docker start $(/usr/bin/docker ps -aq --filter "status=exited")'
 
-    [Install]
-    WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
 ```
 
 Run these commands:

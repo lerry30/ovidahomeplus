@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ErrorModal } from '@/components/Modal';
-import { Plus, Pencil, Printer } from 'lucide-react';
+import { Plus, Pencil, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
@@ -26,12 +26,15 @@ const Barcode = () => {
     const [displayedBatches, setDisplayedBatches] = useState([]);
     const [batchItems, setBatchItems] = useState([]);
     const [printerError, setPrinterError] = useState(false);
+    const [pageOffset, setPageOffset] = useState(1);
     const [loading, setLoading] = useState(false);
 
     const batchTrigger = useRef(false);
 
     const navigate = useNavigate();
     const today = new Date();
+
+    const PAGINATE_NO = 5;
 
     const textToPrint = (item) => {
         const itemCodeText = `ITEM CODE: ${item?.itemCode}`;
@@ -110,7 +113,7 @@ const Barcode = () => {
             setSupplierId(batch?.supplierId);
             setSupplierName(batch?.supplierName);
 
-            const payload = {batchId};
+            const payload = {batchId, limit: PAGINATE_NO, offset: pageOffset};
             const response = await sendJSON(urls.batchdata, payload);
             if(response) {
                 const data = response?.results;
@@ -157,6 +160,13 @@ const Barcode = () => {
             setPrinterError(false);
         }, 1000);
     }, [printerError]);
+
+    useLayoutEffect(() => {
+        if(batches.length > 0) {
+            const batchSelected = batches.find(item => item.batchId===selectedBatchId);
+            selectBatch(batchSelected);
+        }
+    }, [pageOffset]);
 
     useLayoutEffect(() => {
         if(batchTrigger.current)
@@ -314,8 +324,23 @@ const Barcode = () => {
                         {/* buttons for print all and add item for responsiveness */}
                         <PrintNAddItemButtons className="hidden sm:flex" />
                     </div>
+                    <div className="h-[40px] flex justify-between border-b p-2">
+                        <div className="h-[40px] flex md:gap-2">
+                            <button
+                                onClick={() => setPageOffset(Math.max(pageOffset-1, 1))}
+                                className="flex">
+                                <ChevronLeft />
+                            </button>
+                            <span>{pageOffset}</span>
+                            <button 
+                                onClick={() => setPageOffset(pageOffset+1)}
+                                className="flex">
+                                <ChevronRight />
+                            </button>
+                        </div>
+                    </div>
                     {batchItems?.length <= 0 && (
-                        <div className="absolute top-[60px] left-0 right-0 bottom-0 z-[0] flex justify-center items-center">
+                        <div className="absolute top-[100px] left-0 right-0 bottom-0 z-[0] flex justify-center items-center">
                             <h3>{selectedBatchStatus}</h3>
                         </div>
                     )}
