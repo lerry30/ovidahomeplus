@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ErrorModal, Prompt } from '@/components/Modal';
-import { Plus, Pencil, Printer, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Printer, ChevronLeft, ChevronRight, Trash2, AlignJustify, ListOrdered } from 'lucide-react';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
@@ -16,22 +16,26 @@ const Barcode = () => {
     const batchDate = zBatch(state => state?.date);
 
     const [selectedYear, setSelectedYear] = useState(null);
+    // holds data of selected batch
     const [selectedBatchId, setSelectedBatchId] = useState(null);
     const [supplierId, setSupplierId] = useState(null);
     const [supplierName, setSupplierName] = useState('');
     const [selectedBatchNo, setSelectedBatchNo] = useState(null);
     const [selectedBatchDate, setSelectedBatchDate] = useState(null);
-    const [selectedBatchStatus, setSelectedBatchStatus] = useState('No Batch Selected');
-    const [batches, setBatches] = useState([]);
-    const [displayedBatches, setDisplayedBatches] = useState([]);
-    const [batchItems, setBatchItems] = useState([]);
+
+    const [selectedBatchStatus, setSelectedBatchStatus] = useState('No Batch Selected'); // default message for empty list
+    const [batches, setBatches] = useState([]); // all batches
+    const [displayedBatches, setDisplayedBatches] = useState([]); // dropdown list of batches based on selected date
+    const [batchItems, setBatchItems] = useState([]); // contains items which displayed on screen
     const [printerError, setPrinterError] = useState(false);
-    const [pageOffset, setPageOffset] = useState(1);
+    const [pageOffset, setPageOffset] = useState(1); // pagination's index
     const [deletePrompt, setDeletePrompt] = useState({header: '', message: ''});
     const [loading, setLoading] = useState(false);
 
-    const batchTrigger = useRef(false);
-    const barcodeIdToDelete = useRef(null);
+    const [isCompact, setIsCompact] = useState(false); // is compact the displayed items
+
+    const batchTrigger = useRef(false); // trigger to save data of selected batch in store and localstorage
+    const barcodeIdToDelete = useRef(null); // selected item's id
 
     const navigate = useNavigate();
     const today = new Date();
@@ -45,12 +49,11 @@ const Barcode = () => {
         return `${item?.productTypeName}>${item?.description}>${itemCodeText}>${deliveryInfo}>${srpText}`;
     }
 
-    const printAllBarcodes = async () => {
+    const sendDataToPrint = async (items) => {
         try {
             setLoading(true);
-            if(batchItems?.length === 0) throw new Error('Print All: Data to print is not defined.');
             const dataset = [];
-            for(const item of batchItems) {
+            for(const item of items) {
                 if(item?.disabledNote) continue;
                 for(const barcodeData of item?.barcodes) {
                     if(barcodeData?.isSold) continue;
@@ -73,6 +76,18 @@ const Barcode = () => {
         }
     }
 
+    const printItemBarcodes = async (item) => {
+        if(!item) 
+            throw new Error('Print Barcode: Data to print is not defined.');
+        sendDataToPrint([item]);
+    }
+
+    const printAllBarcodes = async () => {
+        if(batchItems?.length === 0) 
+            throw new Error('Print All: Data to print is not defined.');
+        sendDataToPrint(batchItems);
+    }
+
     const printBarcode = async (barcodeData, text) => {
         try {
             setLoading(true);
@@ -91,6 +106,32 @@ const Barcode = () => {
         }
     }
 
+    // To display items and the number of barcodes for each.
+    // It is for eas of analizing their numbers. 
+    const orgList = async () => {
+        try {
+            setLoading(true);
+
+            const payload = {batchId: selectedBatchId, limit: PAGINATE_NO, offset: pageOffset};
+            const response = await sendJSON(urls.getnumberofbarcodes, payload);
+            if(response) {
+                const data = response.results;
+                setBatchItems(data);
+                setIsCompact(true);
+            }
+        } catch(error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // to redisplay the items
+    const setDefaultList = () => {
+        const batchSelected = batches.find(item => item.batchId===selectedBatchId);
+        selectBatch(batchSelected);
+    }
+
     const deleteItem = async () => {
         try {
             setLoading(true);
@@ -99,8 +140,7 @@ const Barcode = () => {
             const response = await sendJSON(urls.deletebarcode, payload, 'DELETE');
             if(response) {
                 setDeletePrompt({header: '', message: ''});
-                const batchSelected = batches.find(item => item.batchId===selectedBatchId);
-                selectBatch(batchSelected);
+                setDefaultList();
             }
         } catch(error) {
             console.log(error);
@@ -156,7 +196,7 @@ const Barcode = () => {
             }
         }
         setDisplayedBatches(nBatches);
-        setBatchItems([]);
+        setBatchItems([]); // displayed items to be cleared when new date is selected
     }
 
     const getBatches = async () => {
@@ -183,8 +223,13 @@ const Barcode = () => {
 
     useLayoutEffect(() => {
         if(batches.length > 0) {
-            const batchSelected = batches.find(item => item.batchId===selectedBatchId);
-            selectBatch(batchSelected);
+            // to help pagination button to identify
+            // which item display format to display
+            if(!isCompact) {
+                setDefaultList();
+            } else {
+                orgList();
+            }
         }
     }, [pageOffset]);
 
@@ -229,6 +274,88 @@ const Barcode = () => {
             </button>
         </div>
     );
+
+    const CompactList = ({item}) => {
+        const soldItems = item?.barcodes?.filter(barcode => barcode?.isSold===1); // get sold items
+        const noOfSoldItems = soldItems?.length;
+        const noOfItems = item?.barcodes?.length ?? 0;
+        const quantity = Math.max(0, noOfItems-noOfSoldItems);
+        return (
+            <div className="h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg">
+                <img
+                    src={`${apiUrl}/fl/items/${item?.image}`}
+                    alt="ovida-product" 
+                    className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
+                    onError={ev => {
+                        ev.target.src=`${apiUrl}/image-off.png`
+                        ev.onerror=null; // prevents infinite loop
+                    }}
+                />
+                <hr />
+                <div className="w-full xl:h-[90px] 
+                    grid grid-cols-2 lg:grid-cols-4 gap-4
+                    p-2">
+                    <div className="w-full flex flex-col md:w-fit 
+                        col-start-1">
+                        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                            <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
+                        </div>
+                        <p className="text-[12px]">{item?.description}</p>
+                        <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
+                    </div>
+                    <div className="flex flex-col text-sm 
+                        row-start-3 lg:row-start-1 lg:col-start-2">
+                        <article>
+                            <span>Supplier:&nbsp;&nbsp;</span>
+                            <span className="font-semibold">
+                                {item.supplierName}
+                            </span>
+                        </article>
+                        <article>
+                            <span>SRP:&nbsp;&nbsp;</span>
+                            <span className="font-semibold">
+                                ₱ {formattedNumber(item?.srp)}
+                            </span>
+                        </article>
+                        <article>
+                            <span>Max discount:&nbsp;&nbsp;</span>
+                            <span className="font-semibold">
+                                ₱ {formattedNumber(item?.maxDiscount)}
+                            </span>
+                        </article>
+                    </div>
+                    <div className="w-full flex flex-col 
+                        row-start-2 lg:row-start-1 lg:col-start-3">
+                        <article>
+                            <span>Quantity:&nbsp;&nbsp;</span>
+                            <span className="font-semibold">
+                                {quantity}
+                            </span>
+                        </article>
+                        <article>
+                            <span>Sold Items:&nbsp;&nbsp;</span>
+                            <span className="font-semibold">
+                                {noOfSoldItems}
+                            </span>
+                        </article>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 md:justify-start
+                        row-start-1 col-start-2 lg:col-start-4">
+                        <button
+                            onClick={() => {
+                                //const text = textToPrint(item);
+                                printItemBarcodes(item);
+                            }}
+                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                            <Printer />
+                            <span className="hidden sm:flex text-nowrap">Print</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     if(deletePrompt?.header || deletePrompt?.message) {
         return (
@@ -355,8 +482,25 @@ const Barcode = () => {
                         {/* buttons for print all and add item for responsiveness */}
                         <PrintNAddItemButtons className="hidden sm:flex" />
                     </div>
-                    <div className="h-[40px] flex justify-end border-b p-2">
-                        <div className="h-[40px] flex md:gap-2">
+                    <div className="h-[40px] flex justify-between border-b p-2 sm:px-4">
+                        {batchItems?.length > 0 && (
+                            <div className="h-full flex gap-3">
+                                <button 
+                                    className={`border rounded-md ${!isCompact && 'text-green-700'}`}
+                                    onClick={() => {
+                                        setDefaultList();
+                                        setIsCompact(false);
+                                    }}>
+                                    <AlignJustify />
+                                </button>
+                                <button 
+                                    className={`border rounded-md ${isCompact && 'text-green-700'}`}
+                                    onClick={orgList}>
+                                    <ListOrdered />
+                                </button>
+                            </div>
+                        )}
+                        <div className="h-full flex md:gap-2 ml-auto">
                             <button
                                 onClick={() => setPageOffset(Math.max(pageOffset-1, 1))}
                                 className="flex">
@@ -390,114 +534,118 @@ const Barcode = () => {
                                     key={index}
                                     className="flex flex-col gap-2"
                                 >
-                                    {item?.barcodes?.map(barcode => {
-                                        return (
-                                            <div key={barcode?.id}>
-                                                <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg 
-                                                    ${isActive ? 'border-neutral-300' : 'border-red-600 bg-gray-200/50'}
-                                                    ${!!barcode?.isSold ? 'bg-red-200' : 'bg-white'}`}>
-                                                    <img 
-                                                        src={`${apiUrl}/fl/items/${item?.image}`}
-                                                        alt="ovida-product" 
-                                                        className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
-                                                        onError={ev => {
-                                                            ev.target.src=`${apiUrl}/image-off.png`
-                                                            ev.onerror=null; // prevents infinite loop
-                                                        }}
-                                                    />
-                                                    <hr />
-                                                    <div className="w-full xl:h-[90px] 
-                                                        grid grid-cols-2 lg:grid-cols-4 gap-4
-                                                        p-2">
-                                                        <div className="w-full flex flex-col md:w-fit 
-                                                            col-start-1">
-                                                            <div className="flex flex-col md:flex-row md:items-center md:gap-2">
-                                                                <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
+                                    {!isCompact ?
+                                        item?.barcodes?.map((barcode, brIndex) => {
+                                            return (
+                                                <div key={brIndex}>
+                                                    <div className={`h-[420px] md:h-[320px] lg:h-fit flex flex-col sm:flex-row p-1 pb-2 border rounded-lg 
+                                                        ${isActive ? 'border-neutral-300' : 'border-red-600 bg-gray-200/50'}
+                                                        ${!!barcode?.isSold ? 'bg-red-200' : 'bg-white'}`}>
+                                                        <img 
+                                                            src={`${apiUrl}/fl/items/${item?.image}`}
+                                                            alt="ovida-product" 
+                                                            className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
+                                                            onError={ev => {
+                                                                ev.target.src=`${apiUrl}/image-off.png`
+                                                                ev.onerror=null; // prevents infinite loop
+                                                            }}
+                                                        />
+                                                        <hr />
+                                                        <div className="w-full xl:h-[90px] 
+                                                            grid grid-cols-2 lg:grid-cols-4 gap-4
+                                                            p-2">
+                                                            <div className="w-full flex flex-col md:w-fit 
+                                                                col-start-1">
+                                                                <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                                                                    <h3 className="font-semibold lg:text-lg">{item?.productTypeName}</h3>
+                                                                </div>
+                                                                <p className="text-[12px]">{item?.description}</p>
+                                                                <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
+                                                                {/* -------------------------------------------------- */}
+                                                                {/* display only for small screen */}
+                                                                {/* <p className="flex md:hidden text-[12px]">
+                                                                    {formattedDateAndTime(new Date(item?.deliveryDate))}
+                                                                </p> */}
+                                                                {!isActive && (
+                                                                    <p className="text-red-500 font-semibold italic text-[14px]">
+                                                                        Inactive item: Note - {item?.disabledNote}
+                                                                    </p>
+                                                                )}
                                                             </div>
-                                                            <p className="text-[12px]">{item?.description}</p>
-                                                            <p className="text-[12px]">Item Code:&nbsp;&nbsp;{item?.itemCode}</p>
-                                                            {/* -------------------------------------------------- */}
-                                                            {/* display only for small screen */}
-                                                            {/* <p className="flex md:hidden text-[12px]">
-                                                                {formattedDateAndTime(new Date(item?.deliveryDate))}
-                                                            </p> */}
-                                                            {!isActive && (
-                                                                <p className="text-red-500 font-semibold italic text-[14px]">
-                                                                    Inactive item: Note - {item?.disabledNote}
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex flex-col text-sm 
-                                                            row-start-3 lg:row-start-1 lg:col-start-2">
-                                                            <article>
-                                                                <span>Supplier:&nbsp;&nbsp;</span>
-                                                                <span className="font-semibold">
-                                                                    {item.supplierName}
-                                                                </span>
-                                                            </article>
-                                                            <article>
-                                                                <span>SRP:&nbsp;&nbsp;</span>
-                                                                <span className="font-semibold">
-                                                                    ₱ {formattedNumber(item?.srp)}
-                                                                </span>
-                                                            </article>
-                                                            <article>
-                                                                <span>Max discount:&nbsp;&nbsp;</span>
-                                                                <span className="font-semibold">
-                                                                    ₱ {formattedNumber(item?.maxDiscount)}
-                                                                </span>
-                                                            </article>
-                                                        </div>
-                                                        <div className="w-full flex lg:justify-center 
-                                                            row-start-2 lg:row-start-1 lg:col-start-3">
-                                                            <img 
-                                                                src={`${apiUrl}/fl/barcodes/${barcode?.barcode}.png`}
-                                                                alt="ovida-product-barcode" 
-                                                                className="w-[124px] h-[50px] object-contain"
-                                                                onError={ev => {
-                                                                    ev.target.src=`${apiUrl}/image-off.png`
-                                                                    ev.onerror=null; // prevents infinite loop
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="flex flex-col items-end gap-1 md:justify-start
-                                                            row-start-1 col-start-2 lg:col-start-4">
-                                                            {!!barcode?.isSold ?
-                                                                <span className="bg-red-600 text-white px-2 rounded-lg font-semibold">
-                                                                    Sold
-                                                                </span>
-                                                            :
-                                                                isActive && (
+                                                            <div className="flex flex-col text-sm 
+                                                                row-start-3 lg:row-start-1 lg:col-start-2">
+                                                                <article>
+                                                                    <span>Supplier:&nbsp;&nbsp;</span>
+                                                                    <span className="font-semibold">
+                                                                        {item.supplierName}
+                                                                    </span>
+                                                                </article>
+                                                                <article>
+                                                                    <span>SRP:&nbsp;&nbsp;</span>
+                                                                    <span className="font-semibold">
+                                                                        ₱ {formattedNumber(item?.srp)}
+                                                                    </span>
+                                                                </article>
+                                                                <article>
+                                                                    <span>Max discount:&nbsp;&nbsp;</span>
+                                                                    <span className="font-semibold">
+                                                                        ₱ {formattedNumber(item?.maxDiscount)}
+                                                                    </span>
+                                                                </article>
+                                                            </div>
+                                                            <div className="w-full flex lg:justify-center 
+                                                                row-start-2 lg:row-start-1 lg:col-start-3">
+                                                                <img 
+                                                                    src={`${apiUrl}/fl/barcodes/${barcode?.barcode}.png`}
+                                                                    alt="ovida-product-barcode" 
+                                                                    className="w-[124px] h-[50px] object-contain"
+                                                                    onError={ev => {
+                                                                        ev.target.src=`${apiUrl}/image-off.png`
+                                                                        ev.onerror=null; // prevents infinite loop
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="flex flex-col items-end gap-1 md:justify-start
+                                                                row-start-1 col-start-2 lg:col-start-4">
+                                                                {!!barcode?.isSold ?
+                                                                    <span className="bg-red-600 text-white px-2 rounded-lg font-semibold">
+                                                                        Sold
+                                                                    </span>
+                                                                :
+                                                                    isActive && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const text = textToPrint(item);
+                                                                                printBarcode(barcode?.barcode, text);
+                                                                            }}
+                                                                            className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                                        >
+                                                                            <Printer />
+                                                                            <span className="hidden sm:flex text-nowrap">Print Barcode</span>
+                                                                        </button>
+                                                                    )
+                                                                }
+                                                                {!barcode?.isSold && (
                                                                     <button
                                                                         onClick={() => {
-                                                                            const text = textToPrint(item);
-                                                                            printBarcode(barcode?.barcode, text);
+                                                                            barcodeIdToDelete.current = barcode?.id;
+                                                                            setDeletePrompt({header: 'Remove Item', message: 'Are you sure you want to remove the item?'});
                                                                         }}
-                                                                        className={`flex gap-2 items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-green-800 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
+                                                                        className={`flex gap-2 items-center justify-center leading-none bg-red-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-red-700 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
                                                                     >
-                                                                        <Printer />
-                                                                        <span className="hidden sm:flex text-nowrap">Print Barcode</span>
+                                                                        <Trash2 />
+                                                                        <span className="hidden sm:flex text-nowrap">Remove</span>
                                                                     </button>
-                                                                )
-                                                            }
-                                                            {!barcode?.isSold && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        barcodeIdToDelete.current = barcode?.id;
-                                                                        setDeletePrompt({header: 'Remove Item', message: 'Are you sure you want to remove the item?'});
-                                                                    }}
-                                                                    className={`flex gap-2 items-center justify-center leading-none bg-red-600 text-white font-bold rounded-lg p-2 sm:px-4 hover:bg-red-700 ${!selectedBatchNo ? 'pointer-events-none opacity-50' : ''}`}
-                                                                >
-                                                                    <Trash2 />
-                                                                    <span className="hidden sm:flex text-nowrap">Remove</span>
-                                                                </button>
-                                                            )}
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                    )}
+                                            )}
+                                        )
+                                    :
+                                        <CompactList item={item} />    
+                                    }
                                 </li>
                             )
                         })}

@@ -146,6 +146,44 @@ const getBatchWithData = requestHandler(async (req, res, database) => {
 }, 'Batch getBatchWithData');
 
 /*
+   desc     Get batch data with numbers of barcodes
+   route    POST /api/batches/getnumberofbarcodes
+   access   private
+*/
+const getBatchWithNumberOfBarcodes = requestHandler(async (req, res, database) => {
+    const batchId = toNumber(req.body?.batchId);
+    const limit = toNumber(req.body?.limit) || null;
+    const offset = toNumber(req.body?.offset) || null;
+
+    const {sqlQuery, queryParams} = setPaginate(limit, offset, batchStmt.getAssociatedToBatch);
+
+    const [results] = await database.execute(sqlQuery, [batchId, ...queryParams]);
+    const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
+
+    const itemsDate = []; // hold id and time for sorting
+    const itemsList = {}; // save items in object for searching
+
+    // create new structures for sorting and searching
+    for(const item of items) {
+        itemsDate.push({
+            id: item?.id,
+            timeCreated: new Date(item?.barcodes[0]?.updatedAt).getTime()
+        }); // for sorting
+
+        itemsList[item?.id] = item; // for searching
+    }
+    // sort
+    const sItemsDate = quickSortObj(itemsDate, 'timeCreated').reverse();
+    // find item by object indexing
+    const nItems = [];
+    for(const sItem of sItemsDate) {
+        nItems.push(itemsList[sItem?.id]);
+    }
+
+    res.status(200).json({results: nItems});
+}, 'Batch: getBatchWithNumberOfBarcodes');
+
+/*
    desc     Get batches by supplier
    route    POST /api/batches/supplier-based
    access   private
@@ -161,6 +199,7 @@ export {
     getBatches,
     getBatch,
     updateBatch,
-    getBatchWithData,
+    getBatchWithData, // first display format
+    getBatchWithNumberOfBarcodes, // second display format
     getBatchesBySupplier,
 };

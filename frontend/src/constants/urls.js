@@ -29,6 +29,7 @@ export const urls = {
     getbatchesbysupplier: `${apiUrl}/api/batches/supplier-based`,
     updatebatch: `${apiUrl}/api/batches/update`,
     batchdata: `${apiUrl}/api/batches/batch-data`,
+    getnumberofbarcodes: `${apiUrl}/api/batches/getnumberofbarcodes`,
     newbarcode: `${apiUrl}/api/barcodes/new`,
     printbarcode: `${apiUrl}/api/barcodes/print`,
     deletebarcode: `${apiUrl}/api/barcodes/delete`,
