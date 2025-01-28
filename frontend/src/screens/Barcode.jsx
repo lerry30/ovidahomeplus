@@ -33,6 +33,8 @@ const Barcode = () => {
     const [loading, setLoading] = useState(false);
 
     const [isCompact, setIsCompact] = useState(false); // is compact the displayed items
+    const [totalItems, setTotalItems] = useState(0);
+    const [totalSoldItems, setTotalSoldItems] = useState(0);
 
     const batchTrigger = useRef(false); // trigger to save data of selected batch in store and localstorage
     const barcodeIdToDelete = useRef(null); // selected item's id
@@ -177,8 +179,14 @@ const Barcode = () => {
             const response = await sendJSON(urls.batchdata, payload);
             if(response) {
                 const data = response?.results;
-                // console.log(data);
+                const total = response?.totalItems;
+                const sold = response?.totalSoldItems
+                //console.log(data);
                 setBatchItems(data);
+
+                setTotalItems(total);
+                setTotalSoldItems(sold);
+
                 if(data?.length <= 0) setSelectedBatchStatus('Empty Batch Items');
             }
         } catch(error) {
@@ -498,6 +506,17 @@ const Barcode = () => {
                                     onClick={orgList}>
                                     <ListOrdered />
                                 </button>
+                                <div className="flex gap-2 border border-neutral-300 rounded-md px-2">
+                                    <article className="font-semibold">
+                                        <span className="mr-1">Total Items:</span>
+                                        <span>{totalItems}</span>
+                                    </article>
+                                    <article className="font-semibold
+                                        border-l-2 border-neutral-300 pl-2">
+                                        <span className="mr-1">Sold Items:</span>
+                                        <span>{totalSoldItems}</span>
+                                    </article>
+                                </div>
                             </div>
                         )}
                         <div className="h-full flex md:gap-2 ml-auto">

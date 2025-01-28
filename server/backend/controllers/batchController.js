@@ -14,7 +14,7 @@ import * as batchStmt from '../mysql/batch.js';
 const newBatch = requestHandler(async (req, res, database) => {
     const supplierId = toNumber(req.body?.supplierId);
     const batchNo = toNumber(req.body?.batchNo);
-    const deliveryReceiptNo = String(req.body?.deliveryReceiptNo).trim().replace(/[^0-9]+/g, '');
+    const deliveryReceiptNo = String(req.body?.deliveryReceiptNo).trim().replace(/[^0-9,]+/g, '');
     let deliveryDate = String(req.body?.deliveryDate)?.trim();
 
     if(supplierId < 1) throw new Error('Supplier is required.');
@@ -64,7 +64,7 @@ const updateBatch = requestHandler(async (req, res, database) => {
     const batchId = toNumber(req.body?.batchId);
     const supplierId = toNumber(req.body?.supplierId);
     const batchNo = toNumber(req.body?.batchNo);
-    const deliveryReceiptNo = String(req.body?.deliveryReceiptNo).trim().replace(/[^0-9]+/g, '');
+    const deliveryReceiptNo = String(req.body?.deliveryReceiptNo).trim().replace(/[^0-9,]+/g, '');
     let deliveryDate = String(req.body?.deliveryDate)?.trim();
 
     if(batchId < 1) throw new Error('Undefined batch.');
@@ -97,8 +97,18 @@ const getBatchWithData = requestHandler(async (req, res, database) => {
     const [results] = await database.execute(batchStmt.getAssociatedToBatch, [batchId]);
     const items = results?.length > 0 ? parseOneDeep(results, ['barcodes']) : [];
 
+    // calculate total items
+    let totalItems = 0;
+    let totalSoldItems = 0;
+    for(const item of items) {
+        const barcodes = item?.barcodes;
+        const soldItems = barcodes?.filter(barcode => barcode?.isSold===1); // get sold items
+        totalItems = totalItems + Math.max(0, toNumber(barcodes?.length) - toNumber(soldItems?.length));
+        totalSoldItems = totalSoldItems + toNumber(soldItems?.length);
+    }
+
     if(!limit && !offset) {
-        res.status(200).json({results: items});
+        res.status(200).json({results: items, totalItems, totalSoldItems});
         return;
     }
 
@@ -142,7 +152,7 @@ const getBatchWithData = requestHandler(async (req, res, database) => {
     const nItems = Object.values(objItems);
     const sItems = quickSortObj(nItems, 'timeCreated').reverse();
 
-    res.status(200).json({results: sItems});
+    res.status(200).json({results: sItems, totalItems, totalSoldItems});
 }, 'Batch getBatchWithData');
 
 /*

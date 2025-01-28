@@ -225,7 +225,7 @@ const UpdateBatch = () => {
                                 value={data?.deliveryReceiptNo ?? ''}
                                 onChange={elem => {
                                     const input = elem.target.value;
-                                    const nInput = input.replace(/[^0-9]+/g, '');
+                                    const nInput = input.replace(/[^0-9,]+/g, '');
                                     setData(state => ({...state, deliveryReceiptNo: nInput}));
                                 }}
                                 className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
