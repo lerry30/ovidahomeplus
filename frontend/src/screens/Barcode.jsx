@@ -483,9 +483,11 @@ const Barcode = () => {
                                     }
                                 </Select>
                             )}
-                            {/* {selectedBatchNo && <span className="bg-green-400/50 p-2 rounded-md">
-                                Batch {selectedBatchNo}{selectedBatchDate ? ` - ${selectedBatchDate}` : ''}
-                            </span>} */}
+                            {(selectedBatchNo && selectedBatchDate && supplierName) && (
+                                <span className="hidden lg:flex bg-green-400/50 p-2 rounded-md">
+                                    {supplierName} Batch {selectedBatchNo}{selectedBatchDate ? ` - ${selectedBatchDate}` : ''}
+                                </span>
+                            )}
                         </div>
                         {/* buttons for print all and add item for responsiveness */}
                         <PrintNAddItemButtons className="hidden sm:flex" />
