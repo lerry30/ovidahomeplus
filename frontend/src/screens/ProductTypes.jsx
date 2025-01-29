@@ -61,32 +61,44 @@ const ProductTypes = () => {
         activateStatus(pageOffset.current, tab);
     }
 
-    const search = (ev) => {
+    const search = async (ev) => {
         try {
             const input = ev.target.value.trim().toLowerCase();
-            let tabSelected = getTabSelected();
+            const tabSelected = getTabSelected();
 
-            if(!input) {
-                tabNavigate(tabSelected);
+            if(!input) { // if input is an empty string due to backspacing
+                tabNavigate(tabSelected); // display items by status
                 return;
             }
 
-            const searched = [];
-            const isTabAll = tabs?.all;
-            for(let i = 0; i < productTypes.length; i++) {
-                const name = String(productTypes[i]?.name || '')?.trim()?.toLowerCase();
-                const status = productTypes[i]?.status;
-                if(name?.match(input)) {
-                    if(tabs[status] || isTabAll){
-                        searched.push(productTypes[i]);
+            const payload = {input};
+            const response = await sendJSON(urls.searchproducttypes, payload);
+            if(response) {
+                //console.log(response?.results);
+                const data = response?.results;
+                if(tabSelected==='all') {
+                    setDisplayProductTypes(data);
+                } else {
+                    const allActive = [];
+                    const allInactive = [];
+                    for(const productType of data) {
+                        if(productType?.status === 'active') {
+                            allActive.push(productType);
+                        } else {
+                            allInactive.push(productType);
+                        }
+                    }
+
+                    if(tabSelected==='active') {
+                        setDisplayProductTypes(allActive);
+                    } else {
+                        setDisplayProductTypes(allInactive);
                     }
                 }
             }
-
-            setDisplayProductTypes(searched);
         } catch(error) {
-            console.log(error);
-        } finally {}
+            console.error(error);
+        }
     }
 
     const changeProductTypeStatus = async (changeTo) => {
@@ -348,3 +360,34 @@ const ProductTypes = () => {
 }
 
 export default ProductTypes;
+
+
+/*
+const search = (ev) => {
+    try {
+        const input = ev.target.value.trim().toLowerCase();
+        let tabSelected = getTabSelected();
+
+        if(!input) {
+            tabNavigate(tabSelected);
+            return;
+        }
+
+        const searched = [];
+        const isTabAll = tabs?.all;
+        for(let i = 0; i < productTypes.length; i++) {
+            const name = String(productTypes[i]?.name || '')?.trim()?.toLowerCase();
+            const status = productTypes[i]?.status;
+            if(name?.match(input)) {
+                if(tabs[status] || isTabAll){
+                    searched.push(productTypes[i]);
+                }
+            }
+        }
+
+        setDisplayProductTypes(searched);
+    } catch(error) {
+        console.log(error);
+    } finally {}
+}
+*/

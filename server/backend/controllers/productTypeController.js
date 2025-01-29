@@ -96,7 +96,7 @@ const updateProductType = requestHandler(async (req, res, database) => {
 
 /*
    desc     Get items either active or inactive
-   route    GET /api/items/status
+   route    GET /api/producttypes/status
    access   public
 */
 const getProductTypesByStatus = requestHandler(async (req, res, database) => {
@@ -112,10 +112,24 @@ const getProductTypesByStatus = requestHandler(async (req, res, database) => {
     res.status(200).json({ results: resultItems });
 }, 'ProductType: getProductTypesByStatus');
 
+/*
+   desc     Search for product type
+   route    POST /api/producttypes/search
+   access   private
+*/
+const searchProductTypes = requestHandler(async (req, res, database) => {
+    const input = String(req.body?.input).trim().toLowerCase();
+    if(!input) throw {status: 400, message: 'Search input cannot be empty.'};
+
+    const [results] = await database.execute(productTypeStmt.searchProductTypes, [input]);
+    res.status(200).json({results});  
+}, 'ProductType: searchProductTypes');
+
 export {
     newProductType,
     getProductTypes,
     changeProductTypeStatus,
     updateProductType,
     getProductTypesByStatus,
+    searchProductTypes,
 };

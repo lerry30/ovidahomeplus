@@ -1,5 +1,5 @@
-//export const apiUrl = 'http://192.168.1.24:4000';
-export const apiUrl = 'https://ovida.store';
+export const apiUrl = 'http://192.168.1.24:4000';
+//export const apiUrl = 'https://ovida.store';
 
 export const urls = {
     signup: `${apiUrl}/api/users/`,
@@ -14,6 +14,7 @@ export const urls = {
     updateproducttypestatus: `${apiUrl}/api/producttypes/status`,
     updateproducttype: `${apiUrl}/api/producttypes/update`,
     getproducttypesbystatus: `${apiUrl}/api/producttypes/status`,
+    searchproducttypes: `${apiUrl}/api/producttypes/search`,
     newitem: `${apiUrl}/api/items/new`,
     getitems: `${apiUrl}/api/items/get`,
     getexclude: `${apiUrl}/api/items/exclude`,
