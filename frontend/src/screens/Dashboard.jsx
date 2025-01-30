@@ -130,23 +130,26 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Total Sold Items Today</h2>
-                        <AnimateNumber number={itemsSoldToday} size={40} />
+                        {/*<AnimateNumber number={itemsSoldToday} size={40} />*/}
+                        <span className="font-bold text-3xl text-center">{itemsSoldToday}</span>
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Total Sold Items</h2>
-                        <AnimateNumber number={itemsSold} size={40} />
+                        {/*<AnimateNumber number={itemsSold} size={40} />*/}
+                        <span className="font-bold text-3xl text-center">{itemsSold}</span>
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Items</h2>
-                        <AnimateNumber number={items} size={40} />
+                        {/*<AnimateNumber number={items} size={40} />*/}
+                        <span className="font-bold text-3xl text-center">{items}</span>
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Suppliers</h2>
-                        <AnimateNumber number={suppliers} size={40} />
+                        <span className="font-bold text-3xl text-center">{suppliers}</span>
                     </div>
                     <div className="bg-white p-4 pb-6 rounded-lg shadow-md flex flex-col items-center">
                         <h2 className="font-semibold text-lg mb-2">Product Types</h2>
-                        <AnimateNumber number={productTypes} size={40} />
+                        <span className="font-bold text-3xl text-center">{productTypes}</span>
                     </div>
                     <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-4 rounded-lg shadow-md">
                         <h2 className="font-semibold text-lg mb-2">Monthly Sales Comparison</h2>

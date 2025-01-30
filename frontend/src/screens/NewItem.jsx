@@ -73,7 +73,7 @@ const NewItem = () => {
             const supplierId = toNumber(data?.supplierId);
             //const deliveryPrice = toNumber(data?.deliveryPrice);
 
-            const itemCode = data?.itemCode?.trim();
+            const itemCode = data?.itemCode?.trim()?.toUpperCase();
             const srp = toNumber(data?.srp);
             const unit = data?.units?.trim();
 

@@ -1,7 +1,7 @@
 import { requestHandler } from '../utils/requestHandler.js';
 import { toNumber, roundToTwo } from '../utils/number.js';
 import { parseOneDeep } from '../utils/jsonParse.js';
-import { checkDescription } from '../helper/items.js';
+import { checkDescription, getDuplicateError } from '../helper/items.js';
 import { setPaginate } from '../utils/pagination.js';
 import { getDir, fileExists } from '../utils/fileDir.js';
 import { unlink } from 'fs/promises';
@@ -39,18 +39,21 @@ const newItem = requestHandler(async (req, res, database) => {
     const maxDiscount = srp - srp * 0.05;
 
     // to make sure that product description is unique
-    const [descriptions] = await database.query(itemStmt.getItemDescription, [supplierId, productTypeId]);
-    checkDescription(description, descriptions); // will verify the description uniqueness
+    //const [descriptions] = await database.query(itemStmt.getItemDescription, [supplierId, productTypeId]);
+    //checkDescription(description, descriptions); // will verify the description uniqueness
 
-    const [itemInserted] = await database.execute(itemStmt.newItem,
-        [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, image]);
-    if(itemInserted?.insertId > 0) {
-        // generateBarcode(itemBarcode);
-        res.status(201).json({message: 'Inserted successfully.'});
-        return;
-    }
+    // I also wrap it in try catch block to define the error
+    // because I wanted to display error message regarding
+    // duplicate item_code since it is a unique constraint.
+    await getDuplicateError(async () => {
+        const [itemInserted] = await database.execute(itemStmt.newItem,
+            [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, image]);
 
-    throw {status: 401, message: 'New item failed to insert.'};
+        if(itemInserted?.insertId > 0) {
+            // generateBarcode(itemBarcode);
+            res.status(201).json({message: 'Inserted successfully.'});
+        }
+    }, 'New item failed to insert.');
 }, 'Item: newItem');
 
 /*
@@ -129,21 +132,23 @@ const updateItem = requestHandler(async (req, res, database) => {
     }
 
     // to make sure that product description is unique
-    const [descriptions] = await database.query(itemStmt.getItemDescription, [supplierId, productTypeId]);
-    if(currentDescription !== description) checkDescription(description, descriptions); // will verify the description uniqueness
+    //const [descriptions] = await database.query(itemStmt.getItemDescription, [supplierId, productTypeId]);
+    //if(currentDescription !== description) checkDescription(description, descriptions); // will verify the description uniqueness
 
-    const [itemUpdated] = await database.execute(itemStmt.updateItem, 
-        [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, newImage, itemId]);
-    if(itemUpdated?.affectedRows > 0) {
-        // if(isBarcodeChange) {
-        //     await unlink(getDir(`uploads/barcodes/${prevBarcode}.png`));
-        //     generateBarcode(itemBarcode);
-        // }
-        res.status(201).json({message: 'Updated successfully.'});
-        return;
-    }
-
-    throw {status: 401, message: 'Updating item failed.'};
+    // I also wrap it in try catch block to define the error
+    // because I wanted to display error message regarding
+    // duplicate item_code since it is a unique constraint.
+    await getDuplicateError(async () => {
+        const [itemUpdated] = await database.execute(itemStmt.updateItem, 
+            [supplierId, productTypeId, description, itemCode, deliveryPrice, srp, maxDiscount, unit, newImage, itemId]);
+        if(itemUpdated?.affectedRows > 0) {
+            // if(isBarcodeChange) {
+            //     await unlink(getDir(`uploads/barcodes/${prevBarcode}.png`));
+            //     generateBarcode(itemBarcode);
+            // }
+            res.status(201).json({message: 'Updated successfully.'});
+        }
+    }, 'Updating item failed.');
 }, 'Item: updateItem');
 
 /*

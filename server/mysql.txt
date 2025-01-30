@@ -43,7 +43,7 @@ CREATE TABLE items(
 	supplier_id INT NOT NULL,
 	product_type_id INT NOT NULL,
 	description VARCHAR(255) NOT NULL,
-	item_code VARCHAR(255) NOT NULL,
+	item_code VARCHAR(255) UNIQUE NOT NULL,
 	delivery_price INT NOT NULL,
 	srp INT NOT NULL,
 	max_discount INT NOT NULL,

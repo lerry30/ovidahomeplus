@@ -5,13 +5,22 @@ new modifications made in the code base and redeploying is
 a must. So I will never just forget necessary configs needed
 and scratch my head why the setup is not working.
 
-1. Make sure URLs are updated in the frontend to properly
-    reached the endpoint. Since I didn't include this file
-    when rsync or update made.
+1. Make sure the endpoint of the frontend is set properly.
 
-- rsync -avP --exclude server/node_modules --exclude frontend/node_modules --exclude server/.env --exclude frontend/src/constants/urls.js --exclude server/backend/uploads --exclude .git --exclude local  ~/Desktop/root user@192.168.1.100:~/
+    got to /ovida/frontend/src/constants/urls.js
 
-2. I used cloudflare for tunneling as well as nginx as my proxy
+    modify the the urls variable to backend's url to make requests.
+
+2. Build the frontend.
+
+```bash
+npm run build
+```
+
+    I actually provide rsync command in this root directory to upload
+    in server.
+
+3. I used cloudflare for tunneling as well as nginx as my proxy
     server therefore the daemon name is nginx and cloudflared.
 
 - sudo systemctl status nginx

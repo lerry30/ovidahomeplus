@@ -20,3 +20,17 @@ export const checkDescription = (toInsert, descriptions) => {
         }
     }
 }
+
+// I also wrap it in try catch block to define the error
+// because I wanted to display error message regarding
+// duplicate item_code since it is a unique constraint.
+export const getDuplicateError = async (callback, errorMessage) => {
+    try {
+        await callback();
+    } catch(error) {
+        if(error?.code === 'ER_DUP_ENTRY') throw {status: 400, message: 'Item code already exists.'};
+        throw {status: 401, message: errorMessage};
+    }
+}
+
+
