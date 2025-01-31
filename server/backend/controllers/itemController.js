@@ -16,15 +16,15 @@ import * as soldItemStmt from '../mysql/soldItems.js';
 */
 const newItem = requestHandler(async (req, res, database) => {
     const productTypeId = toNumber(req.body?.productTypeId);
-    const description = req.body?.description?.trim();
+    const description = String(req.body?.description).trim();
 
     const supplierId = toNumber(req.body?.supplierId);
     //const deliveryPrice = toNumber(req.body?.deliveryPrice);
     const deliveryPrice = 0;
 
-    const itemCode = req.body?.itemCode?.trim();
+    const itemCode = String(req.body?.itemCode).trim();
     const srp = roundToTwo(toNumber(req.body?.srp));
-    const unit = req.body?.unit?.trim();
+    const unit = String(req.body?.unit).trim();
 
     const image = req?.file?.filename || '';
 
@@ -33,7 +33,7 @@ const newItem = requestHandler(async (req, res, database) => {
     if(!supplierId) throw {status: 400, message: 'Please select a supplier from the dropdown menu.'};
     //if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
     if(!itemCode) throw {status: 400, message: 'Please provide an item code.'};
-    if(srp <= 0) throw {status: 400, message: 'SRP must be greater than zero.'};
+    //if(srp <= 0) throw {status: 400, message: 'SRP must be greater than zero.'};
     if(!unit) throw {status: 400, message: 'Please select units from the dropdown menu.'};
 
     const maxDiscount = srp - srp * 0.05;
@@ -111,7 +111,7 @@ const updateItem = requestHandler(async (req, res, database) => {
     if(!supplierId) throw {status: 400, message: 'Please select a supplier from the dropdown menu.'};
     //if(deliveryPrice <= 0) throw {status: 400, message: 'Delivery price must be greater than zero.'};
     if(!itemCode) throw {status: 400, message: 'Please provide an item code.'};
-    if(srp <= 0) throw {status: 400, message: 'SRP must be greater than zero.'};
+    //if(srp <= 0) throw {status: 400, message: 'SRP must be greater than zero.'};
     if(!unit) throw {status: 400, message: 'Please select units from the dropdown menu.'};
 
     const maxDiscount = srp - srp * 0.05;

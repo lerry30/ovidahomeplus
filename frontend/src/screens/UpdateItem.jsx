@@ -1,4 +1,5 @@
 import { CircleX } from 'lucide-react';
+import { Prompt } from '@/components/Modal';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
@@ -40,17 +41,19 @@ const UpdateItem = () => {
         supplier: '',
         //deliveryPrice: '',
         itemCode: '',
-        srp: '',
+        //srp: '',
         units: '',
         default: ''
     });
     const [image, setImage] = useState(undefined);
     const [suppliers, setSuppliers] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
+    const [zeroSrpPrompt, setZeroSrpPrompt] = useState({header: '', message: ''});
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
     const descriptionInputRef = useRef(null);
+    const formData = useRef(null);
 
     //const PROFIT_MARGIN = 0.4576;
 
@@ -62,6 +65,20 @@ const UpdateItem = () => {
             if(!inputValue) return;
             setData(state => ({...state, description: [...state?.description, inputValue]}));
             ev.target.value = '';
+        }
+    }
+
+    // I separate this to allow zero srp prompt
+    const requestForUpdateItem = async () => {
+        try {
+            const response = await sendForm(urls?.updateitem, formData.current, 'PUT');
+            if(response) {
+                //console.log(response?.message);
+                navigate('/admin/inventory');
+            }
+        } catch(error) {
+            console.log(error);
+            setErrorData(state => ({...state, default: error?.message}));
         }
     }
 
@@ -82,7 +99,7 @@ const UpdateItem = () => {
             const supplierId = toNumber(data?.supplierId);
             //const deliveryPrice = toNumber(data?.deliveryPrice);
 
-            const itemCode = data?.itemCode?.trim();
+            const itemCode = data?.itemCode?.trim()?.toUpperCase();
             const srp = toNumber(data?.srp);
             const unit = data?.units?.trim();
 
@@ -114,10 +131,10 @@ const UpdateItem = () => {
                 hasError = true;
             }
 
-            if(srp <= 0) {
-                setErrorData(state => ({...state, srp: 'SRP must be greater than zero.'}));
-                hasError = true;
-            }
+            //if(srp <= 0) {
+            //    setErrorData(state => ({...state, srp: 'SRP must be greater than zero.'}));
+            //    hasError = true;
+            //}
 
             if(!unit) {
                 setErrorData(state => ({...state, units: 'Please select units from the dropdown menu.'}));
@@ -137,11 +154,19 @@ const UpdateItem = () => {
             form.append('unit', unit);
             form.append('file', image);
 
-            const response = await sendForm(urls?.updateitem, form, 'PUT');
-            if(response) {
-                console.log(response?.message);
-                navigate('/admin/inventory');
+            // made it a global since the zero srp prompt is included
+            formData.current = form;
+
+            // move this filter down to allow zero srp
+            if(srp <= 0) {
+                setZeroSrpPrompt({
+                    header: 'Zero SRP', 
+                    message: 'Are you sure you want to allow zero SRP for this item?'
+                });
+                return;
             }
+
+            await requestForUpdateItem();
         } catch(error) {
             console.log(error?.message);
             setErrorData(state => ({...state, default: error?.message}));
@@ -253,6 +278,17 @@ const UpdateItem = () => {
         addEventListener('click', onPageClick);
         return () => removeEventListener('click', onPageClick);
     }, []);
+
+    if(zeroSrpPrompt?.header && zeroSrpPrompt?.message) {
+        return (
+            <Prompt 
+                header={zeroSrpPrompt.header} 
+                message={zeroSrpPrompt.message}
+                callback={requestForUpdateItem}
+                onClose={() => setZeroSrpPrompt({header: '', message: ''})}
+            />
+        )
+    }
 
     if(loading) {
         return (
@@ -470,7 +506,7 @@ const UpdateItem = () => {
                                     className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                                     required
                                 />
-                                <ErrorField message={errorData?.srp || ''} />
+                                {/*<ErrorField message={errorData?.srp || ''} />*/}
                             </div>
                         </div>
                         <div className="flex flex-col sm:px-4 gap-2">

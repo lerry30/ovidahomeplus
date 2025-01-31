@@ -1,4 +1,5 @@
 import { CircleX } from 'lucide-react';
+import { Prompt } from '@/components/Modal';
 import { useLayoutEffect, useState, useRef } from 'react';
 import { sendForm, getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
@@ -31,17 +32,19 @@ const NewItem = () => {
         supplier: '',
         //deliveryPrice: '',
         itemCode: '',
-        srp: '',
+        //srp: '',
         units: '',
         default: ''
     });
     const [image, setImage] = useState(undefined);
     const [suppliers, setSuppliers] = useState([]);
     const [productTypes, setProductTypes] = useState([]);
+    const [zeroSrpPrompt, setZeroSrpPrompt] = useState({header: '', message: ''});
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
     const descriptionInputRef = useRef(null);
+    const formData = useRef(null);
 
     const PROFIT_MARGIN = 0.4576;
 
@@ -53,6 +56,20 @@ const NewItem = () => {
             if(!inputValue) return;
             setData(state => ({...state, description: [...state?.description, inputValue]}));
             ev.target.value = '';
+        }
+    }
+
+    // I separate this to allow zero srp prompt
+    const requestForNewItem = async () => {
+        try {
+            const response = await sendForm(urls?.newitem, formData.current);
+            if(response) {
+                //console.log(response?.message);
+                navigate('/admin/inventory');
+            }
+        } catch(error) {
+            console.log(error);
+            setErrorData(state => ({...state, default: error?.message}));
         }
     }
 
@@ -103,11 +120,6 @@ const NewItem = () => {
                 hasError = true;
             }
 
-            if(srp <= 0) {
-                setErrorData(state => ({...state, srp: 'SRP must be greater than zero.'}));
-                hasError = true;
-            }
-
             if(!unit) {
                 setErrorData(state => ({...state, units: 'Please select units from the dropdown menu.'}));
                 hasError = true;
@@ -125,11 +137,21 @@ const NewItem = () => {
             form.append('unit', unit);
             form.append('file', image);
 
-            const response = await sendForm(urls?.newitem, form);
-            if(response) {
-                console.log(response?.message);
-                navigate('/admin/inventory');
+            // made it a global since the zero srp prompt is included
+            formData.current = form;
+
+            // move this filter down to allow zero srp
+            if(srp <= 0) {
+                setZeroSrpPrompt({
+                    header: 'Zero SRP', 
+                    message: 'Are you sure you want to allow zero SRP for this item?'
+                });
+                return;
+            //    setErrorData(state => ({...state, srp: 'SRP must be greater than zero.'}));
+            //    hasError = true;
             }
+
+            await requestForNewItem();
         } catch(error) {
             console.log(error);
             setErrorData(state => ({...state, default: error?.message}));
@@ -198,6 +220,17 @@ const NewItem = () => {
             removeEventListener('click', onPageClick);
         }
     }, []);
+    
+    if(zeroSrpPrompt?.header && zeroSrpPrompt?.message) {
+        return (
+            <Prompt 
+                header={zeroSrpPrompt.header} 
+                message={zeroSrpPrompt.message}
+                callback={requestForNewItem}
+                onClose={() => setZeroSrpPrompt({header: '', message: ''})}
+            />
+        )
+    }
 
     if(loading) {
         return (
@@ -418,7 +451,7 @@ const NewItem = () => {
                             <div className="w-1/2 flex flex-col sm:px-4 gap-2">
                                 <label htmlFor="srp" className="font-semibold">
                                     SRP
-                                    <span className="text-red-500">*</span>
+                                    {/*<span className="text-red-500">*</span>*/}
                                 </label>
                                 <input 
                                     id="srp"
@@ -430,7 +463,7 @@ const NewItem = () => {
                                     className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
                                     required
                                 />
-                                <ErrorField message={errorData?.srp || ''} />
+                                {/*<ErrorField message={errorData?.srp || ''} />*/}
                             </div>
                         </div>
                         <div className="flex flex-col sm:px-4 gap-2">
