@@ -203,6 +203,11 @@ const Barcode = () => {
                 nBatches.push(batch);
             }
         }
+
+        if(nBatches?.length === 0) {
+            navigate('/admin/new-batch');
+        }
+
         setDisplayedBatches(nBatches);
         setBatchItems([]); // displayed items to be cleared when new date is selected
     }

@@ -12,6 +12,7 @@ const Calendar = ({year=2025, callback=(date)=>{}, highlight={}}) => {
     const noOfDaysInMonths = daysOfMonths(year);
 
     const handleClicked = (day) => {
+        if(day === 0) return;
         const date = `${year}-${String(month+1).padStart(2, 0)}-${String(day).padStart(2, 0)}`;
         callback(date);
         setOpen(false);
