@@ -97,10 +97,13 @@ const SignIn = () => {
                                 autoComplete="current-password"
                                 required
                             />
-                            <button onClick={ev => {
-                                ev.preventDefault();
-                                setTogglePasswordDisplay(state => !state);
-                            }} className="pr-4" tabIndex="-1">
+                            <button 
+                                type="button"
+                                onClick={ev => {
+                                    ev.preventDefault();
+                                    setTogglePasswordDisplay(state => !state);
+                                }} 
+                                className="pr-4" tabIndex="-1">
                                 { togglePasswordDisplay ? <Eye /> : <EyeOff /> }
                             </button>
                         </div>
