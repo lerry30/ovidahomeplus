@@ -72,6 +72,7 @@ const Inventory = () => {
 
             if(!input) { // if input is an empty string due to backspacing
                 tabNavigate(tabSelected); // display items by status
+                setItemActions(Array(PAGINATE_NO).fill(false)); // reset
                 return;
             }
 
@@ -81,6 +82,8 @@ const Inventory = () => {
                 //console.log(response?.results);
                 const data = response?.results;
                 if(tabSelected==='all') {
+                    //update it to make sure that every item can select actions
+                    setItemActions(Array(data.length).fill(false));
                     setDisplayItems(data);
                 } else {
                     const allActive = [];
@@ -94,8 +97,10 @@ const Inventory = () => {
                     }
 
                     if(tabSelected==='active') {
+                        setItemActions(Array(allActive.length).fill(false));
                         setDisplayItems(allActive);
                     } else {
+                        setItemActions(Array(allInactive.length).fill(false));
                         setDisplayItems(allInactive);
                     }
                 }

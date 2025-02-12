@@ -11,7 +11,7 @@ const generateToken = (res, value) => {
         httpOnly: isInProduction,
         secure: isInProduction,
         sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000
+        maxAge: 7 * 24 * 60 * 60 * 1000
     });
 }
 

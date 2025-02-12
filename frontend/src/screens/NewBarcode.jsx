@@ -23,7 +23,7 @@ const NewBarcode = () => {
     const [items, setItems] = useState([]);
     const [displayItems, setDisplayItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState(0);
     const [errorMessage, setErrorMessage] = useState({header: '', message: ''});
     const [errorData, setErrorData] = useState({quantity: ''});
     const [loading, setLoading] = useState(false);

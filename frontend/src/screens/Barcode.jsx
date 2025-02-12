@@ -210,6 +210,12 @@ const Barcode = () => {
 
         setDisplayedBatches(nBatches);
         setBatchItems([]); // displayed items to be cleared when new date is selected
+
+        setSelectedBatchId(null);
+        setSelectedBatchNo(null);
+        setSelectedBatchDate(null);
+        setSupplierId(null);
+        setSupplierName(null);
     }
 
     const getBatches = async () => {

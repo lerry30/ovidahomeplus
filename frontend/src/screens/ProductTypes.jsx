@@ -68,6 +68,7 @@ const ProductTypes = () => {
 
             if(!input) { // if input is an empty string due to backspacing
                 tabNavigate(tabSelected); // display items by status
+                setProductTypeActions(Array(PAGINATE_NO).fill(false));
                 return;
             }
 
@@ -78,6 +79,7 @@ const ProductTypes = () => {
                 const data = response?.results;
                 if(tabSelected==='all') {
                     setDisplayProductTypes(data);
+                    setProductTypeActions(Array(data?.length).fill(false));
                 } else {
                     const allActive = [];
                     const allInactive = [];
@@ -91,8 +93,10 @@ const ProductTypes = () => {
 
                     if(tabSelected==='active') {
                         setDisplayProductTypes(allActive);
+                        setProductTypeActions(Array(allActive?.length).fill(false));
                     } else {
                         setDisplayProductTypes(allInactive);
+                        setProductTypeActions(Array(allInactive?.length).fill(false));
                     }
                 }
             }
