@@ -5,9 +5,10 @@ import { urls, apiUrl } from '@/constants/urls';
 import { formattedDate, formatDateToLong } from '@/utils/datetime';
 import { toNumber, formattedCurrency } from '@/utils/number';
 
-import Select from '@/components/DropDown';
 import CalendarPicker from '@/components/CalendarPicker';
 import Loading from '@/components/Loading';
+
+import Select, {SelectButton} from '@/components/DropDown';
 
 const Report = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('Daily');
@@ -262,11 +263,10 @@ const Report = () => {
                                 name={`${selectedPeriod || 'Select Period'}`}
                                 className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-50"
                             >
-                                <button
+                                <SelectButton
+                                    text="Daily"
                                     onClick={() => setSelectedPeriod('Daily')}
-                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center">
-                                    Daily
-                                </button>
+                                />
                                 <button
                                     onClick={() => setSelectedPeriod('Monthly')}
                                     className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center">
@@ -290,13 +290,11 @@ const Report = () => {
                                             {Array(today.getFullYear() - YEAR_STARTED + 1).fill(0)?.map((_, index) => {
                                                 const nYear = YEAR_STARTED + index;
                                                 return (
-                                                    <button
+                                                    <SelectButton
                                                         key={index}
+                                                        text={nYear}
                                                         onClick={() => setSelectedYear(nYear)}
-                                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                    >
-                                                        {nYear}
-                                                    </button>
+                                                    />
                                                 )
                                             })}
                                         </Select>
@@ -305,13 +303,11 @@ const Report = () => {
                                             className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10"
                                         >
                                             {months?.map((month, index) => (
-                                                <button
+                                                <SelectButton
                                                     key={index}
+                                                    text={month}
                                                     onClick={() => selectMonth(month, index)}
-                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                >
-                                                    {month}
-                                                </button>
+                                                />
                                             ))}
                                         </Select>
                                     </>
@@ -324,13 +320,11 @@ const Report = () => {
                                             {Array(today.getFullYear() - YEAR_STARTED + 1).fill(0)?.map((_, index) => {
                                                 const nYear = YEAR_STARTED + index;
                                                 return (
-                                                    <button
+                                                    <SelectButton
                                                         key={index}
+                                                        text={nYear}
                                                         onClick={() => selectYear(nYear)}
-                                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                    >
-                                                        {nYear}
-                                                    </button>
+                                                    />
                                                 )
                                             })}
                                         </Select>

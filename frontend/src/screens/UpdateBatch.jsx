@@ -12,7 +12,8 @@ import AppLogo from '@/components/AppLogo';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
-import Select from '@/components/DropDown';
+
+import Select, {SelectButton} from '@/components/DropDown';
 
 const UpdateBatch = () => {
     const [data, setData] = useState({supplierId: 0, batchNo: 0, deliveryReceiptNo: '', deliveryDate: ''});
@@ -177,16 +178,14 @@ const UpdateBatch = () => {
                                         suppliers.map((item, index) => {
                                             if(item?.status !== 'active') return null;
                                             return (
-                                                <button
+                                                <SelectButton
                                                     key={index}
+                                                    text={item?.name}
                                                     onClick={() => {
                                                         setData(state => ({...state, supplierId: item?.id}));
                                                         setSelectedSupplier(item?.name);
                                                     }}
-                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                >
-                                                    {item?.name}
-                                                </button>
+                                                />
                                             )
                                         })
                                     }

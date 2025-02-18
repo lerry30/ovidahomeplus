@@ -1,4 +1,3 @@
-import { ChevronLeft } from 'lucide-react';
 import { useState, useLayoutEffect } from 'react';
 import { getData, sendJSON } from '@/utils/send';
 import { urls } from '@/constants/urls';
@@ -8,11 +7,10 @@ import { isValidDate, formattedDate } from '@/utils/datetime';
 import { quickSort } from '@/utils/sort';
 import { zBatch } from '@/store/batch';
 
-import AppLogo from '@/components/AppLogo';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
-import Select from '@/components/DropDown';
+import Select, {SelectButton} from '@/components/DropDown';
 
 const NewBatch = () => {
     const [data, setData] = useState({supplierId: 0, batchNo: 0, deliveryReceiptNo: '', deliveryDate: ''});
@@ -106,7 +104,7 @@ const NewBatch = () => {
                 const batchesNo = data.map(item => item?.batchNo);
                 const sortedNo = quickSort(batchesNo);
                 let suggestedBatchNo = sortedNo?.length > 0 ? sortedNo[sortedNo.length-1] + 1 : 1;
-                
+
                 const lastBatchDate = data.find(item => item?.batchNo === sortedNo[sortedNo.length-1]);
                 const month = new Date(lastBatchDate?.deliveryDate).getMonth();
 
@@ -153,7 +151,7 @@ const NewBatch = () => {
             <main
                 className="absolute top-0 left-admin-sidebar-sm lg:left-admin-sidebar-lg
                     w-[calc(100vw-var(--admin-sidebar-width-sm))] lg:w-[calc(100vw-var(--admin-sidebar-width-lg))]
-                    h-full md:h-screen bg-neutral-100 p-2 sm:p-4 lg:px-6 
+                    h-full md:h-screen bg-neutral-100 p-2 sm:p-4 lg:px-6
                     flex flex-col overflow-y-auto
                     [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-100
                     [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-thumb]:bg-gray-300"
@@ -173,7 +171,7 @@ const NewBatch = () => {
                                 <span className="text-red-500">*</span>
                             </h3>
                             <div className="flex items-center gap-4">
-                                <Select 
+                                <Select
                                     name={`${selectedSupplier ? selectedSupplier : 'Select Supplier'}`}
                                     className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-20"
                                 >
@@ -181,24 +179,22 @@ const NewBatch = () => {
                                         suppliers.map((item, index) => {
                                             if(item?.status !== 'active') return null;
                                             return (
-                                                <button
+                                                <SelectButton
                                                     key={index}
+                                                    text={item?.name}
                                                     onClick={() => {
                                                         setData(state => ({...state, supplierId: item?.id}));
                                                         setSelectedSupplier(item?.name);
                                                     }}
-                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                >
-                                                    {item?.name}
-                                                </button>
+                                                />
                                             )
                                         })
                                     }
                                 </Select>
                                 {/* Dropdown output */}
                                 {selectedSupplier && (
-                                    <span 
-                                        className="hidden sm:flex 
+                                    <span
+                                        className="hidden sm:flex
                                         bg-green-400/50 p-2 rounded-md"
                                     >
                                         {selectedSupplier}
@@ -212,11 +208,11 @@ const NewBatch = () => {
                                 Batch Number
                                 <span className="text-red-500">*</span>
                             </label>
-                            <input 
+                            <input
                                 id="batch-number"
                                 value={data?.batchNo}
                                 onChange={elem => setData(state => ({...state, batchNo: elem.target.value}))}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
                                 placeholder="Batch Number"
                                 required
                             />
@@ -224,7 +220,7 @@ const NewBatch = () => {
                         </div>
                         <div className="flex flex-col sm:px-4 gap-2">
                             <label htmlFor="delivery-receipt_no" className="font-semibold">Delivery Receipt Number</label>
-                            <input 
+                            <input
                                 id="delivery-receipt_no"
                                 value={data?.deliveryReceiptNo ?? ''}
                                 onChange={elem => {
@@ -232,7 +228,7 @@ const NewBatch = () => {
                                     const nInput = input.replace(/[^0-9,]+/g, '');
                                     setData(state => ({...state, deliveryReceiptNo: nInput}));
                                 }}
-                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4" 
+                                className="max-w-96 outline-none border-2 border-neutral-400 rounded-lg py-2 px-4"
                                 placeholder="Delivery Receipt Number"
                             />
                         </div>
@@ -240,7 +236,7 @@ const NewBatch = () => {
                             <label htmlFor="delivery-date" className="font-semibold">
                                 Delivery Date
                             </label>
-                            <input 
+                            <input
                                 id="delivery-date"
                                 type="date"
                                 value={data?.deliveryDate}
@@ -254,14 +250,14 @@ const NewBatch = () => {
                             <ErrorField message={errorData?.deliveryDate || ''} />
                         </div>
                         <div className="sm:px-4 sm:py-2 flex gap-2">
-                            <Link 
+                            <Link
                                 to="/admin/barcodes"
                                 className="flex items-center justify-center leading-none font-bold rounded-lg p-4 text-white bg-gray-500 hover:bg-gray-600"
                             >
                                 Cancel
                             </Link>
-                            <button 
-                                onClick={batch} 
+                            <button
+                                onClick={batch}
                                 className="flex items-center justify-center leading-none bg-green-600 text-white font-bold rounded-lg p-4 hover:bg-green-800"
                             >
                                 Add Batch

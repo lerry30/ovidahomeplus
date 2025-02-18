@@ -1,4 +1,4 @@
-import { Plus, Minus, X, ReceiptText } from 'lucide-react';
+import { X, ReceiptText } from 'lucide-react';
 import { ErrorModal } from '@/components/Modal';
 import { useNavigate } from 'react-router-dom';
 import { useState, useLayoutEffect, useRef } from 'react';

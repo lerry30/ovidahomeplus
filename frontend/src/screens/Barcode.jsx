@@ -4,12 +4,13 @@ import { Plus, Pencil, Printer, ChevronLeft, ChevronRight, Trash2, AlignJustify,
 import { useLayoutEffect, useState, useRef } from 'react';
 import { urls, apiUrl } from '@/constants/urls';
 import { getData, sendJSON } from '@/utils/send';
-import { formattedNumber, toNumber } from '@/utils/number';
+import { formattedNumber } from '@/utils/number';
 import { zBatch } from '@/store/batch';
 
 import Loading from '@/components/Loading';
-import Select from '@/components/DropDown';
 import Calendar from '@/components/Calendar';
+
+import Select, {SelectButton} from '@/components/DropDown';
 
 const Barcode = () => {
     const batchId = zBatch(state => state?.id);
@@ -306,7 +307,8 @@ const Barcode = () => {
                     alt="ovida-product" 
                     className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                     onError={ev => {
-                        ev.target.src=`${apiUrl}/image-off.png`
+                        // just for dev and production to prevent error
+                        ev.target.src='/image-off.png';
                         ev.onerror=null; // prevents infinite loop
                     }}
                 />
@@ -444,13 +446,11 @@ const Barcode = () => {
                                     Array(today.getFullYear()-2024+1).fill(0).map((_, index) => {
                                         const text = index + 2024;
                                         return (
-                                            <button
+                                            <SelectButton 
                                                 key={index}
+                                                text={text}
                                                 onClick={() => setSelectedYear(text)}
-                                                className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                            >
-                                                {text}
-                                            </button>
+                                            />
                                         )
                                     })
                                 }
@@ -479,16 +479,14 @@ const Barcode = () => {
                                     {
                                         displayedBatches.map((item, index) => {
                                             return (
-                                                <button
+                                                <SelectButton
                                                     key={index}
+                                                    text={`${item?.supplierName} Batch ${item?.batchNo}${item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}`}
                                                     onClick={() => {
                                                         selectBatch(item);
                                                         batchTrigger.current = true;
                                                     }}
-                                                    className="text-nowrap text-[16px] p-2 sm:px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                >
-                                                    {item?.supplierName} Batch {item?.batchNo}{item?.deliveryDate ? ` - ${item?.deliveryDate}` : ''}
-                                                </button>
+                                                />
                                             )
                                         })
                                     }
@@ -578,7 +576,8 @@ const Barcode = () => {
                                                             alt="ovida-product" 
                                                             className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                             onError={ev => {
-                                                                ev.target.src=`${apiUrl}/image-off.png`
+                                                                // just for dev and production to prevent error
+                                                                ev.target.src='/image-off.png';
                                                                 ev.onerror=null; // prevents infinite loop
                                                             }}
                                                         />
@@ -632,7 +631,8 @@ const Barcode = () => {
                                                                     alt="ovida-product-barcode" 
                                                                     className="w-[124px] h-[50px] object-contain"
                                                                     onError={ev => {
-                                                                        ev.target.src=`${apiUrl}/image-off.png`
+                                                                        // just for dev and production to prevent error
+                                                                        ev.target.src='/image-off.png';
                                                                         ev.onerror=null; // prevents infinite loop
                                                                     }}
                                                                 />

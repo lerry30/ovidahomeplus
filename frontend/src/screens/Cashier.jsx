@@ -244,7 +244,8 @@ const Cashier = () => {
                                                 alt="ovida-product"
                                                 className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                 onError={ev => {
-                                                    ev.target.src=`${apiUrl}/image-off.png`
+                                                    // just for dev and production to prevent error
+                                                    ev.target.src='/image-off.png';
                                                     ev.onerror=null; // prevents infinite loop
                                                 }}
                                             />

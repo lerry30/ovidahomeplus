@@ -1,8 +1,21 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { toNumber } from '@/utils/number';
+
+export const SelectButton = ({text='', onClick=()=>{}}) => {
+    return (
+        <button
+            onClick={onClick}
+            className="overflow-hidden min-h-[40px] text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 text-ellipsis flex gap-2 items-center"
+        >
+            {text}
+        </button>
+    );
+}
 
 const Select = ({children, className='', name=''}) => {
-    const [ open, setOpen ] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [maxHeight, setMaxHeight] = useState(0);
     const dropdown = useRef(null);
     const dropdownArrow = useRef(null);
 
@@ -26,8 +39,15 @@ const Select = ({children, className='', name=''}) => {
     }
     
     useEffect(() => {
+        const rect = dropdown.current.getBoundingClientRect();
+        const top = toNumber(rect?.y) + toNumber(rect?.height);
+        const remainingHeight = innerHeight - top;
+        setMaxHeight(remainingHeight);
+
         addEventListener('click', focusOutside);
-        return () => removeEventListener('click', focusOutside);
+        return () => {
+            removeEventListener('click', focusOutside);
+        }
     }, []);
 
     return (
@@ -40,8 +60,9 @@ const Select = ({children, className='', name=''}) => {
             </button>
             <div 
                 onClick={toggle}
-                className={ `absolute flex-col mt-1 p-2 border border-neutral-300 shadow-lg bg-white rounded-lg 
+                className={ `absolute overflow-y-auto flex-col mt-1 p-2 border border-neutral-300 shadow-lg bg-white rounded-lg 
                     ${ open ? 'flex' : 'hidden' }`}
+                style={{maxHeight: `${maxHeight}px`}}
             >
                 { children }
             </div>

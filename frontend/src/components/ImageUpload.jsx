@@ -1,7 +1,6 @@
 import { Image } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { toNumber } from '@/utils/number';
-import { apiUrl } from '@/constants/urls';
 
 const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
@@ -88,7 +87,8 @@ const ImageUpload = ({fileData: [file, setFile], initialImageSrc=undefined, clas
                             alt="Preview Image"
                             className="w-full h-full object-contain rounded-md"
                             onError={ev => {
-                                ev.target.src=`${apiUrl}/image-off.png`
+                                // just for dev and production to prevent error
+                                ev.target.src='/image-off.png';
                                 ev.onerror=null; // prevents infinite loop
                             }}
                         />

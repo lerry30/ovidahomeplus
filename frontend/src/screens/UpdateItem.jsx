@@ -12,7 +12,8 @@ import ImageUpload from '@/components/ImageUpload';
 import SidebarLayout from '@/components/Sidebar';
 import Loading from '@/components/Loading';
 import ErrorField from '@/components/ErrorField';
-import Select from '@/components/DropDown';
+
+import Select, {SelectButton} from '@/components/DropDown';
 
 const UpdateItem = () => {
     const currentSupplierName = zItem(state => state?.supplierName);
@@ -347,15 +348,13 @@ const UpdateItem = () => {
                                         productTypes.map((item, index) => {
                                             if(item?.status !== 'active') return null;
                                             return (
-                                                <button
+                                                <SelectButton
                                                     key={index}
+                                                    text={item?.name}
                                                     onClick={() => {
                                                         setData(state => ({...state, productType: item?.name, productTypeId: item?.id}));
                                                     }}
-                                                    className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                >
-                                                    {item?.name}
-                                                </button>
+                                                />
                                             )
                                         })
                                     }
@@ -416,15 +415,13 @@ const UpdateItem = () => {
                                             suppliers.map((item, index) => {
                                                 if(item?.status !== 'active') return null;
                                                 return (
-                                                    <button
+                                                    <SelectButton
                                                         key={index}
+                                                        text={item?.name}
                                                         onClick={() => {
                                                             setData(state => ({...state, supplier: item?.name, supplierId: item?.id}));
                                                         }}
-                                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                                    >
-                                                        {item?.name}
-                                                    </button>
+                                                    />
                                                 )
                                             })
                                         }
@@ -516,22 +513,18 @@ const UpdateItem = () => {
                             </h3>
                             <div className="flex items-center gap-4">
                                 <Select name="Select Unit" className="w-fit py-2 max-h-[40px] rounded-lg border-2 border-neutral-400 z-10">
-                                    <button
+                                    <SelectButton
+                                        text="pcs"
                                         onClick={() => {
                                             setData(state => ({...state, units: 'pcs'}));
                                         }}
-                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                    >
-                                        pcs
-                                    </button>
-                                    <button
+                                    />
+                                    <SelectButton
+                                        text="set"
                                         onClick={() => {
                                             setData(state => ({...state, units: 'set'}));
                                         }}
-                                        className="text-nowrap text-[16px] p-2 px-4 rounded-lg hover:bg-gray-200 overflow-x-hidden text-ellipsis flex gap-2 items-center"
-                                    >
-                                        set
-                                    </button>
+                                    />
                                 </Select>
                                 {/* Dropdown output */}
                                 {data?.units && <span className="bg-green-400/50 p-2 rounded-md">{data?.units}</span>}

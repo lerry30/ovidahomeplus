@@ -1,8 +1,8 @@
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ErrorModal } from '@/components/Modal';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useLayoutEffect, useState, useRef } from 'react';
-import { getData, sendJSON } from '@/utils/send';
+import { sendJSON } from '@/utils/send';
 import { urls, apiUrl } from '@/constants/urls';
 import { toNumber, formattedNumber } from '@/utils/number';
 import { isValidDate, formattedDate } from '@/utils/datetime';
@@ -289,7 +289,8 @@ const NewBarcode = () => {
                                                                 alt="ovida-product" 
                                                                 className="w-[80px] h-[80px] object-contain rounded-lg border mb-4"
                                                                 onError={ev => {
-                                                                    ev.target.src=`${apiUrl}/image-off.png`
+                                                                    // just for dev and production to prevent error
+                                                                    ev.target.src='/image-off.png';
                                                                     ev.onerror=null; // prevents infinite loop
                                                                 }}
                                                             />
@@ -345,7 +346,8 @@ const NewBarcode = () => {
                                                                         alt="ovida-product-barcode" 
                                                                         className="w-[120px] h-[50px] object-contain"
                                                                         onError={ev => {
-                                                                            ev.target.src=`${apiUrl}/image-off.png`
+                                                                            // just for dev and production to prevent error
+                                                                            ev.target.src='/image-off.png';
                                                                             ev.onerror=null; // prevents infinite loop
                                                                         }}
                                                                     /> */}

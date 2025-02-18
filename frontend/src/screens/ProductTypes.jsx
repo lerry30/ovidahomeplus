@@ -269,7 +269,8 @@ const ProductTypes = () => {
                                                             alt="ovida-product-type" 
                                                             className="size-[80px] rounded-lg border object-contain"
                                                             onError={ev => {
-                                                                ev.target.src=`${apiUrl}/image-off.png`
+                                                                // just for dev and production to prevent error
+                                                                ev.target.src='/image-off.png';
                                                                 ev.onerror=null; // prevents infinite loop
                                                             }}
                                                         />

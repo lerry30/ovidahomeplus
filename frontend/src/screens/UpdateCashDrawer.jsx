@@ -16,7 +16,7 @@ const UpdateCashDrawer = () => {
     const [loading, setLoading] = useState(false);
     const [isUpdated, setIsUpdated] = useState(false);
 
-    const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
+    //const wordToNumberDenomination = {onethousand: 1000, fivehundred: 500, twohundred: 200, onehundred: 100, fifty: 50, twenty: 20, ten: 10, five: 5, one: 1};
     const navigate = useNavigate();
 
     const handleUpdateDenom = async () => {

@@ -1,5 +1,5 @@
 import Loading from '@/components/Loading';
-import AnimateNumber from '@/components/AnimateNumber';
+//import AnimateNumber from '@/components/AnimateNumber';
 
 import { getData } from '@/utils/send';
 import { urls } from '@/constants/urls';
