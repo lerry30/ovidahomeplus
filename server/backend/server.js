@@ -22,6 +22,8 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { getDir } from './utils/fileDir.js';
 import { allowResourceAccess } from './middleware/corsFileMiddleware.js';
 
+import { sheetToDatabase } from './sheet.js';
+
 dotenv.config();
 // database
 // if it cannot connect to database, it would run process.exit(1), which terminate the program
@@ -71,6 +73,8 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/cashdrawer', cashDrawerRoutes);
+
+//sheetToDatabase();
 
 // fall back when route is not found
 app.use(notFound);

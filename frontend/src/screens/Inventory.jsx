@@ -225,7 +225,7 @@ const Inventory = () => {
                                     header: 'Status Updated Successfully', 
                                     message: response?.message
                                 });
-                            getItems();
+                            getItems(pageOffset.current);
                         }
                     } catch(error) {
                         console.log(error?.message);
@@ -260,7 +260,7 @@ const Inventory = () => {
                                     header: 'Status Updated Successfully', 
                                     message: response?.message
                                 });
-                            getItems();
+                            getItems(pageOffset.current);
                         }
                     } catch(error) {
                         console.log(error?.message);
