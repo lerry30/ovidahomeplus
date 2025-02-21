@@ -118,7 +118,7 @@ const ProductTypes = () => {
             const response = await sendJSON(urls?.updateproducttypestatus, payload, 'PATCH');
             if(response) {
                 // console.log(response?.message || '');
-                await getProductTypes();
+                await getProductTypes(pageOffset.current);
             }
         } catch(error) {
             console.log(error);
