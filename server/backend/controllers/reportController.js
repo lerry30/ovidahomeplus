@@ -123,8 +123,10 @@ const getReportByMonth = requestHandler(async (req, res, database) => {
 
     const items = [];
     for(let i = 0; i < numberOfDays; i++) {
+        const fMonth = String(month).padStart(2, 0);
+        const fDay = String(i+1).padStart(2, 0);
         const nItem = {
-            date: `${year}-${month}-${i + 1}`,
+            date: `${year}-${fMonth}-${fDay}`,
             grossSales: 0,
             totalExpenses: 0,
             //totalPayments: 0,
